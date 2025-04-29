@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title th:text="'Fog Carport Service - ' + ${#strings.capitalize( (currentPage != null ? currentPage : 'Start') )}">Fog Carport Service</title>
+
     <link href="../public/css/index.css" th:href="@{/css/index.css}" rel="stylesheet"/>
 </head>
 <body>
@@ -28,23 +29,14 @@
                             <span class="step-text">Start</span>
                         </a>
                     </li>
-                    <li th:classappend="${currentPage == 'specifikationer'} ? 'active'">
-                        <a th:href="@{/specifikationer}">
-                            <span class="step-indicator" data-step-number="2"></span>
-                            <span class="step-text">Specifikationer</span>
-                        </a>
+                    <li th:classappend="${currentPage == 'specifications'} ? 'active'"> <a th:href="@{/specifications}"> <span class="step-indicator" data-step-number="2"></span>
+                        <span class="step-text">Specifikationer</span> </a>
                     </li>
-                    <li th:classappend="${currentPage == 'tilfoejelser'} ? 'active'">
-                        <a th:href="@{/tilfoejelser}">
-                            <span class="step-indicator" data-step-number="3"></span>
-                            <span class="step-text">Tilføjelser</span>
-                        </a>
+                    <li th:classappend="${currentPage == 'additions'} ? 'active'"> <a th:href="@{/additions}"> <span class="step-indicator" data-step-number="3"></span>
+                        <span class="step-text">Tilføjelser</span> </a>
                     </li>
-                    <li th:classappend="${currentPage == 'oplysninger'} ? 'active'">
-                        <a th:href="@{/oplysninger}">
-                            <span class="step-indicator" data-step-number="4"></span>
-                            <span class="step-text">Oplysninger</span>
-                        </a>
+                    <li th:classappend="${currentPage == 'details'} ? 'active'"> <a th:href="@{/details}"> <span class="step-indicator" data-step-number="4"></span>
+                        <span class="step-text">Oplysninger</span> </a>
                     </li>
                 </ul>
             </nav>
@@ -54,7 +46,8 @@
             <div class="content-body">
                 <div class="welcome-container">
                     <div class="welcome-box">
-                        <div class="welcome-text-box"> <h1>Velkommen til Fogs Carport Service</h1>
+                        <div class="welcome-text-box">
+                            <h1>Velkommen til Fogs Carport Service</h1>
                             <p>
                                 Du vil blive guidet igennem de forskellige valgmuligheder
                                 for at vi kan give dig et uforpligtende tilbud på
@@ -66,7 +59,7 @@
                         </div>
                     </div>
                     <div class="button-container">
-                        <a th:href="@{/specifikationer}" class="btn btn-primary">Påbegynd</a>
+                        <a th:href="@{/specifications}" class="btn btn-primary">Påbegynd</a>
                     </div>
                 </div>
             </div>
