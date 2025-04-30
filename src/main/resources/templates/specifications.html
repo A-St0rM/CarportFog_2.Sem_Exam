@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="da" xmlns:th="http://www.thymeleaf.org" th:attr="data-page=${currentPage}">
+<html lang="da" xmlns:th="http://www.thymeleaf.org" th:attr="data-page=${ (currentPage != null ? currentPage : 'specifications') }">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -60,33 +60,51 @@
                                 <select id="carport-width" name="carportWidth" required>
                                     <option value="" disabled selected>Vælg*</option>
                                     <option value="240">240 cm</option>
+                                    <option value="270">270 cm</option>
                                     <option value="300">300 cm</option>
+                                    <option value="330">330 cm</option>
                                     <option value="360">360 cm</option>
+                                    <option value="390">390 cm</option>
+                                    <option value="420">420 cm</option>
+                                    <option value="450">450 cm</option>
+                                    <option value="480">480 cm</option>
+                                    <option value="510">510 cm</option>
+                                    <option value="540">540 cm</option>
+                                    <option value="570">570 cm</option>
+                                    <option value="600">600 cm</option>
                                 </select>
                             </div>
                             <div class="form-group">
                                 <label for="carport-length">Carport længde (cm)</label>
                                 <select id="carport-length" name="carportLength" required>
                                     <option value="" disabled selected>Vælg*</option>
-                                    <option value="480">480 cm</option>
-                                    <option value="540">540 cm</option>
-                                    <option value="600">600 cm</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="carport-height">Carport højde (cm)</label>
-                                <select id="carport-height" name="carportHeight" required>
-                                    <option value="" disabled selected>Vælg*</option>
-                                    <option value="210">210 cm</option>
                                     <option value="240">240 cm</option>
+                                    <option value="270">270 cm</option>
+                                    <option value="300">300 cm</option>
+                                    <option value="330">330 cm</option>
+                                    <option value="360">360 cm</option>
+                                    <option value="390">390 cm</option>
+                                    <option value="420">420 cm</option>
+                                    <option value="450">450 cm</option>
+                                    <option value="480">480 cm</option>
+                                    <option value="510">510 cm</option>
+                                    <option value="540">540 cm</option>
+                                    <option value="570">570 cm</option>
+                                    <option value="600">600 cm</option>
+                                    <option value="630">630 cm</option>
+                                    <option value="660">660 cm</option>
+                                    <option value="690">690 cm</option>
+                                    <option value="720">720 cm</option>
+                                    <option value="750">750 cm</option>
+                                    <option value="780">780 cm</option>
                                 </select>
                             </div>
+
                             <div class="form-group">
-                                <label for="shed-option">Med eller uden redskabsrum</label>
-                                <select id="shed-option" name="hasShed" required>
-                                    <option value="" disabled selected>Vælg*</option>
-                                    <option value="false">Uden redskabsrum</option>
-                                    <option value="true">Med redskabsrum</option>
+                                <label for="trapez-roof-option">Vil du have et trapeztag på din carport?</label>
+                                <select id="trapez-roof-option" name="hasTrapezRoof" required>
+                                    <option value="true" selected>Med trapeztag</option>
+                                    <option value="false">Uden tagplader</option>
                                 </select>
                             </div>
                             <div class="form-navigation">

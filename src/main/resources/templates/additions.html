@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="da" xmlns:th="http://www.thymeleaf.org" th:attr="data-page=${ (currentPage != null ? currentPage : 'additions') }">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title th:text="'Fog Carport Service - ' + ${#strings.capitalize( (currentPage != null ? currentPage : 'additions') )}">Fog Carport Service</title>
+  <link href="../public/css/index.css" th:href="@{/css/index.css}" rel="stylesheet"/>
+</head>
+<body>
+<div class="container">
+  <header class="main-header">
+    <img class="logo-img" src="/images/Fog_logo.png" alt="Fog Logo">
+  </header>
+
+  <div class="content-header">
+    <div class="sub-logo">Få et uforpligtende Quick-Byg tilbud - Carport med fladt tag</div>
+  </div>
+
+  <div class="main-content-area">
+    <aside class="sidebar">
+      <nav class="steps-nav">
+        <ul>
+          <li class="completed" th:classappend="${currentPage == 'start'} ? 'active'">
+            <a th:href="@{/}">
+              <span class="step-indicator" data-step-number="1"></span>
+              <span class="step-text">Start</span>
+            </a>
+          </li>
+          <li class="completed" th:classappend="${currentPage == 'specifications'} ? 'active'">
+            <a th:href="@{/specifications}">
+              <span class="step-indicator" data-step-number="2"></span>
+              <span class="step-text">Specifikationer</span>
+            </a>
+          </li>
+          <li th:classappend="${currentPage == 'additions'} ? 'active'">
+            <a th:href="@{/additions}">
+              <span class="step-indicator" data-step-number="3"></span>
+              <span class="step-text">Tilføjelser</span>
+            </a>
+          </li>
+          <li th:classappend="${currentPage == 'details'} ? 'active'">
+            <a th:href="@{/details}">
+              <span class="step-indicator" data-step-number="4"></span>
+              <span class="step-text">Oplysninger</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </aside>
+
+    <main class="content">
+      <div class="content-body">
+        <h2 class="page-title">Tilføjelser</h2>
+        <div class="spec-layout">
+          <div class="spec-form">
+            <form method="post" th:action="@{/additions}" id="additions-form">
+
+              <div class="form-group">
+                <label for="include-shed">Kunne du tænke dig et redskabsrum i din carport?</label>
+                <select id="include-shed" name="includeShed" required>
+                  <option value="false" selected>Nej</option>
+                  <option value="true">Ja</option>
+                </select>
+                <p class="disclaimer-text hidden" id="shed-disclaimer">
+                  Detaljer og pris for redskabsrum aftales ved efterfølgende kontakt (forvent merpris på 1500-3000 kr. afhængig af størrelse).
+                </p>
+              </div>
+
+              <div class="form-group">
+                <label for="builder">Hvem skal bygge carporten?</label>
+                <select id="builder" name="builder" required>
+                  <option value="fog" selected>Fog</option>
+                  <option value="customer">Dig selv</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="paint-option">Vil du tilkøbe maling til carporten?</label>
+                <select id="paint-option" name="needsPaint" required>
+                  <option value="false" selected>Nej</option>
+                  <option value="true">Ja</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="special-requests">Evt. særlige ønsker?</label>
+                <textarea id="special-requests" name="specialRequests" rows="4" placeholder="Skriv særlige ønsker her"></textarea>
+              </div>
+
+              <div class="form-navigation">
+                <a th:href="@{/specifications}" class="btn btn-secondary">Forrige trin</a>
+                <button type="submit" class="btn btn-primary">Næste trin</button>
+              </div>
+            </form>
+          </div>
+
+          <div class="spec-info additions-image-container">
+            <img src="/images/Woodpile.jpg" alt="Træ til carport">
+          </div>
+        </div> </div> </main>
+  </div> </div> <script>
+  // Wait for the HTML document to be fully loaded
+  document.addEventListener('DOMContentLoaded', function() {
+    // Get references to the dropdown and the disclaimer paragraph
+    const shedSelect = document.getElementById('include-shed');
+    const shedDisclaimer = document.getElementById('shed-disclaimer');
+
+    // Function to check the dropdown value and show/hide the disclaimer
+    function toggleDisclaimer() {
+      if (shedSelect.value === 'true') {
+        // If 'Yes' (value 'true') is selected, remove the 'hidden' class
+        shedDisclaimer.classList.remove('hidden');
+      } else {
+        // Otherwise, add the 'hidden' class
+        shedDisclaimer.classList.add('hidden');
+      }
+    }
+
+    // Add an event listener to the dropdown to call toggleDisclaimer on change
+    shedSelect.addEventListener('change', toggleDisclaimer);
+
+    // Optional: Call the function once initially in case the default value should show the disclaimer
+    // (Not needed here since default is 'false' which should hide it)
+    // toggleDisclaimer();
+  });
+</script>
+</body>
+</html>
