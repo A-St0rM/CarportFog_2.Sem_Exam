@@ -4,23 +4,37 @@ public class Order {
 
     private int orderId;
     private int carportWidth;
-    private int carportHeight;
+    private int carportLength;
     private boolean isPaid;
+    private int totalPrice;
     private Customer customer;
 
-    public Order(int orderId, int carportWidth, int carportHeight, boolean isPaid, Customer customer) {
+    public Order(int orderId, int carportWidth, int carportLength, int totalPrice, Customer customer) {
         this.orderId = orderId;
         this.carportWidth = carportWidth;
-        this.carportHeight = carportHeight;
+        this.carportLength = carportLength;
+        this.isPaid = false;
+        this.customer = customer;
+    }
+
+    public Order(int carportWidth, int carportLength, int totalPrice, boolean isPaid, Customer customer) {
+        this.totalPrice = totalPrice;
+        this.carportWidth = carportWidth;
+        this.carportLength = carportLength;
         this.isPaid = isPaid;
         this.customer = customer;
     }
 
-    public Order(int carportWidth, int carportHeight, boolean isPaid, Customer customer) {
+    public Order(int carportWidth, int carportLength, int totalPrice, Customer customer) {
+        this.totalPrice = totalPrice;
         this.carportWidth = carportWidth;
-        this.carportHeight = carportHeight;
-        this.isPaid = isPaid;
+        this.carportLength = carportLength;
+        this.isPaid = false;
         this.customer = customer;
+    }
+
+    public int getTotalPrice() {
+        return totalPrice;
     }
 
     public int getOrderId() {
@@ -31,8 +45,8 @@ public class Order {
         return carportWidth;
     }
 
-    public int getCarportHeight() {
-        return carportHeight;
+    public int getCarportLength() {
+        return carportLength;
     }
 
     public boolean isPaid() {
@@ -42,4 +56,5 @@ public class Order {
     public Customer getCustomer() {
         return customer;
     }
+
 }

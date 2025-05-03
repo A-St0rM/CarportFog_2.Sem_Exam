@@ -1,30 +1,30 @@
 package app.entities;
 
-public class BOMItem {
+public class BOM {
 
-    private int OrderItemId;
+    private int bomId;
     private int quantity;
     private String description;
     private Order order;
     private MaterialVariant materialVariant;
 
-    public BOMItem(int orderItemId, int quantity, String description, Order order, MaterialVariant materialVariant) {
-        this.OrderItemId = orderItemId;
+    public BOM(int bomId, int quantity, String description, Order order, MaterialVariant materialVariant) {
+        this.bomId = bomId;
         this.quantity = quantity;
         this.description = description;
         this.order = order;
         this.materialVariant = materialVariant;
     }
 
-    public BOMItem(int quantity, String description, Order order, MaterialVariant materialVariant) {
+    public BOM(int quantity, String description, Order order, MaterialVariant materialVariant) {
         this.quantity = quantity;
         this.description = description;
         this.order = order;
         this.materialVariant = materialVariant;
     }
 
-    public int getOrderItemId() {
-        return OrderItemId;
+    public int getBomId() {
+        return bomId;
     }
 
     public int getQuantity() {
