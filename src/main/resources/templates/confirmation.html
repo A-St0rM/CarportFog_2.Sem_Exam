@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="da" xmlns:th="http://www.thymeleaf.org" th:attr="data-page=${ (currentPage != null ? currentPage : 'confirmation') }">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title th:text="'Fog Carport Service - ' + ${#strings.capitalize( (currentPage != null ? currentPage : 'Bekræftelse') )}">Fog Carport Service</title>
+  <link href="../public/css/index.css" th:href="@{/css/index.css}" rel="stylesheet"/>
+</head>
+<body>
+
+<div class="container">
+  <header class="main-header">
+    <img class="logo-img" src="/images/Fog_logo.png" alt="Fog Logo">
+  </header>
+
+  <div class="content-header">
+    <div class="sub-logo">Få et uforpligtende Quick-Byg tilbud - Carport med fladt tag</div>
+  </div>
+
+  <div class="main-content-area">
+    <aside class="sidebar">
+      <nav class="steps-nav">
+        <ul>
+          <li class="completed">
+            <a th:href="@{/}">
+              <span class="step-indicator" data-step-number="1"></span>
+              <span class="step-text">Start</span>
+            </a>
+          </li>
+          <li class="completed">
+            <a th:href="@{/specifications}">
+              <span class="step-indicator" data-step-number="2"></span>
+              <span class="step-text">Specifikationer</span>
+            </a>
+          </li>
+          <li class="completed">
+            <a th:href="@{/additions}">
+              <span class="step-indicator" data-step-number="3"></span>
+              <span class="step-text">Tilføjelser</span>
+            </a>
+          </li>
+          <li class="completed">
+            <a th:href="@{/details}">
+              <span class="step-indicator" data-step-number="4"></span>
+              <span class="step-text">Oplysninger</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </aside>
+
+    <main class="content">
+      <div class="content-body">
+        <div class="confirmation-container">
+          <h2 class="confirmation-header">Tak for din forespørgsel!</h2>
+          <p class="confirmation-main">
+            Vi har netop sendt en mail til dig med dine indtastede oplysninger og en skitsetegning af din valgte carport.
+          </p>
+          <p class="confirmation-sub">
+            Du vil blive kontaktet af os inden for en af de kommende dage vedrørende det endelige tilbud.
+            Har du spørgsmål eller ændringer, står vores kontaktoplysninger i den mail, du har modtaget.
+          </p>
+          <div class="svg-section">
+            <h3 class="svg-placeholder-title">SVG tegning af din carport</h3>
+            <div class="svg-placeholder" id="carport-svg-confirmation">
+              (Tegning vises her)
+            </div>
+          </div>
+          <div class="button-container confirmation-button">
+            <a th:href="@{/}" class="btn btn-primary">Gå tilbage til forsiden</a>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+</body>
+</html>

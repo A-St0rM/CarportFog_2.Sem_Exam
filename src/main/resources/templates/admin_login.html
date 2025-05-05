@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="da" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fog Admin - Login</title>
+    <link href="../public/css/index.css" th:href="@{/css/index.css}" rel="stylesheet"/>
+</head>
+<body>
+<a th:href="@{/}" class="admin-login-button">Tilbage til forsiden</a>
+<div class="container">
+    <header class="main-header">
+        <img class="logo-img" src="/images/Fog_logo.png" alt="Fog Logo">
+    </header>
+
+    <div class="content-header">
+        <div class="sub-logo">Admin side</div>
+    </div>
+
+    <main class="admin-content">
+        <div class="login-form-container">
+            <h3>Admin Login</h3>
+            <form method="post" th:action="@{/admin/login}" id="admin-login-form">
+                <div class="form-group">
+                    <label for="admin-email">Email</label>
+                    <input type="email" id="admin-email" name="email" required placeholder="Indtast admin email">
+                </div>
+                <div class="form-group">
+                    <label for="admin-password">Kode</label>
+                    <input type="password" id="admin-password" name="password" required placeholder="Indtast kodeord">
+                </div>
+                <div class="form-navigation login-button-container">
+                    <button type="submit" class="btn btn-primary">Login</button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+</div> </body>
+</html>

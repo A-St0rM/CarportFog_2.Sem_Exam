@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="da" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fog Admin - Dashboard</title>
+    <link href="../public/css/index.css" th:href="@{/css/index.css}" rel="stylesheet"/>
+</head>
+<body>
+
+<div class="container">
+    <header class="main-header">
+        <img class="logo-img" src="/images/Fog_logo.png" alt="Fog Logo">
+        <a th:href="@{/}" class="admin-action-button">Forside</a>
+    </header>
+
+    <div class="content-header">
+        <div class="sub-logo">Admin side</div>
+    </div>
+
+    <main class="admin-content dashboard">
+
+        <h2 class="page-title admin-title">Alle bestillinger</h2>
+
+        <div class="admin-controls">
+            <div class="search-bar">
+                <input type="search" id="order-search" name="search" placeholder="Søg i bestillinger...">
+                <button type="button" class="btn btn-secondary btn-small">Søg</button>
+            </div>
+            <div class="filter-bar">
+                <label for="status-filter">Filter status:</label>
+                <select id="status-filter" name="statusFilter">
+                    <option value="all" selected>Alle</option>
+                    <option value="pending">Afventende</option>
+                    <option value="paid">Betalt</option>
+                    <option value="completed">Gennemført</option>
+                    <option value="rejected">Afslået</option>
+                </select>
+                <button type="button" class="btn btn-secondary btn-small">Filter</button> </div>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                <tr>
+                    <th>Navn</th>
+                    <th>Adresse</th>
+                    <th>Postnr</th>
+                    <th>By</th>
+                    <th>Telefon</th>
+                    <th>Email</th>
+                    <th>Længde</th> <th>Bredde</th> <th>Trapez?</th> <th>Skur?</th> <th>Bygger?</th> <th>Maling?</th> <th>Ønsker</th> <th class="col-status">Status</th> <th class="col-comment">Kommentar</th> <th>Handlinger</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>Test Testesen</td>
+                    <td>Testvej 1</td>
+                    <td>1234</td>
+                    <td>Testby</td>
+                    <td>99887766</td>
+                    <td>test@test.dk</td>
+                    <td><input type="number" class="input-in-table" name="length_example" value="600" /></td>
+                    <td><input type="number" class="input-in-table" name="width_example" value="360" /></td>
+                    <td>
+                        <select class="input-in-table" name="trapez_example">
+                            <option value="true" selected>Ja</option>
+                            <option value="false">Nej</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select class="input-in-table" name="shed_example">
+                            <option value="true">Ja</option>
+                            <option value="false" selected>Nej</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select class="input-in-table" name="builder_example">
+                            <option value="fog" selected>Fog</option>
+                            <option value="customer">Selv</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select class="input-in-table" name="paint_example">
+                            <option value="true">Ja</option>
+                            <option value="false" selected>Nej</option>
+                        </select>
+                    </td>
+                    <td class="td-small-text"><textarea class="input-in-table" rows="1" name="requests_example">Gerne ekstra stolper...</textarea></td>
+                    <td class="col-status">
+                        <select name="orderStatus_example">
+                            <option value="pending" selected>Afventende</option>
+                            <option value="paid">Betalt</option>
+                            <option value="completed">Gennemført</option>
+                            <option value="rejected">Afslået</option>
+                        </select>
+                    </td>
+                    <td class="col-comment"><textarea name="adminComment_example" rows="2" placeholder="Tilføj note..."></textarea></td>
+                    <td class="actions-cell">
+                        <button type="button" class="btn-action btn-delete">Slet</button>
+                        <button type="button" class="btn-action btn-send-link">Send link</button>
+                        <button type="button" class="btn-action btn-recalculate">Opdater beregning</button>
+                    </td>
+                </tr>
+                <tr th:each="order : ${orders}">
+                    <td th:text="${order.customerName}"></td>
+                    <td th:text="${order.customerAddress}"></td>
+                    <td th:text="${order.customerZip}"></td>
+                    <td th:text="${order.customerCity}"></td>
+                    <td th:text="${order.customerPhone}"></td>
+                    <td th:text="${order.customerEmail}"></td>
+                    <td><input type="number" class="input-in-table" th:name="'length_' + ${order.id}" th:value="${order.carportLength}" /></td>
+                    <td><input type="number" class="input-in-table" th:name="'width_' + ${order.id}" th:value="${order.carportWidth}" /></td>
+                    <td>
+                        <select class="input-in-table" th:name="'trapez_' + ${order.id}">
+                            <option value="true" th:selected="${order.hasTrapezRoof}">Ja</option>
+                            <option value="false" th:selected="${!order.hasTrapezRoof}">Nej</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select class="input-in-table" th:name="'shed_' + ${order.id}">
+                            <option value="true" th:selected="${order.hasShed}">Ja</option>
+                            <option value="false" th:selected="${!order.hasShed}">Nej</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select class="input-in-table" th:name="'builder_' + ${order.id}">
+                            <option value="fog" th:selected="${order.builder == 'fog'}">Fog</option>
+                            <option value="customer" th:selected="${order.builder == 'customer'}">Selv</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select class="input-in-table" th:name="'paint_' + ${order.id}">
+                            <option value="true" th:selected="${order.needsPaint}">Ja</option>
+                            <option value="false" th:selected="${!order.needsPaint}">Nej</option>
+                        </select>
+                    </td>
+                    <td class="td-small-text"><textarea class="input-in-table" rows="1" th:name="'requests_' + ${order.id}" th:text="${order.specialRequests}"></textarea></td>
+                    <td class="col-status">
+                        <select class="input-in-table" th:name="'status_' + ${order.id}" th:attr="data-order-id=${order.id}">
+                            <option value="pending" th:selected="${order.status == 'pending'}">Afventende</option>
+                            <option value="paid" th:selected="${order.status == 'paid'}">Betalt</option>
+                            <option value="completed" th:selected="${order.status == 'completed'}">Gennemført</option>
+                            <option value="rejected" th:selected="${order.status == 'rejected'}">Afslået</option>
+                        </select>
+                    </td>
+                    <td class="col-comment">
+                        <textarea class="input-in-table" rows="2" th:name="'comment_' + ${order.id}" placeholder="Tilføj note..." th:text="${order.adminComment}"></textarea>
+                    </td>
+                    <td class="actions-cell">
+                        <button type="button" class="btn-action btn-delete" th:attr="data-order-id=${order.id}">Slet</button>
+                        <button type="button" class="btn-action btn-send-link" th:attr="data-order-id=${order.id}">Send link</button>
+                        <button type="button" class="btn-action btn-recalculate" th:attr="data-order-id=${order.id}">Opdater beregning</button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div> <div class="button-container dashboard-save">
+        <button type="button" class="btn btn-primary save-changes-button">Gem ændringer</button>
+        <a th:href="@{/admin/options}" class="btn btn-secondary options-button">Rediger Valgmuligheder</a>
+    </div>
+
+    </main>
+
+</div> </body>
+</html>

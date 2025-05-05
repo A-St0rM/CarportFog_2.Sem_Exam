@@ -1,11 +1,70 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="da" xmlns:th="http://www.thymeleaf.org" th:attr="data-page=${ (currentPage != null ? currentPage : 'start') }">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="'Fog Carport Service - ' + ${#strings.capitalize( (currentPage != null ? currentPage : 'Start') )}">Fog Carport Service</title>
+
+    <link href="../public/css/index.css" th:href="@{/css/index.css}" rel="stylesheet"/>
 </head>
 <body>
+<a th:href="@{/admin/login}" class="admin-login-button">Admin</a>
 
-<h1>HEJSA</h1>
+<div class="container">
+    <header class="main-header">
+        <img class="logo-img" src="/images/Fog_logo.png" th:src="@{/images/Fog_logo.png}" alt="Fog Logo">
+    </header>
+
+    <div class="content-header">
+        <div class="sub-logo">Få et uforpligtende Quick-Byg tilbud - Carport med fladt tag</div>
+    </div>
+
+    <div class="main-content-area">
+        <aside class="sidebar">
+            <nav class="steps-nav">
+                <ul>
+                    <li th:classappend="${currentPage == 'start'} ? 'active'">
+                        <a th:href="@{/}">
+                            <span class="step-indicator" data-step-number="1"></span>
+                            <span class="step-text">Start</span>
+                        </a>
+                    </li>
+                    <li th:classappend="${currentPage == 'specifications'} ? 'active'"> <a th:href="@{/specifications}"> <span class="step-indicator" data-step-number="2"></span>
+                        <span class="step-text">Specifikationer</span> </a>
+                    </li>
+                    <li th:classappend="${currentPage == 'additions'} ? 'active'"> <a th:href="@{/additions}"> <span class="step-indicator" data-step-number="3"></span>
+                        <span class="step-text">Tilføjelser</span> </a>
+                    </li>
+                    <li th:classappend="${currentPage == 'details'} ? 'active'"> <a th:href="@{/details}"> <span class="step-indicator" data-step-number="4"></span>
+                        <span class="step-text">Oplysninger</span> </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main class="content">
+            <div class="content-body">
+                <div class="welcome-container">
+                    <div class="welcome-box">
+                        <div class="welcome-text-box">
+                            <h1>Velkommen til Fogs Carport Service</h1>
+                            <p>
+                                Du vil blive guidet igennem de forskellige valgmuligheder
+                                for at vi kan give dig et uforpligtende tilbud på
+                                en carport, specifikt designet til din have.
+                            </p>
+                        </div>
+                        <div class="welcome-image">
+                            <img src="/images/Audi_carport.png" th:src="@{/images/Audi_carport.png}" alt="Carport illustration">
+                        </div>
+                    </div>
+                    <div class="button-container">
+                        <a th:href="@{/specifications}" class="btn btn-primary">Påbegynd</a>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
 </body>
 </html>
