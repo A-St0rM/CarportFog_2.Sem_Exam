@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="da" xmlns:th="http://www.thymeleaf.org" th:attr="data-page=${ (currentPage != null ? currentPage : 'specifications') }">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="'Fog Carport Service - ' + ${#strings.capitalize( (currentPage != null ? currentPage : 'specifications') )}">Fog Carport Service</title>
+    <link href="../public/css/index.css" th:href="@{/css/index.css}" rel="stylesheet"/>
+</head>
+<body>
+<div class="container">
+    <header class="main-header">
+        <img class="logo-img" src="/images/Fog_logo.png" alt="Fog Logo">
+    </header>
+
+    <div class="content-header">
+        <div class="sub-logo">Få et uforpligtende Quick-Byg tilbud - Carport med fladt tag</div>
+    </div>
+
+    <div class="main-content-area">
+        <aside class="sidebar">
+            <nav class="steps-nav">
+                <ul>
+                    <li class="completed" th:classappend="${currentPage == 'start'} ? 'active'">
+                        <a th:href="@{/}">
+                            <span class="step-indicator" data-step-number="1"></span>
+                            <span class="step-text">Start</span>
+                        </a>
+                    </li>
+                    <li th:classappend="${currentPage == 'specifications'} ? 'active'">
+                        <a th:href="@{/specifications}">
+                            <span class="step-indicator" data-step-number="2"></span>
+                            <span class="step-text">Specifikationer</span>
+                        </a>
+                    </li>
+                    <li th:classappend="${currentPage == 'additions'} ? 'active'">
+                        <a th:href="@{/additions}">
+                            <span class="step-indicator" data-step-number="3"></span>
+                            <span class="step-text">Tilføjelser</span>
+                        </a>
+                    </li>
+                    <li th:classappend="${currentPage == 'details'} ? 'active'">
+                        <a th:href="@{/details}">
+                            <span class="step-indicator" data-step-number="4"></span>
+                            <span class="step-text">Oplysninger</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main class="content">
+            <div class="content-body">
+                <h2 class="page-title">Specifikationer</h2>
+
+                <div class="spec-layout">
+                    <div class="spec-form">
+                        <form method="post" th:action="@{/specifications}" id="spec-form">
+                            <div class="form-group">
+                                <label for="carport-width">Carport bredde (cm)</label>
+                                <select id="carport-width" name="carportWidth" required>
+                                    <option value="" disabled selected>Vælg*</option>
+                                    <option value="240">240 cm</option>
+                                    <option value="270">270 cm</option>
+                                    <option value="300">300 cm</option>
+                                    <option value="330">330 cm</option>
+                                    <option value="360">360 cm</option>
+                                    <option value="390">390 cm</option>
+                                    <option value="420">420 cm</option>
+                                    <option value="450">450 cm</option>
+                                    <option value="480">480 cm</option>
+                                    <option value="510">510 cm</option>
+                                    <option value="540">540 cm</option>
+                                    <option value="570">570 cm</option>
+                                    <option value="600">600 cm</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="carport-length">Carport længde (cm)</label>
+                                <select id="carport-length" name="carportLength" required>
+                                    <option value="" disabled selected>Vælg*</option>
+                                    <option value="240">240 cm</option>
+                                    <option value="270">270 cm</option>
+                                    <option value="300">300 cm</option>
+                                    <option value="330">330 cm</option>
+                                    <option value="360">360 cm</option>
+                                    <option value="390">390 cm</option>
+                                    <option value="420">420 cm</option>
+                                    <option value="450">450 cm</option>
+                                    <option value="480">480 cm</option>
+                                    <option value="510">510 cm</option>
+                                    <option value="540">540 cm</option>
+                                    <option value="570">570 cm</option>
+                                    <option value="600">600 cm</option>
+                                    <option value="630">630 cm</option>
+                                    <option value="660">660 cm</option>
+                                    <option value="690">690 cm</option>
+                                    <option value="720">720 cm</option>
+                                    <option value="750">750 cm</option>
+                                    <option value="780">780 cm</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="trapez-roof-option">Vil du have et trapeztag på din carport?</label>
+                                <select id="trapez-roof-option" name="hasTrapezRoof" required>
+                                    <option value="true" selected>Med trapeztag</option>
+                                    <option value="false">Uden tagplader</option>
+                                </select>
+                            </div>
+                            <div class="form-navigation">
+                                <a th:href="@{/}" class="btn btn-secondary">Gå tilbage</a>
+                                <button type="submit" class="btn btn-primary">Næste trin</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="spec-info">
+                        <div class="info-content-wrapper">
+                            <div class="info-box">
+                                <p>
+                                    Med hjælp af vores algoritme kan vi lynhurtigt
+                                    beregne prisen og lave en skitsetegning af din
+                                    designede carport, som vi sender til dig på din mail.
+                                </p>
+                            </div>
+                            <div class="info-image">
+                                <img src="/images/White_carport.png" alt="Carport skitse">
+                            </div>
+                        </div>
+                    </div>
+                </div> </div> </main>
+    </div> </div> </body>
+</html>
