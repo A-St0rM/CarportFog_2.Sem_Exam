@@ -13,11 +13,13 @@ import java.util.List;
 
 public class ProductMapper {
 
-    public static List<ProductVariant> getVariantsByProductIdAndMinLength(int minLength, int productId, ConnectionPool connectionPool) throws DatabaseException {
+    public static List<ProductVariant> getVariantsByProductIdAndMinLength(int productId, int minLength, ConnectionPool connectionPool) throws DatabaseException {
 
         List<ProductVariant> variants = new ArrayList<ProductVariant>();
 
-        String query = "SELECT * FROM product_variants" + "INNER JOIN products m USING(product_id)" + "WHERE product_id = ? AND length = >= ?";
+        String query = "SELECT * FROM product_variants " +
+                "INNER JOIN products USING(product_id) " +
+                "WHERE product_id = ? AND length >= ?";
 
         try(Connection con = connectionPool.getConnection())
         {
