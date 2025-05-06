@@ -124,7 +124,7 @@ public class RoutingController {
 
             // 4. TODO: Combine all data & Create Order object
             System.out.println("=== Order Details Received (Consent Given) ===");
-            System.out.println("Customer: " + name); // etc...
+            System.out.println("Customer: " + name);
 
             // 5. *** TODO: SAVE THE COMBINED ORDER DATA TO THE DATABASE ***
 
