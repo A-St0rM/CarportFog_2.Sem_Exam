@@ -1,11 +1,11 @@
 package app.service;
 
 import app.entities.BOM;
-import app.entities.MaterialVariant;
+import app.entities.ProductVariant;
 import app.entities.Order;
 import app.exceptions.DatabaseException;
 import app.persistence.ConnectionPool;
-import app.persistence.MaterialMapper;
+import app.persistence.ProductMapper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,9 +41,9 @@ public class CalculateBOM {
         int quantity = calculatePolesQuantity();
 
         //Finde længde på stolperne - dvs variant
-        List<MaterialVariant> materialVariants = MaterialMapper.getVariantsByProductIdAndMinLength(0, POLES, connectionPool);
-        MaterialVariant materialVariant = materialVariants.get(0);
-        BOM bom = new BOM(0, quantity, "Stolper nedgraves 90cm i jorden", order, materialVariant);
+        List<ProductVariant> productVariants = ProductMapper.getVariantsByProductIdAndMinLength(0, POLES, connectionPool);
+        ProductVariant productVariant = productVariants.get(0);
+        BOM bom = new BOM(0, quantity, "Stolper nedgraves 90cm i jorden", order, productVariant);
 
         bomList.add(bom);
     }
