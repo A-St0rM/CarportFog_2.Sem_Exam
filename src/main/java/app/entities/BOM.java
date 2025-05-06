@@ -6,21 +6,21 @@ public class BOM {
     private int quantity;
     private String description;
     private Order order;
-    private MaterialVariant materialVariant;
+    private ProductVariant productVariant;
 
-    public BOM(int bomId, int quantity, String description, Order order, MaterialVariant materialVariant) {
+    public BOM(int bomId, int quantity, String description, Order order, ProductVariant productVariant) {
         this.bomId = bomId;
         this.quantity = quantity;
         this.description = description;
         this.order = order;
-        this.materialVariant = materialVariant;
+        this.productVariant = productVariant;
     }
 
-    public BOM(int quantity, String description, Order order, MaterialVariant materialVariant) {
+    public BOM(int quantity, String description, Order order, ProductVariant productVariant) {
         this.quantity = quantity;
         this.description = description;
         this.order = order;
-        this.materialVariant = materialVariant;
+        this.productVariant = productVariant;
     }
 
     public int getBomId() {
@@ -39,7 +39,7 @@ public class BOM {
         return order;
     }
 
-    public MaterialVariant getMaterialVariant() {
-        return materialVariant;
+    public ProductVariant getProductVariant() {
+        return productVariant;
     }
 }

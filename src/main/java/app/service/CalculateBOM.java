@@ -1,7 +1,7 @@
 package app.service;
 
 import app.entities.BOM;
-import app.entities.MaterialVariant;
+import app.entities.ProductVariant;
 import app.entities.Order;
 import app.exceptions.DatabaseException;
 import app.persistence.ConnectionPool;
@@ -41,8 +41,8 @@ public class CalculateBOM {
         int quantity = calculatePolesQuantity();
 
         //Finde længde på stolperne - dvs variant
-        List<MaterialVariant> materialVariants = MaterialMapper.getVariantsByProductIdAndMinLength(0, POLES, connectionPool);
-        MaterialVariant materialVariant = materialVariants.get(0);
+        List<ProductVariant> materialVariants = MaterialMapper.getVariantsByProductIdAndMinLength(0, POLES, connectionPool);
+        ProductVariant materialVariant = materialVariants.get(0);
         BOM bom = new BOM(0, quantity, "Stolper nedgraves 90cm i jorden", order, materialVariant);
 
         bomList.add(bom);

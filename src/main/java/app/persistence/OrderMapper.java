@@ -1,8 +1,8 @@
 package app.persistence;
 
 import app.entities.BOM;
-import app.entities.Material;
-import app.entities.MaterialVariant;
+import app.entities.Product;
+import app.entities.ProductVariant;
 import app.entities.Order;
 import app.exceptions.DatabaseException;
 
@@ -22,7 +22,7 @@ public class OrderMapper {
     public static List<BOM> getBOMItemsByOrderId(ConnectionPool connectionPool, int orderId) throws DatabaseException {
 
         List<BOM> bomList = new ArrayList<>();
-        String query = "SELECT * FROM bill_of_materials_view WHERE order_id = ?";
+        String query = "SELECT * FROM bill_of_products_view WHERE order_id = ?";
 
         try (
                 Connection connection = connectionPool.getConnection();
@@ -40,26 +40,26 @@ public class OrderMapper {
 
                 Order order = new Order(carportWidth, carportLength, totalPrice, isPaid, null);
 
-                //Material
-                int materialId = rs.getInt("material_id");
+                //product
+                int productId = rs.getInt("product_id");
                 String name = rs.getString("name");
                 String unit = rs.getString("unit");
                 int price = rs.getInt("price");
 
-                Material material = new Material(materialId, name, unit, price);
+                Product product = new Product(productId, name, unit, price);
 
-                //materialVariant
-                int materialVariantId = rs.getInt("material_variant_id");
+                //productVariant
+                int productVariantId = rs.getInt("product_variant_id");
                 String description = rs.getString("description");
                 int length = rs.getInt("length");
 
-                MaterialVariant materialVariant = new MaterialVariant(materialVariantId, length, material);
+                ProductVariant productVariant = new ProductVariant(productVariantId, length, product);
 
                 //BOM
                 int bomId = rs.getInt("bom_id");
                 int quantity = rs.getInt("quantity");
 
-                BOM bom = new BOM(bomId, quantity, description, order, materialVariant);
+                BOM bom = new BOM(bomId, quantity, description, order, productVariant);
                 bomList.add(bom);
             }
         } catch (SQLException e) {
@@ -100,14 +100,14 @@ public class OrderMapper {
 
     public static void insertBOMItems(List<BOM> bomlist, ConnectionPool connectionPool) throws DatabaseException {
 
-        String query = "INSERT INTO bom_Items (order_id, material_variant_id, quantity, description)" + "VALUES(?,?,?,?)";
+        String query = "INSERT INTO bom_Items (order_id, product_variant_id, quantity, description)" + "VALUES(?,?,?,?)";
 
         try (Connection connection = connectionPool.getConnection()) {
             for (BOM bom : bomlist) {
 
                 try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
                     preparedStatement.setInt(1, bom.getOrder().getOrderId());
-                    preparedStatement.setInt(2, bom.getMaterialVariant().getMaterialVariantId());
+                    preparedStatement.setInt(2, bom.getProductVariant().getProductVariantId());
                     preparedStatement.setInt(3, bom.getQuantity());
                     preparedStatement.setString(4, bom.getDescription());
                     preparedStatement.executeUpdate();
