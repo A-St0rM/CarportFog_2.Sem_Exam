@@ -6,20 +6,26 @@ public class Customer {
     private String email;
     private String address;
     private String phone;
+    private String name;
     private int postalCode; //TODO: object or variable?
 
 
-    public Customer(int customerId, String email, String address, String phone, int postalCode) {
+    public Customer(int customerId, String email, String address, String phone, String name, int postalCode) {
+        this.customerId = customerId;
         this.email = email;
         this.address = address;
         this.phone = phone;
+        this.name = name;
         this.postalCode = postalCode;
+
+
     }
 
-    public Customer(String email, String address, String phone, int postalCode) {
+    public Customer(String email, String address, String phone, String name, int postalCode) {
         this.email = email;
         this.address = address;
         this.phone = phone;
+        this.name = name;
         this.postalCode = postalCode;
     }
 
@@ -41,5 +47,8 @@ public class Customer {
 
     public int getPostalCode() {
         return postalCode;
+    }
+    public String getName() {
+        return name;
     }
 }

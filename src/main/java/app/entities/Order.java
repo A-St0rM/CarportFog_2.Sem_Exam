@@ -37,6 +37,11 @@ public class Order {
         return totalPrice;
     }
 
+    public int setTotalPrice(int totalPrice) {
+        this.totalPrice = totalPrice;
+        return totalPrice;
+    }
+
     public int getOrderId() {
         return orderId;
     }

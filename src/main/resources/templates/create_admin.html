@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="da" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fog Admin - Opret Admin</title>
+    <link href="../public/css/index.css" th:href="@{/css/index.css}" rel="stylesheet"/>
+</head>
+<body>
+
+<div class="container">
+    <header class="main-header">
+        <img class="logo-img" src="/images/Fog_logo.png" th:src="@{/images/Fog_logo.png}" alt="Fog Logo">
+        <a th:href="@{/admin/dashboard}" class="admin-action-button">Tilbage til Dashboard</a>
+    </header>
+
+    <div class="content-header">
+        <div class="sub-logo">Admin side - Opret Ny Admin</div>
+    </div>
+
+    <main class="admin-content">
+        <div class="login-form-container create-admin-form-container">
+            <h3>Opret Ny Admin Bruger</h3>
+
+            <div th:if="${message}" class="error-message" th:text="${message}">
+                Fejlbesked her...
+            </div>
+
+            <form method="post" th:action="@{/admin/create}" id="create-admin-form">
+                <div class="form-group">
+                    <label for="admin-email">Email</label>
+                    <input type="email" id="admin-email" name="email" required placeholder="Indtast admin email" th:value="${email}">
+                </div>
+                <div class="form-group">
+                    <label for="admin-password">Kodeord</label>
+                    <input type="password" id="admin-password" name="password" required placeholder="Indtast nyt kodeord">
+                </div>
+                <div class="form-group">
+                    <label for="admin-password2">Bekræft Kodeord</label>
+                    <input type="password" id="admin-password2" name="password2" required placeholder="Bekræft nyt kodeord">
+                </div>
+                <div class="form-navigation login-button-container"> <button type="submit" class="btn btn-primary">Opret Admin</button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+</div> </body>
+</html>

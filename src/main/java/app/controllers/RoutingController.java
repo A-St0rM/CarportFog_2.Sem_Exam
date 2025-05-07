@@ -4,6 +4,7 @@ import app.persistence.ConnectionPool;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
 import io.javalin.validation.ValidationException;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +22,7 @@ public class RoutingController {
     private static final String ROUTE_ADMIN_LOGIN = "/admin/login";
     private static final String ROUTE_ADMIN_DASHBOARD = "/admin/dashboard";
     private static final String ROUTE_ADMIN_OPTIONS = "/admin/options";
+    private static final String ROUTE_ADMIN_CREATE = "/admin/create";
 
     public static void startRouting(Javalin app, ConnectionPool connectionPool) {
 
@@ -33,12 +35,17 @@ public class RoutingController {
         app.get(ROUTE_ADMIN_LOGIN, RoutingController::renderAdminLoginPage);
         app.get(ROUTE_ADMIN_DASHBOARD, ctx -> renderAdminDashboard(ctx, connectionPool));
         app.get(ROUTE_ADMIN_OPTIONS, ctx -> renderAdminOptionsPage(ctx, connectionPool));
+        app.get(ROUTE_ADMIN_CREATE, RoutingController::renderCreateAdminPage);
+
 
         // --- POST Routes ---
         app.post(ROUTE_SPECIFICATIONS, ctx -> handleSpecificationsForm(ctx));
         app.post(ROUTE_ADDITIONS, ctx -> handleAdditionsForm(ctx));
         app.post(ROUTE_DETAILS, ctx -> handleDetailsForm(ctx, connectionPool)); // Handler updated below
         app.post(ROUTE_ADMIN_LOGIN, ctx -> handleAdminLoginAttempt(ctx));
+        app.post(ROUTE_ADMIN_CREATE, ctx -> ctx.redirect(ROUTE_ADMIN_DASHBOARD));
+
+        // ***
         // TODO: app.post(ROUTE_ADMIN_OPTIONS, ...)
 
         // --- Exception Handling ---
@@ -46,9 +53,6 @@ public class RoutingController {
             // TODO: Improve this - re-render form with specific errors
             System.err.println("Validation Error occurred: " + e.getErrors());
             ctx.attribute("error", "Udfyld venligst alle påkrævede felter korrekt."); // Generic message
-            // Need context to know which page to re-render, complicates central handling
-            // Example: if (ctx.path().equals(ROUTE_DETAILS)) { renderDetailsPage(ctx, connectionPool); } // Needs pool instance
-            // Fallback for now:
             ctx.status(400).result("Validation Error: Please check your input. " + e.getErrors());
         });
         app.exception(Exception.class, (e, ctx) -> {
@@ -57,14 +61,17 @@ public class RoutingController {
             ctx.status(500).result("Internal server error.");
         });
     }
-
     // --- Page Rendering Methods ---
-
+    private static void renderCreateAdminPage(Context ctx) {
+        String message = ctx.queryParam("message"); // For error/success messages on redirect
+        String email = ctx.queryParam("email");     // To repopulate email field on error
+        ctx.attribute("message", message);
+        ctx.attribute("email", email);
+        ctx.render("create_admin.html");
+    }
     private static void renderStartPage(Context ctx) { /* as before */ ctx.attribute("currentPage", "start"); ctx.render("index.html"); }
     private static void renderSpecificationsPage(Context ctx, ConnectionPool cp) { /* as before */ ctx.attribute("currentPage", "specifications"); ctx.render("specifications.html"); }
     private static void renderAdditionsPage(Context ctx, ConnectionPool cp) { /* as before */ ctx.attribute("currentPage", "additions"); ctx.render("additions.html"); }
-
-    // *** UPDATED renderDetailsPage ***
     private static void renderDetailsPage(Context ctx, ConnectionPool connectionPool) {
         // TODO: Fetch saved values from session
         // *** NEW: Check for error message in query parameter ***
@@ -74,7 +81,6 @@ public class RoutingController {
         ctx.attribute("currentPage", "details");
         ctx.render("details.html");
     }
-
     private static void renderConfirmationPage(Context ctx) { /* as before */ ctx.attribute("currentPage", "confirmation"); ctx.render("confirmation.html"); }
     private static void renderAdminLoginPage(Context ctx) { /* as before */ ctx.attribute("error", ctx.queryParam("error")); ctx.render("admin_login.html"); }
     private static void renderAdminDashboard(Context ctx, ConnectionPool cp) { /* as before */ List<Object> o=new ArrayList<>(); ctx.attribute("orders",o); ctx.render("admin_dashboard.html"); }
