@@ -88,6 +88,11 @@
             <groupId>org.mindrot</groupId>
             <artifactId>jbcrypt</artifactId>
             <version>0.4</version>
+
+            <groupId>com.sendgrid</groupId>
+            <artifactId>sendgrid-java</artifactId>
+            <version>4.10.1</version> <!-- Use the latest version -->
+
         </dependency>
     </dependencies>
     <build>
