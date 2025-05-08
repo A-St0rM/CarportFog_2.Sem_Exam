@@ -389,8 +389,15 @@ td:has(> .input-in-table) { padding-top: 6px; padding-bottom: 6px; } /* Adjust c
 .dashboard-save { padding-top: 20px; text-align: center; padding-bottom: 20px;} /* Save changes button container */
 .dashboard-save .btn { margin: 0 10px;} /* Add spacing between buttons */
 .save-changes-button { /* Uses .btn and .btn-primary styles */ }
-.options-button { /* Styling for the new 'Rediger Valgmuligheder' button */
-    /* Uses .btn and .btn-secondary styles */
+
+.admin-controls .add-admin-button-container {
+}
+
+.create-admin-form-container {
+}
+
+.create-admin-form-container .form-navigation {
+    justify-content: center;
 }
 
 
