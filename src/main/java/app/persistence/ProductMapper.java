@@ -41,7 +41,7 @@ public class ProductMapper {
             }
 
         } catch (SQLException e) {
-            throw new DatabaseException("Couldn't get variants " + e.getMessage());
+            throw new DatabaseException("Couldn't get variants " + e.getMessage(), e.getMessage());
         }
         return variants;
     }
@@ -54,12 +54,67 @@ public class ProductMapper {
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 return rs.getInt("product_id");
-            } else {
-                throw new DatabaseException("Produkt med navn '" + name + "' blev ikke fundet.");
             }
         } catch (SQLException e) {
             throw new DatabaseException("Fejl ved opslag af produktnavn", e.getMessage());
         }
+        return 0;
     }
 
+
+    public static int[] getAvailableBeamLengths(ConnectionPool connectionPool) throws DatabaseException {
+        List<Integer> beamLengths = new ArrayList<>();
+        String query = "SELECT length FROM product_variants WHERE product_id = ?";
+
+        try (Connection con = connectionPool.getConnection()) {
+            PreparedStatement ps = con.prepareStatement(query);
+            int productIdForBeams = 2; // Det er produkt-ID’et for remme
+            ps.setInt(1, productIdForBeams);
+
+            ResultSet rs = ps.executeQuery();
+
+            // Tilføj alle beam-længder til vores liste
+            while (rs.next()) {
+                int length = rs.getInt("length");
+                beamLengths.add(length);
+            }
+        } catch (SQLException e) {
+            throw new DatabaseException("Couldn't get beam lengths: " + e.getMessage(), e.getMessage());
+        }
+
+        // Konverter List til array og returner
+        int[] beamLengthsArray = new int[beamLengths.size()];
+        for (int i = 0; i < beamLengths.size(); i++) {
+            beamLengthsArray[i] = beamLengths.get(i);
+        }
+        return beamLengthsArray;
+    }
+
+    public static int[] getAvailableRoofWidths(ConnectionPool connectionPool) throws DatabaseException {
+        List<Integer> roofWidths = new ArrayList<>();
+        String query = "SELECT width FROM product_variants WHERE product_id = ?";
+
+        try (Connection con = connectionPool.getConnection()) {
+            PreparedStatement ps = con.prepareStatement(query);
+            int productIdForBeams = 3; // Det er produkt-ID’et for tag
+            ps.setInt(1, productIdForBeams);
+
+            ResultSet rs = ps.executeQuery();
+
+            // Tilføj alle tag-længder til vores liste
+            while (rs.next()) {
+                int width = rs.getInt("width");
+                roofWidths.add(width);
+            }
+        } catch (SQLException e) {
+            throw new DatabaseException("Couldn't get roof widths: " + e.getMessage(), e.getMessage());
+        }
+
+        // Konverter List til array og returner
+        int[] roofWidthsArray = new int[roofWidths.size()];
+        for (int i = 0; i < roofWidths.size(); i++) {
+            roofWidthsArray[i] = roofWidths.get(i);
+        }
+        return roofWidthsArray;
+    }
 }

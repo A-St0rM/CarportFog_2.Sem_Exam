@@ -63,7 +63,7 @@ public class OrderMapper {
                 bomList.add(bom);
             }
         } catch (SQLException e) {
-            throw new DatabaseException("Could not get BOM from the Database " + e.getMessage());
+            throw new DatabaseException("Could not get BOM from the Database " + e.getMessage(), e.getMessage());
         }
         return bomList;
     }
@@ -76,7 +76,6 @@ public class OrderMapper {
         try (
                 Connection connection = connectionPool.getConnection();
                 PreparedStatement preparedStatement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
-
         ) {
             preparedStatement.setInt(1, order.getCarportWidth());
             preparedStatement.setInt(2, order.getCarportLength());
@@ -94,7 +93,7 @@ public class OrderMapper {
                 return null;
             }
         } catch (SQLException e) {
-            throw new DatabaseException("Could not insert order into the Database " + e.getMessage());
+            throw new DatabaseException("Could not insert order into the Database " + e.getMessage(), e.getMessage());
         }
     }
 
@@ -114,7 +113,7 @@ public class OrderMapper {
                 }
             }
         } catch (SQLException e) {
-            throw new DatabaseException("Could not insert BOM items into the Database " + e.getMessage());
+            throw new DatabaseException("Could not insert BOM items into the Database " + e.getMessage(), e.getMessage());
         }
 
     }
