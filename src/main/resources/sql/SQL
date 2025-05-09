@@ -1,0 +1,52 @@
+
+
+CREATE TABLE public.admins (
+    admin_id SERIAL PRIMARY KEY,
+    email VARCHAR(100),
+    password VARCHAR(50)
+);
+
+CREATE TABLE public.customers (
+    customer_id SERIAL PRIMARY KEY,
+    email VARCHAR(50),
+    address VARCHAR(50),
+    postal_code INTEGER REFERENCES public.postal_codes(postal_code),
+    phone INTEGER,
+    name VARCHAR(50)
+);
+
+CREATE TABLE public.postal_codes (
+    postal_code INTEGER PRIMARY KEY,
+    city VARCHAR(50)
+);
+
+CREATE TABLE public.orders (
+    order_id SERIAL PRIMARY KEY,
+    customer_id INTEGER REFERENCES public.customers(customer_id),
+    carport_width INTEGER,
+    carport_length INTEGER,
+    status VARCHAR,
+    total_price INTEGER
+);
+
+CREATE TABLE public.products (
+    product_id SERIAL PRIMARY KEY,
+    name VARCHAR(100),
+    unit VARCHAR(50),
+    price_meter INTEGER
+);
+
+CREATE TABLE public.product_variants (
+    product_variant_id SERIAL PRIMARY KEY,
+    product_id INTEGER REFERENCES public.products(product_id),
+    length INTEGER,
+    width DOUBLE PRECISION
+);
+
+CREATE TABLE public.bom_items (
+    bom_item_id SERIAL PRIMARY KEY,
+    order_id INTEGER REFERENCES public.orders(order_id),
+    product_variant_id INTEGER REFERENCES public.product_variants(product_variant_id),
+    quantity INTEGER,
+    description VARCHAR(200)
+);
