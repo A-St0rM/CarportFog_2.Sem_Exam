@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="da" xmlns:th="http://www.thymeleaf.org" th:attr="data-page=${ (currentPage != null ? currentPage : 'payment') }">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="'Fog Carport - ' + ${#strings.capitalize( (currentPage != null ? currentPage : 'Betaling') )}">Fog Carport - Betaling</title>
+    <link href="../public/css/index.css" th:href="@{/css/index.css}" rel="stylesheet"/>
+</head>
+<body>
+
+<div class="container">
+    <header class="main-header">
+        <img class="logo-img" src="/images/Fog_logo.png" th:src="@{/images/Fog_logo.png}" alt="Fog Logo">
+        <a th:href="@{/}" class="admin-action-button">Forside</a>
+    </header>
+
+    <div class="content-header">
+        <div class="sub-logo" th:text="${ (pageSubtitle != null ? pageSubtitle : 'Betaling') }">Betaling</div>
+    </div>
+
+    <div class="main-content-area">
+        <aside class="sidebar">
+            <nav class="steps-nav">
+                <ul>
+                    <li class="completed">
+                        <a th:href="@{/}">
+                            <span class="step-indicator" data-step-number="1"></span>
+                            <span class="step-text">Start</span>
+                        </a>
+                    </li>
+                    <li class="completed">
+                        <a th:href="@{/specifications}">
+                            <span class="step-indicator" data-step-number="2"></span>
+                            <span class="step-text">Specifikationer</span>
+                        </a>
+                    </li>
+                    <li class="completed">
+                        <a th:href="@{/additions}">
+                            <span class="step-indicator" data-step-number="3"></span>
+                            <span class="step-text">Tilføjelser</span>
+                        </a>
+                    </li>
+                    <li class="completed">
+                        <a th:href="@{/details}">
+                            <span class="step-indicator" data-step-number="4"></span>
+                            <span class="step-text">Oplysninger</span>
+                        </a>
+                    </li>
+                    <li th:classappend="${currentPage == 'payment'} ? 'active'">
+                        <a th:href="@{/payment}">
+                            <span class="step-indicator" data-step-number="5"></span>
+                            <span class="step-text">Betaling</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main class="content">
+            <div class="content-body">
+                <div class="payment-container">
+                    <h2 class="payment-greeting" th:if="${customerName}">
+                        Hej <span th:text="${customerName}">Kunde</span>!
+                    </h2>
+                    <p class="payment-info">
+                        Du mangler at betale følgende beløb for din Carport:
+                    </p>
+                    <p class="payment-amount" th:if="${totalPrice}">
+                        <strong th:text="${#numbers.formatDecimal(totalPrice, 1, 'POINT', 2, 'COMMA')}">28.394,00</strong> KR.
+                    </p>
+                    <p class="payment-amount" th:unless="${totalPrice}">
+                        Prisoplysninger er ikke tilgængelige i øjeblikket.
+                    </p>
+
+                    <div class="payment-form-actions">
+                        <a th:href="@{/payment-confirmation}" class="btn btn-primary btn-large">Bekræft og betal</a>
+                    </div>
+                    <div class="payment-footer-note">
+                        <p>Du vil blive viderestilt til bekræftelsessiden.</p> </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+</body>
+</html>
