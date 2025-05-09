@@ -4,21 +4,10 @@ import app.controllers.RoutingController;
 import app.config.SessionConfig;
 import app.config.ThymeleafConfig;
 import app.persistence.ConnectionPool;
-import app.util.PasswordUtil;
-import com.sendgrid.helpers.mail.objects.Personalization;
-
 import io.javalin.Javalin;
 import io.javalin.rendering.template.JavalinThymeleaf;
 import java.io.IOException;
 
-import com.sendgrid.SendGrid;
-import com.sendgrid.Request;
-import com.sendgrid.Response;
-import com.sendgrid.Method;
-
-import com.sendgrid.helpers.mail.Mail;
-import com.sendgrid.helpers.mail.objects.Email;
-import com.sendgrid.helpers.mail.objects.Personalization;
 
 public class Main {
 
@@ -35,7 +24,7 @@ public class Main {
             config.staticFiles.add("/public");
             config.jetty.modifyServletContextHandler(handler -> handler.setSessionHandler(SessionConfig.sessionConfig()));
             config.fileRenderer(new JavalinThymeleaf(ThymeleafConfig.templateEngine()));
-        }).start(7171);
+        }).start(7070);
 
         RoutingController.startRouting(app, connectionPool);
 
