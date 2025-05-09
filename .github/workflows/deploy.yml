@@ -21,9 +21,6 @@ jobs:
     - name: Build with Maven
       run: mvn clean package -DskipTests
 
-    - name: Show public IP of runner
-      run: curl https://ifconfig.me
-
     - name: Upload fat jar to VM
       uses: appleboy/scp-action@master
       with:
