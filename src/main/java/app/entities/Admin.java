@@ -10,6 +10,7 @@ public class Admin {
         this.email = email;
         this.password = password;
     }
+
     public Admin(String email, String password) {
         this.email = email;
         this.password = password;
@@ -21,7 +22,7 @@ public class Admin {
 
     public void setAdmin_id(int admin_id) {
         this.admin_id = admin_id;
-
+    }
 
     public String getEmail() {
         return email;
