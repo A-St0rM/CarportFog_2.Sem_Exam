@@ -2,17 +2,17 @@
 :root {
     /* Color Palette */
     --fog-primary-blue: #00406C;
-    --fog-content-header-bg: #B1CBFF;
-    --fog-nav-active-bg: #B1CBFF;
-    --fog-nav-inactive-bg: #ffffff;
-    --fog-nav-behind-box: #000452;
-    --fog-nav-completed-bg: #000452;
-    --fog-welcome-box-bg: #00406C;
+    --fog-content-header-bg: #B1CBFF;    /* Used for content header and some info boxes */
+    --fog-nav-active-bg: #B1CBFF;       /* Sidebar active nav item background */
+    --fog-nav-inactive-bg: #ffffff;     /* Sidebar inactive nav item background */
+    --fog-nav-behind-box: #000452;      /* Sidebar nav "shadow" effect */
+    --fog-nav-completed-bg: #000452;   /* Sidebar completed nav item background */
+    --fog-welcome-box-bg: #00406C;      /* Background for welcome text box on page 1 */
     --fog-white: #ffffff;
-    --fog-text-dark: #000452;
-    --fog-text-light: #ffffff;
-    --fog-text-grey: #333333;
-    --fog-border-grey: #dee2e6;
+    --fog-text-dark: #000452;           /* Dark text, e.g., on light blue backgrounds */
+    --fog-text-light: #ffffff;          /* Light text, e.g., on dark blue backgrounds */
+    --fog-text-grey: #333333;           /* General body text */
+    --fog-border-grey: #dee2e6;         /* Light borders */
     /* Font */
     --font-primary: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
@@ -32,7 +32,7 @@ body {
     font-family: var(--font-primary);
     color: var(--fog-text-grey);
     line-height: 1.5;
-    background-color: var(--fog-white);
+    background-color: var(--fog-white); /* Fallback, container usually covers */
     position: relative; /* Needed for absolute positioned buttons */
     min-height: 100vh;
 }
@@ -49,23 +49,23 @@ body {
 img {
     max-width: 100%;
     height: auto;
-    display: block;
+    display: block; /* Removes extra space below images */
 }
 
-/* Helper class */
+/* Helper class for dynamically hiding elements */
 .hidden {
     display: none !important;
 }
 
 /* === General Components === */
 
-/* Top-right action buttons (Admin Login / Back to Start / Homepage) */
+/* Top-right action buttons (Admin Login / Homepage link) */
 .admin-login-button,
 .admin-action-button {
     position: absolute;
     top: 15px;
     right: 20px;
-    z-index: 100;
+    z-index: 100; /* Ensure it's above other elements */
     background-color: rgba(255, 255, 255, 0.8);
     color: var(--fog-primary-blue);
     padding: 5px 10px;
@@ -73,7 +73,7 @@ img {
     font-size: 0.8rem;
     text-decoration: none;
     font-weight: 500;
-    opacity: 0.8; /* Adjusted default opacity */
+    opacity: 0.8;
     transition: background-color 0.2s ease, opacity 0.2s ease;
 }
 .admin-login-button:hover,
@@ -89,14 +89,14 @@ img {
     display: flex;
     justify-content: center;
     align-items: center;
-    position: relative; /* Context for admin action button */
+    position: relative; /* Context for buttons inside header */
 }
 .logo-img {
     height: 70px; /* Adjust logo size */
     width: auto;
 }
 
-/* Content Header (Sub-logo / Admin Title) */
+/* Content Header (Sub-logo / Secondary Title Bar) */
 .content-header {
     background-color: var(--fog-content-header-bg);
     min-height: 45px;
@@ -113,30 +113,30 @@ img {
     font-weight: 500;
 }
 
-/* General Page Title (Used inside .content-body on pages 2+) */
+/* General Page Title (Used inside .content-body on form pages) */
 .page-title {
     font-size: 1.8rem;
     font-weight: 600;
     color: var(--fog-primary-blue);
-    text-align: left;       /* Align text left */
-    margin-bottom: 35px;    /* Spacing below title */
-    max-width: 1100px;      /* Match the layout width below */
-    margin-left: auto;      /* Center the title block */
-    margin-right: auto;     /* Center the title block */
-    padding-top: 10px;      /* Space from top padding of content-body */
+    text-align: left;
+    margin-bottom: 35px;
+    max-width: 1100px; /* Matches .spec-layout */
+    margin-left: auto;
+    margin-right: auto;
+    padding-top: 10px;
 }
 
 /* Main Layout Area (Sidebar + Content) */
 .main-content-area {
     display: flex;
-    flex-grow: 1; /* Take remaining vertical space */
+    flex-grow: 1;
 }
 
 /* Sidebar */
 .sidebar {
-    flex: 0 0 300px; /* Sidebar width */
+    flex: 0 0 300px;
     background-color: var(--fog-primary-blue);
-    padding: 30px 0 30px 0; /* Vertical padding */
+    padding: 30px 0 30px 0;
 }
 .steps-nav ul { list-style: none; }
 .steps-nav li { position: relative; margin: 0 25px 15px 30px; }
@@ -168,18 +168,18 @@ img {
 .step-text { flex-grow: 1; } /* Text label */
 
 /* Sidebar Nav Button States */
-.steps-nav li:not(.active):not(.completed) a:hover { background-color: #f0f0f0; } /* Hover */
-.steps-nav li.active a { /* Active */
+.steps-nav li:not(.active):not(.completed) a:hover { background-color: #f0f0f0; }
+.steps-nav li.active a {
     background-color: var(--fog-nav-active-bg); color: var(--fog-text-dark);
     border-color: var(--fog-nav-active-bg); font-weight: 600;
 }
 .steps-nav li.active .step-indicator { border-color: var(--fog-text-dark); background-color: var(--fog-text-light); color: var(--fog-text-dark); }
-.steps-nav li.completed a { /* Completed */
+.steps-nav li.completed a {
     background-color: var(--fog-nav-completed-bg); color: var(--fog-text-light); border-color: var(--fog-nav-completed-bg);
 }
 .steps-nav li.completed .step-indicator { border-color: var(--fog-text-light); background-color: var(--fog-text-light); color: var(--fog-nav-completed-bg); }
-.steps-nav li.completed .step-indicator::before { content: ''; } /* Hide number */
-.steps-nav li.completed .step-indicator::after { /* Show checkmark */
+.steps-nav li.completed .step-indicator::before { content: ''; }
+.steps-nav li.completed .step-indicator::after {
     content: '✓'; font-weight: bold; font-size: 1.1rem; position: absolute;
     top: 50%; left: 50%; transform: translate(-50%, -50%);
 }
@@ -193,7 +193,6 @@ img {
     padding: 40px; /* Base padding */
     flex-grow: 1;
     width: 100%;
-    /* Default: No flex/grid centering */
 }
 
 /* General Button Styling */
@@ -275,7 +274,7 @@ img {
 
 /* --- Page 3 Specific (Image) --- */
 .additions-image-container { display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; }
-.additions-image-container img { max-width: 100%; max-height: 400px; width: auto;}
+.additions-image-container img { max-width: 100%; max-height: 400px; width: auto; border: 1px solid var(--fog-border-grey); border-radius: 4px; }
 
 /* --- Page 4 Specific (Checkbox / SVG Placeholder) --- */
 .form-group-checkbox { display: flex; align-items: flex-start; gap: 10px; margin-top: 15px; }
@@ -286,58 +285,75 @@ img {
 .svg-placeholder { width: 100%; max-width: 450px; min-height: 300px; background-color: var(--fog-content-header-bg); border: 1px solid var(--fog-primary-blue); border-radius: 5px; display: flex; justify-content: center; align-items: center; margin: 0 auto; color: var(--fog-text-dark); font-style: italic; font-size: 0.9rem; }
 
 
-/* ========== PAGE 5 SPECIFIC STYLING (Confirmation) ========== */
-
-/* Apply Flexbox centering ONLY to content-body on confirmation page */
-html[data-page='confirmation'] .content-body {
+/* ========== CUSTOMER FLOW ENDPAGES (Confirmation, Payment) ========== */
+/* Centering content for pages like confirmation and payment */
+html[data-page='confirmation'] .content-body,
+html[data-page='payment'] .content-body,
+html[data-page='paymentConfirmation'] .content-body { /* Added paymentConfirmation */
     display: flex;
     flex-direction: column;
     justify-content: center; /* Center vertically */
     align-items: center;     /* Center horizontally */
-    padding: 60px 40px; /* Adjust padding as needed */
+    padding: 60px 40px;      /* Generous padding */
+    text-align: center;      /* Center text within children by default */
 }
 
-.confirmation-container {
-    max-width: 700px; /* Max width for the confirmation content block */
-    width: 100%;
-    text-align: center; /* Center text within the container */
+/* Container for the centered box on confirmation/payment pages */
+.confirmation-container,
+.payment-container,
+.confirmation-message-box { /* For payment confirmation */
+    background-color: var(--fog-content-header-bg); /* Light blue box */
+    padding: 40px 50px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    max-width: 650px; /* Max width for the content block */
+    width: 90%;
+    /* text-align: center; (Inherited from .content-body) */
 }
 
-.confirmation-header {
+/* Text styling within confirmation/payment boxes */
+.confirmation-header,
+.payment-greeting {
     font-size: 1.9rem;
     color: var(--fog-primary-blue);
     margin-bottom: 20px;
+    font-weight: 600;
 }
-
-.confirmation-main {
+.confirmation-main,
+.payment-info {
     font-size: 1.1rem;
     margin-bottom: 15px;
     line-height: 1.6;
 }
-
-.confirmation-sub {
+.confirmation-sub,
+.payment-footer-note {
     font-size: 0.9rem;
     color: var(--fog-text-grey);
-    margin-bottom: 40px; /* Space down to SVG section */
+    margin-bottom: 40px;
 }
 
-.confirmation-container .svg-section { /* Container for SVG title and placeholder */
-    margin-bottom: 40px; /* Space down to button */
-}
+/* Confirmation Page Specifics */
+.confirmation-container .svg-section { margin-bottom: 40px; }
+.confirmation-container .svg-placeholder { min-height: 250px; }
+.confirmation-button { padding-top: 0; margin-top: 0; }
 
-.confirmation-container .svg-placeholder-title { /* Reuse style from page 4 */
-    /* Already defined */
+/* Payment Page Specifics */
+.payment-footer-note { margin-top: 30px; margin-bottom: 0; }
+.payment-amount {
+    font-size: 2.2rem;
+    font-weight: bold;
+    color: var(--fog-text-dark);
+    margin-bottom: 35px;
 }
+.payment-amount strong { font-weight: 700; }
+.payment-form-actions { margin-top: 20px; }
+.payment-form-actions .btn-large { padding: 18px 50px; font-size: 1.25rem; }
 
-.confirmation-container .svg-placeholder { /* Reuse style from page 4 */
-    /* Already defined - adjust min-height/max-width if needed */
-    min-height: 250px;
-}
-
-.confirmation-button { /* Specific container for confirmation button */
-    padding-top: 0; /* Remove default padding */
-    margin-top: 0; /* Remove default margin */
-}
+/* Payment Confirmation Page Specifics */
+.confirmation-message-box .confirmation-header { font-size: 1.8rem; margin-bottom: 25px; }
+.confirmation-message-box .confirmation-main { font-size: 1.05rem; margin-bottom: 20px; }
+.confirmation-message-box .confirmation-sub { font-size: 0.9rem; margin-bottom: 30px; }
+.confirmation-message-box .confirmation-button { margin-top: 20px; }
 
 
 /* ========== Admin Pages Styling ========== */
@@ -346,73 +362,83 @@ html[data-page='confirmation'] .content-body {
 .admin-content {
     flex-grow: 1; display: flex; padding: 30px 40px; flex-direction: column;
 }
-.admin-content.dashboard { justify-content: flex-start; align-items: stretch; } /* Dashboard layout */
-.admin-content:not(.dashboard) { justify-content: center; align-items: center; } /* Center login box */
+.admin-content.dashboard { /* Dashboard & Options page uses this */
+    justify-content: flex-start;
+    align-items: stretch;
+}
+.admin-content:not(.dashboard) { /* Login & Create Admin center their content */
+    justify-content: center;
+    align-items: center;
+}
 
-/* Admin Login */
-.login-form-container { background-color: var(--fog-content-header-bg); padding: 35px 40px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); max-width: 450px; width: 100%; }
+/* Admin Login & Create Admin Form Container */
+.login-form-container { /* Also used by create-admin page */
+    background-color: var(--fog-content-header-bg); padding: 35px 40px; border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); max-width: 450px; width: 100%;
+}
 .login-form-container h3 { text-align: center; margin-bottom: 25px; color: var(--fog-primary-blue); font-size: 1.6rem; }
 .login-form-container .form-group { margin-bottom: 20px; }
 .login-form-container .form-group label { display: block; margin-bottom: 8px; font-weight: 500; font-size: 0.95rem; color: var(--fog-text-grey); }
 .login-form-container .form-group input[type="email"],
-.login-form-container .form-group input[type="password"] { /* Shared styles for consistency */
+.login-form-container .form-group input[type="password"] { /* Consistent input styling */
     width: 100%; padding: 12px 15px; border: 1px solid var(--fog-border-grey);
     border-radius: 4px; font-size: 1rem; font-family: var(--font-primary);
     background-color: #f8f9fa; box-sizing: border-box;
 }
-.login-button-container { border-top: none; padding-top: 10px; display: flex; justify-content: center; }
+.login-button-container { /* For login/create admin submit button */
+    border-top: none; padding-top: 10px; display: flex; justify-content: center;
+}
 .error-message { color: #dc3545; background-color: #f8d7da; border: 1px solid #f5c6cb; padding: 10px 15px; border-radius: 4px; margin-bottom: 20px; text-align: center; font-size: 0.9rem; }
 
-/* Admin Dashboard */
-.admin-controls { display: flex; justify-content: center; align-items: center; margin-bottom: 25px; gap: 30px; flex-wrap: wrap; }
-.search-bar, .filter-bar { display: flex; align-items: center; gap: 10px; }
+/* Admin Dashboard & Admin Options Common Title */
+.page-title.admin-title { /* Used by Dashboard and Options page for their main title */
+    text-align: center; margin-left: auto; margin-right: auto;
+    max-width: none; padding-top: 0; margin-bottom: 20px;
+}
+
+/* Admin Dashboard Specific */
+.admin-controls { display: flex; justify-content: center; align-items: center; margin-bottom: 25px; gap: 20px; flex-wrap: wrap; }
+.admin-controls .search-bar,
+.admin-controls .filter-bar,
+.admin-controls .add-admin-button-container { display: flex; align-items: center; gap: 10px; }
 #order-search { padding: 8px 12px; border: 1px solid var(--fog-border-grey); border-radius: 4px; min-width: 250px; }
 #status-filter { padding: 8px 12px; border: 1px solid var(--fog-border-grey); border-radius: 4px; background-color: var(--fog-white); }
-.page-title.admin-title { text-align: center; margin-left: auto; margin-right: auto; max-width: none; padding-top: 0; margin-bottom: 20px;} /* Centered dashboard title */
 .table-container { width: 100%; overflow-x: auto; border: 1px solid var(--fog-border-grey); border-radius: 5px; margin-bottom: 30px; -webkit-overflow-scrolling: touch; }
 table { width: 100%; min-width: 1200px; border-collapse: collapse; font-size: 0.9rem; }
 th, td { padding: 12px 15px; border: 1px solid var(--fog-border-grey); text-align: left; vertical-align: middle; white-space: nowrap; }
 thead th { background-color: #f8f9fa; font-weight: 600; position: sticky; top: 0; z-index: 10; }
 tbody tr:nth-child(even) { background-color: #f8f9fa; }
 tbody tr:hover { background-color: #e9ecef; }
-td.td-small-text { white-space: normal; min-width: 150px; } /* Allow wrapping for comments/wishes */
-.col-status, .col-comment { min-width: 160px; white-space: normal; } /* Width for specific columns */
-.col-status select, .col-comment textarea { width: 100%; } /* Ensure inputs fill cell */
-td textarea[name^="adminComment"] { min-height: 45px; resize: vertical; } /* Comment field height */
-.input-in-table { width: 100%; padding: 4px 6px; border: 1px solid var(--fog-border-grey); border-radius: 3px; font-size: 0.85rem; font-family: var(--font-primary); background-color: var(--fog-white); box-sizing: border-box; } /* Styling for inputs/selects within table cells */
-td:has(> .input-in-table) { padding-top: 6px; padding-bottom: 6px; } /* Adjust cell padding for inputs */
-.actions-cell { white-space: nowrap; text-align: right; } /* Action buttons alignment */
+td.td-small-text { white-space: normal; min-width: 150px; }
+.col-status, .col-comment { min-width: 160px; white-space: normal; }
+.col-status select, .col-comment textarea { width: 100%; }
+td textarea[name^="adminComment"] { min-height: 45px; resize: vertical; }
+.input-in-table { width: 100%; padding: 4px 6px; border: 1px solid var(--fog-border-grey); border-radius: 3px; font-size: 0.85rem; font-family: var(--font-primary); background-color: var(--fog-white); box-sizing: border-box; }
+td:has(> .input-in-table) { padding-top: 6px; padding-bottom: 6px; }
+.actions-cell { white-space: nowrap; text-align: right; }
 .btn-action { background: none; border: none; padding: 5px 8px; margin-left: 5px; cursor: pointer; color: var(--fog-primary-blue); font-size: 0.85rem; border-radius: 3px; transition: background-color 0.2s ease; }
 .btn-action:hover { background-color: #e9ecef; }
 .btn-delete:hover { color: #dc3545; }
-.btn-action i { display: none; } /* Ensure icons are hidden */
-.dashboard-save { padding-top: 20px; text-align: center; padding-bottom: 20px;} /* Save changes button container */
-.dashboard-save .btn { margin: 0 10px;} /* Add spacing between buttons */
+.btn-action i { display: none; }
+.dashboard-save { padding-top: 20px; text-align: center; padding-bottom: 20px;}
+.dashboard-save .btn { margin: 0 10px;}
 .save-changes-button { /* Uses .btn and .btn-primary styles */ }
+.options-button { /* Uses .btn and .btn-secondary styles */ }
 
-.admin-controls .add-admin-button-container {
+/* Admin Options Page Specific */
+.admin-content.options-page .page-title { /* .page-title.admin-title might be better for less specificity */
+    margin-bottom: 40px; text-align: center;
 }
-
-.create-admin-form-container {
-}
-
-.create-admin-form-container .form-navigation {
-    justify-content: center;
-}
-
-
-/* Admin Options Page */
-.options-page .page-title { margin-bottom: 40px; text-align: center; } /* Center title on options page */
 .options-section { margin-bottom: 40px; padding: 25px; border: 1px solid var(--fog-border-grey); border-radius: 8px; background-color: #fdfdfd; max-width: 900px; margin-left: auto; margin-right: auto;}
 .options-section h3 { font-size: 1.5rem; color: var(--fog-primary-blue); margin-bottom: 20px; border-bottom: 2px solid var(--fog-primary-blue); padding-bottom: 8px; }
-.options-table table { min-width: unset; } /* Allow table to be narrower */
+.options-table table { min-width: unset; }
 .options-table th, .options-table td { white-space: normal; padding: 10px 12px; }
-.options-table .input-in-table { max-width: 150px; } /* Limit width of inputs */
+.options-table .input-in-table { max-width: 150px; }
 .options-table .price-input { max-width: 100px; }
 .options-table td.actions-cell { text-align: center; }
-.input-simple { padding: 8px 12px; border: 1px solid var(--fog-border-grey); border-radius: 4px; font-size: 1rem; max-width: 150px; } /* Input for trapez price */
-.trapez-price-group label { display: block; margin-bottom: 8px; font-weight: 500; } /* Label for trapez price */
-.options-save { margin-top: 10px; padding-top: 10px; text-align: center; } /* Save button container on options page */
+.input-simple { padding: 8px 12px; border: 1px solid var(--fog-border-grey); border-radius: 4px; font-size: 1rem; max-width: 150px; }
+.trapez-price-group label { display: block; margin-bottom: 8px; font-weight: 500; }
+.options-save { margin-top: 10px; padding-top: 10px; text-align: center; }
 
 
 /* ========== Responsiveness ========== */
@@ -438,8 +464,12 @@ td:has(> .input-in-table) { padding-top: 6px; padding-bottom: 6px; } /* Adjust c
     .info-box { padding: 20px; }
     .btn, .btn-secondary { padding: 14px 35px; font-size: 1.1rem; }
     .svg-placeholder { min-height: 250px; }
-    /* Page 5 */
-    .confirmation-container { max-width: 90%; }
+    /* Page 5 & Payment & Payment Confirmation */
+    .confirmation-container, .payment-container, .confirmation-message-box { max-width: 90%; }
+    html[data-page='confirmation'] .content-body,
+    html[data-page='payment'] .content-body,
+    html[data-page='paymentConfirmation'] .content-body { padding: 50px 30px; }
+    .confirmation-header, .payment-greeting { font-size: 1.8rem; }
     /* Admin */
     .admin-content.dashboard { padding: 25px 30px; }
     th, td { padding: 10px 12px; }
@@ -470,11 +500,14 @@ td:has(> .input-in-table) { padding-top: 6px; padding-bottom: 6px; } /* Adjust c
     .additions-image-container img { max-width: 70%; } /* Page 3 */
     .svg-placeholder { max-width: 90%; min-height: 220px;} /* Page 4 */
     .form-navigation { margin-top: 30px; }
-    /* Page 5 */
-    .confirmation-container { max-width: 95%; padding: 20px 0;}
-    .confirmation-header { font-size: 1.7rem; }
-    .confirmation-main { font-size: 1rem; }
-    .confirmation-sub { font-size: 0.85rem; }
+    /* Page 5 & Payment & Payment Confirmation */
+    .confirmation-container, .payment-container, .confirmation-message-box { max-width: 95%; padding: 20px 0;}
+    html[data-page='confirmation'] .content-body,
+    html[data-page='payment'] .content-body,
+    html[data-page='paymentConfirmation'] .content-body { padding: 40px 25px; }
+    .confirmation-header, .payment-greeting { font-size: 1.7rem; }
+    .confirmation-main, .payment-info { font-size: 1rem; }
+    .confirmation-sub, .payment-footer-note { font-size: 0.85rem; }
     /* Admin */
     .admin-controls { flex-direction: column; align-items: stretch; gap: 15px;}
     .search-bar, .filter-bar { width: 100%; justify-content: space-between;}
@@ -535,17 +568,24 @@ td:has(> .input-in-table) { padding-top: 6px; padding-bottom: 6px; } /* Adjust c
     .form-group input[type="tel"],
     .form-group input[type="email"],
     .form-group textarea { padding: 11px 13px; font-size: 0.95rem; }
-    .form-navigation { margin-top: 35px; padding-top: 20px; flex-wrap: wrap; gap: 10px; } /* Allow buttons to wrap */
+    .form-navigation { margin-top: 35px; padding-top: 20px; flex-wrap: wrap; gap: 10px; }
     .btn, .btn-secondary { width: 100%; font-size: 0.9rem; padding: 12px 15px;} /* Stack buttons */
     .info-box { padding: 20px;}
     .info-image img { max-width: 80%; } /* Page 2 */
     .additions-image-container img { max-width: 80%; } /* Page 3 */
     .svg-placeholder { min-height: 180px; } /* Page 4 */
-    /* Page 5 Mobile */
-    .confirmation-container { padding: 10px 0; }
-    .confirmation-header { font-size: 1.5rem; }
-    .confirmation-main { font-size: 0.95rem; }
-    .confirmation-sub { font-size: 0.8rem; margin-bottom: 30px; }
+    /* Page 5 & Payment & Payment Confirmation Mobile */
+    html[data-page='confirmation'] .content-body,
+    html[data-page='payment'] .content-body,
+    html[data-page='paymentConfirmation'] .content-body {
+        padding: 30px 15px; /* Less padding on smallest screens */
+        justify-content: flex-start; /* Align to top */
+        padding-top: 30px; /* Ensure some space from top */
+    }
+    .confirmation-container, .payment-container, .confirmation-message-box { padding: 10px 0; }
+    .confirmation-header, .payment-greeting { font-size: 1.5rem; }
+    .confirmation-main, .payment-info { font-size: 0.95rem; }
+    .confirmation-sub, .payment-footer-note { font-size: 0.8rem; margin-bottom: 30px; }
     .svg-section { margin-bottom: 30px; }
     /* Admin Dashboard Mobile */
     .admin-content.dashboard { padding: 15px 10px; }

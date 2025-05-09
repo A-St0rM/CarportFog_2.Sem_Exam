@@ -13,6 +13,9 @@ import static app.Main.connectionPool;
 
 public class CustomerMapper {
 
+    public CustomerMapper(ConnectionPool connectionPool) {
+    }
+
     public static List<Customer> getCustomersByCustomerId(ConnectionPool connectionPool, int customerId) throws DatabaseException {
 
         List<Customer> customerList = new ArrayList<>();

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="da" xmlns:th="http://www.thymeleaf.org" th:attr="data-page=${ (currentPage != null ? currentPage : 'paymentConfirmation') }">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fog Carport - Betalingsbekræftelse</title>
+  <link href="../public/css/index.css" th:href="@{/css/index.css}" rel="stylesheet"/>
+</head>
+<body>
+
+<div class="container">
+  <header class="main-header">
+    <img class="logo-img" src="/images/Fog_logo.png" th:src="@{/images/Fog_logo.png}" alt="Fog Logo">
+    <a th:href="@{/}" class="admin-action-button">Forside</a>
+  </header>
+
+  <div class="content-header">
+    <div class="sub-logo">Betaling Gennemført</div>
+  </div>
+
+  <div class="main-content-area">
+    <aside class="sidebar">
+      <nav class="steps-nav">
+        <ul>
+          <li class="completed">
+            <a th:href="@{/}">
+              <span class="step-indicator" data-step-number="1"></span>
+              <span class="step-text">Start</span>
+            </a>
+          </li>
+          <li class="completed">
+            <a th:href="@{/specifications}">
+              <span class="step-indicator" data-step-number="2"></span>
+              <span class="step-text">Specifikationer</span>
+            </a>
+          </li>
+          <li class="completed">
+            <a th:href="@{/additions}">
+              <span class="step-indicator" data-step-number="3"></span>
+              <span class="step-text">Tilføjelser</span>
+            </a>
+          </li>
+          <li class="completed">
+            <a th:href="@{/details}">
+              <span class="step-indicator" data-step-number="4"></span>
+              <span class="step-text">Oplysninger</span>
+            </a>
+          </li>
+          <li class="completed"> <a th:href="@{/payment}"> <span class="step-indicator" data-step-number="5"></span>
+            <span class="step-text">Betaling</span>
+          </a>
+          </li>
+        </ul>
+      </nav>
+    </aside>
+
+    <main class="content">
+      <div class="content-body">
+        <div class="payment-container confirmation-message-box">
+
+          <h2 class="confirmation-header" th:if="${customerName}">
+            Tak for din betaling, <span th:text="${customerName}">Kunde</span>!
+          </h2>
+          <h2 class="confirmation-header" th:unless="${customerName}">
+            Tak for din betaling!
+          </h2>
+
+          <p class="confirmation-main">
+            Din betaling er nu gennemført, og din ordre er bekræftet.
+          </p>
+          <p class="confirmation-sub">
+            Du har netop modtaget en mail fra os med din ordrebekræftelse samt listen af de varer, som du skal bruge til dit carport projekt.
+          </p>
+
+          <div class="button-container confirmation-button">
+            <a th:href="@{/}" class="btn btn-primary">Tilbage til forsiden</a>
+          </div>
+
+        </div> </div> </main>
+  </div> </div> </body>
+</html>

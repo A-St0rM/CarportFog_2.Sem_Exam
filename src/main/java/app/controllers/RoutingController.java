@@ -1,15 +1,16 @@
 package app.controllers;
 
+import app.persistence.AdminMapper;   // Assuming you might need this if passing AdminController
 import app.persistence.ConnectionPool;
+import app.persistence.CustomerMapper; // Assuming you might need this if passing AdminController
 import io.javalin.Javalin;
 import io.javalin.http.Context;
 import io.javalin.validation.ValidationException;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-// import app.entities.Order;
+// import app.entities.Order; // Example: Import your Order class/DTO when ready
 
 public class RoutingController {
 
@@ -19,141 +20,228 @@ public class RoutingController {
     private static final String ROUTE_ADDITIONS = "/additions";
     private static final String ROUTE_DETAILS = "/details";
     private static final String ROUTE_CONFIRMATION = "/confirmation";
+    private static final String ROUTE_PAYMENT = "/payment";
+    private static final String ROUTE_PAYMENT_CONFIRMATION = "/payment-confirmation";
     private static final String ROUTE_ADMIN_LOGIN = "/admin/login";
     private static final String ROUTE_ADMIN_DASHBOARD = "/admin/dashboard";
     private static final String ROUTE_ADMIN_OPTIONS = "/admin/options";
     private static final String ROUTE_ADMIN_CREATE = "/admin/create";
 
-    public static void startRouting(Javalin app, ConnectionPool connectionPool) {
+    public static void startRouting(Javalin app, ConnectionPool connectionPool, AdminController adminController) {
 
-        // --- GET Routes ---
+        // --- GET Routes (for showing pages) ---
         app.get(ROUTE_START, RoutingController::renderStartPage);
         app.get(ROUTE_SPECIFICATIONS, ctx -> renderSpecificationsPage(ctx, connectionPool));
         app.get(ROUTE_ADDITIONS, ctx -> renderAdditionsPage(ctx, connectionPool));
-        app.get(ROUTE_DETAILS, ctx -> renderDetailsPage(ctx, connectionPool)); // Will now check for query param 'error'
+        app.get(ROUTE_DETAILS, ctx -> renderDetailsPage(ctx, connectionPool));
         app.get(ROUTE_CONFIRMATION, RoutingController::renderConfirmationPage);
+        app.get(ROUTE_PAYMENT, ctx -> renderPaymentPage(ctx, connectionPool));
+        app.get(ROUTE_PAYMENT_CONFIRMATION, RoutingController::renderPaymentConfirmationPage);
         app.get(ROUTE_ADMIN_LOGIN, RoutingController::renderAdminLoginPage);
         app.get(ROUTE_ADMIN_DASHBOARD, ctx -> renderAdminDashboard(ctx, connectionPool));
         app.get(ROUTE_ADMIN_OPTIONS, ctx -> renderAdminOptionsPage(ctx, connectionPool));
         app.get(ROUTE_ADMIN_CREATE, RoutingController::renderCreateAdminPage);
 
 
-        // --- POST Routes ---
+        // --- POST Routes (for handling form submissions) ---
         app.post(ROUTE_SPECIFICATIONS, ctx -> handleSpecificationsForm(ctx));
         app.post(ROUTE_ADDITIONS, ctx -> handleAdditionsForm(ctx));
-        app.post(ROUTE_DETAILS, ctx -> handleDetailsForm(ctx, connectionPool)); // Handler updated below
-        app.post(ROUTE_ADMIN_LOGIN, ctx -> handleAdminLoginAttempt(ctx));
-        app.post(ROUTE_ADMIN_CREATE, ctx -> ctx.redirect(ROUTE_ADMIN_DASHBOARD));
+        app.post(ROUTE_DETAILS, ctx -> handleDetailsForm(ctx, connectionPool));
+        app.post(ROUTE_ADMIN_LOGIN, adminController::adminLogin); // Uses AdminController instance
+        app.post(ROUTE_ADMIN_CREATE, adminController::createAdmin); // Uses AdminController instance
+        // app.post("/process-payment", ...); // Removed as per your request
 
-        // ***
-        // TODO: app.post(ROUTE_ADMIN_OPTIONS, ...)
+        // TODO: app.post(ROUTE_ADMIN_OPTIONS, ctx -> handleAdminOptionsUpdate(ctx, connectionPool));
 
         // --- Exception Handling ---
         app.exception(ValidationException.class, (e, ctx) -> {
-            // TODO: Improve this - re-render form with specific errors
             System.err.println("Validation Error occurred: " + e.getErrors());
-            ctx.attribute("error", "Udfyld venligst alle påkrævede felter korrekt."); // Generic message
-            ctx.status(400).result("Validation Error: Please check your input. " + e.getErrors());
+            ctx.attribute("error", "Udfyld venligst alle påkrævede felter korrekt.");
+            // Consider redirecting back to the form page with error messages
+            // For now, a generic error response.
+            ctx.status(400).result("Validation Error: Please check your input. " + e.getErrors().toString());
         });
         app.exception(Exception.class, (e, ctx) -> {
-            System.err.println("Error: " + e.getMessage());
-            e.printStackTrace();
+            System.err.println("An unexpected error occurred: " + e.getMessage());
+            e.printStackTrace(); // Log stack trace during development
             ctx.status(500).result("Internal server error.");
         });
     }
-    // --- Page Rendering Methods ---
-    private static void renderCreateAdminPage(Context ctx) {
-        String message = ctx.queryParam("message"); // For error/success messages on redirect
-        String email = ctx.queryParam("email");     // To repopulate email field on error
-        ctx.attribute("message", message);
-        ctx.attribute("email", email);
-        ctx.render("create_admin.html");
-    }
-    private static void renderStartPage(Context ctx) { /* as before */ ctx.attribute("currentPage", "start"); ctx.render("index.html"); }
-    private static void renderSpecificationsPage(Context ctx, ConnectionPool cp) { /* as before */ ctx.attribute("currentPage", "specifications"); ctx.render("specifications.html"); }
-    private static void renderAdditionsPage(Context ctx, ConnectionPool cp) { /* as before */ ctx.attribute("currentPage", "additions"); ctx.render("additions.html"); }
-    private static void renderDetailsPage(Context ctx, ConnectionPool connectionPool) {
-        // TODO: Fetch saved values from session
-        // *** NEW: Check for error message in query parameter ***
-        String error = ctx.queryParam("error");
-        ctx.attribute("error", error); // Pass error (or null) to the template
 
+    // --- Page Rendering Methods (All written out fully) ---
+
+    private static void renderStartPage(Context ctx) {
+        ctx.attribute("currentPage", "start");
+        ctx.render("index.html");
+    }
+
+    private static void renderSpecificationsPage(Context ctx, ConnectionPool connectionPool) {
+        // TODO: Fetch saved values from session if needed
+        ctx.attribute("currentPage", "specifications");
+        ctx.render("specifications.html");
+    }
+
+    private static void renderAdditionsPage(Context ctx, ConnectionPool connectionPool) {
+        // TODO: Fetch saved values from session if needed
+        ctx.attribute("currentPage", "additions");
+        ctx.render("additions.html");
+    }
+
+    private static void renderDetailsPage(Context ctx, ConnectionPool connectionPool) {
+        String error = ctx.queryParam("error"); // Check for error from redirect
+        ctx.attribute("error", error);
+        // TODO: Fetch saved values from session if needed
         ctx.attribute("currentPage", "details");
         ctx.render("details.html");
     }
-    private static void renderConfirmationPage(Context ctx) { /* as before */ ctx.attribute("currentPage", "confirmation"); ctx.render("confirmation.html"); }
-    private static void renderAdminLoginPage(Context ctx) { /* as before */ ctx.attribute("error", ctx.queryParam("error")); ctx.render("admin_login.html"); }
-    private static void renderAdminDashboard(Context ctx, ConnectionPool cp) { /* as before */ List<Object> o=new ArrayList<>(); ctx.attribute("orders",o); ctx.render("admin_dashboard.html"); }
-    private static void renderAdminOptionsPage(Context ctx, ConnectionPool cp) { /* as before */ List<Map<String,Object>> w=new ArrayList<>(List.of(Map.of("value",240,"price",1000))); List<Map<String,Object>> l=new ArrayList<>(List.of(Map.of("value",240,"price",1500))); int tp=500; ctx.attribute("widths",w); ctx.attribute("lengths",l); ctx.attribute("trapezPrice",tp); ctx.render("admin_options.html"); }
+
+    private static void renderConfirmationPage(Context ctx) {
+        // TODO: Fetch order details from session/DB to display on confirmation
+        ctx.attribute("currentPage", "confirmation");
+        ctx.render("confirmation.html");
+    }
+
+    private static void renderPaymentPage(Context ctx, ConnectionPool connectionPool) {
+        // TODO: Fetch necessary order details from session or DB to display name/price
+        ctx.attribute("customerName", "Test Kunde (Placeholder)");
+        ctx.attribute("totalPrice", 28394.00);
+        ctx.attribute("orderId", 123); // Placeholder
+        ctx.attribute("pageSubtitle", "Betaling");
+        ctx.attribute("currentPage", "payment");
+        ctx.render("payment.html");
+    }
+
+    private static void renderPaymentConfirmationPage(Context ctx) {
+        // TODO: Fetch customer name or order ID from session if needed
+        // ctx.attribute("customerName", ctx.sessionAttribute("customerName"));
+        ctx.attribute("currentPage", "paymentConfirmation");
+        ctx.render("payment_confirmation.html");
+    }
+
+    private static void renderAdminLoginPage(Context ctx) {
+        String error = ctx.queryParam("error");
+        ctx.attribute("error", error);
+        ctx.render("admin_login.html");
+    }
+
+    private static void renderAdminDashboard(Context ctx, ConnectionPool connectionPool) {
+        // TODO: Security check: if(ctx.sessionAttribute("adminUser") == null) { ctx.redirect(...); return; }
+        // TODO: Fetch actual orders
+        List<Object> orders = new ArrayList<>(); // Placeholder
+        ctx.attribute("orders", orders);
+        ctx.render("admin_dashboard.html");
+    }
+
+    private static void renderAdminOptionsPage(Context ctx, ConnectionPool connectionPool) {
+        // TODO: Security check
+        // TODO: Fetch actual options from DB
+        List<Map<String, Object>> widths = new ArrayList<>(List.of(Map.of("value", 240, "price", 1000)));
+        List<Map<String, Object>> lengths = new ArrayList<>(List.of(Map.of("value", 240, "price", 1500)));
+        int trapezPrice = 500;
+        ctx.attribute("widths", widths);
+        ctx.attribute("lengths", lengths);
+        ctx.attribute("trapezPrice", trapezPrice);
+        ctx.render("admin_options.html");
+    }
+
+    private static void renderCreateAdminPage(Context ctx) {
+        String message = ctx.queryParam("message");
+        String email = ctx.queryParam("email");
+        ctx.attribute("message", message);
+        ctx.attribute("email", email);
+        ctx.render("admin/create_admin.html");
+    }
 
 
-    // --- Form Handling Methods ---
+    // --- Form Handling Methods (All written out fully) ---
 
-    private static void handleSpecificationsForm(Context ctx) { /* as before */ try { int w=ctx.formParamAsClass("carportWidth",Integer.class).get(); int l=ctx.formParamAsClass("carportLength",Integer.class).get(); boolean h=ctx.formParamAsClass("hasTrapezRoof",Boolean.class).getOrDefault(false); ctx.sessionAttribute("carportWidth",w); ctx.sessionAttribute("carportLength",l); ctx.sessionAttribute("hasTrapezRoof",h); ctx.redirect(ROUTE_ADDITIONS); } catch(Exception e){throw e;} }
-    private static void handleAdditionsForm(Context ctx) { /* as before */ try { boolean i=ctx.formParamAsClass("includeShed",Boolean.class).getOrDefault(false); String b=ctx.formParamAsClass("builder",String.class).get(); boolean n=ctx.formParamAsClass("needsPaint",Boolean.class).getOrDefault(false); String s=ctx.formParam("specialRequests"); ctx.sessionAttribute("includeShed",i); ctx.sessionAttribute("builder",b); ctx.sessionAttribute("needsPaint",n); ctx.sessionAttribute("specialRequests",s); ctx.redirect(ROUTE_DETAILS); } catch(Exception e){throw e;} }
+    private static void handleSpecificationsForm(Context ctx) {
+        try {
+            int width = ctx.formParamAsClass("carportWidth", Integer.class).get();
+            int length = ctx.formParamAsClass("carportLength", Integer.class).get();
+            boolean hasTrapezRoof = ctx.formParamAsClass("hasTrapezRoof", Boolean.class).getOrDefault(false);
 
-    // *** UPDATED handleDetailsForm ***
+            ctx.sessionAttribute("carportWidth", width);
+            ctx.sessionAttribute("carportLength", length);
+            ctx.sessionAttribute("hasTrapezRoof", hasTrapezRoof);
+            System.out.println("Session Specs Saved: Width=" + width + ", Length=" + length + ", TrapezRoof=" + hasTrapezRoof);
+
+            ctx.redirect(ROUTE_ADDITIONS);
+        } catch (Exception e) {
+            // Let general exception handler in startRouting handle this
+            throw e;
+        }
+    }
+
+    private static void handleAdditionsForm(Context ctx) {
+        try {
+            boolean includeShed = ctx.formParamAsClass("includeShed", Boolean.class).getOrDefault(false);
+            String builder = ctx.formParamAsClass("builder", String.class).get(); // Assuming this field is always present
+            boolean needsPaint = ctx.formParamAsClass("needsPaint", Boolean.class).getOrDefault(false);
+            String specialRequests = ctx.formParam("specialRequests");
+
+            ctx.sessionAttribute("includeShed", includeShed);
+            ctx.sessionAttribute("builder", builder);
+            ctx.sessionAttribute("needsPaint", needsPaint);
+            ctx.sessionAttribute("specialRequests", specialRequests);
+            System.out.println("Session Additions Saved: Shed=" + includeShed + ", Builder=" + builder + ", Paint=" + needsPaint + ", Requests=" + specialRequests);
+
+            ctx.redirect(ROUTE_DETAILS);
+        } catch (Exception e) {
+            throw e; // Let general exception handler handle
+        }
+    }
+
     private static void handleDetailsForm(Context ctx, ConnectionPool connectionPool) throws Exception {
         try {
-            // 1. Read customer details
             String name = ctx.formParamAsClass("customerName", String.class).check(s -> s != null && !s.isBlank(), "Name is required").get();
             String address = ctx.formParamAsClass("customerAddress", String.class).check(s -> s != null && !s.isBlank(), "Address is required").get();
             String zip = ctx.formParamAsClass("customerZip", String.class).check(s -> s != null && s.matches("[0-9]{4}"), "Zip code must be 4 digits").get();
             String city = ctx.formParamAsClass("customerCity", String.class).check(s -> s != null && !s.isBlank(), "City is required").get();
             String phone = ctx.formParamAsClass("customerPhone", String.class).check(s -> s != null && s.matches("[0-9]{8}"), "Phone number must be 8 digits").get();
             String email = ctx.formParamAsClass("customerEmail", String.class).check(s -> s != null && s.contains("@"), "Valid email is required").get();
-            boolean consent = ctx.formParamAsClass("consent", Boolean.class).getOrDefault(false); // Read consent value
+            boolean consent = ctx.formParamAsClass("consent", Boolean.class).getOrDefault(false);
 
-            // **** REPLACED 'throw' WITH REDIRECT ****
             if (!consent) {
                 System.err.println("Consent not given by user.");
-                // Redirect back to details page with an error message in URL
                 ctx.redirect(ROUTE_DETAILS + "?error=Du skal give samtykke for at fortsætte.");
-                return; // Stop processing this request further
+                return;
             }
-            // ****************************************
 
-            // 2. Retrieve carport details from session (if consent was given)
             Integer width = ctx.sessionAttribute("carportWidth");
             Integer length = ctx.sessionAttribute("carportLength");
-            Boolean hasTrapezRoof = ctx.sessionAttribute("hasTrapezRoof");
-            Boolean includeShed = ctx.sessionAttribute("includeShed");
-            String builder = ctx.sessionAttribute("builder");
-            Boolean needsPaint = ctx.sessionAttribute("needsPaint");
-            String specialRequests = ctx.sessionAttribute("specialRequests");
+            // ... retrieve all other session attributes ...
 
-            // 3. TODO: Validate that session data exists
             if (width == null || length == null) {
-                System.err.println("Error: Missing carport data in session.");
-                throw new Exception("Incomplete carport data in session.");
+                System.err.println("Error: Missing carport data in session for details submission.");
+                throw new Exception("Incomplete carport data in session when submitting details.");
             }
 
-            // 4. TODO: Combine all data & Create Order object
             System.out.println("=== Order Details Received (Consent Given) ===");
-            System.out.println("Customer: " + name);
+            System.out.println("Customer: " + name); // Log other details...
 
-            // 5. *** TODO: SAVE THE COMBINED ORDER DATA TO THE DATABASE ***
+            // TODO: Combine data, create Order object, save to DB, send email, clear session
 
-            // 6. TODO: Send confirmation email
-
-            // 7. TODO: Clear session attributes?
-
-            // 8. Redirect to the confirmation page
             ctx.redirect(ROUTE_CONFIRMATION);
 
         } catch (ValidationException e) {
-            // TODO: Re-render details form with *specific* error messages and *all* submitted data
-            System.err.println("Validation failed for details: " + e.getErrors());
-            // Example redirect back with generic error for now
+            System.err.println("Validation failed for details form: " + e.getErrors());
             ctx.redirect(ROUTE_DETAILS + "?error=Udfyld venligst alle felter korrekt.");
-            // throw e; // Avoid re-throwing if redirecting
         } catch (Exception e) {
-            System.err.println("Error in handleDetailsForm: " + e.getMessage());
-            throw e; // Let general handler catch other errors
+            // Let general exception handler handle other types of errors
+            System.err.println("Exception in handleDetailsForm: " + e.getMessage());
+            throw e;
         }
     }
 
-    private static void handleAdminLoginAttempt(Context ctx) { /* as before */ try{String e=ctx.formParam("email");boolean i=true;if(i){ctx.sessionAttribute("adminUser",e);ctx.redirect(ROUTE_ADMIN_DASHBOARD);}else{ctx.redirect(ROUTE_ADMIN_LOGIN+"?error=Invalid");}}catch(Exception ex){throw ex;} }
-
-    // TODO: Implement handleAdminOptionsUpdate(...)
+    // handleAdminLoginAttempt and handleAdminCreateAttempt should call methods on AdminController instance
+    // This is a simplified placeholder if AdminController is not passed to startRouting
+    private static void handleAdminLoginAttempt(Context ctx) {
+        String email = ctx.formParam("email");
+        // This should actually call adminController.adminLogin(ctx);
+        // Forcing redirect for now if AdminController is not setup in startRouting.
+        System.out.println("Placeholder admin login attempt for: " + email + ". Redirecting to dashboard.");
+        ctx.sessionAttribute("adminUser", email); // Simulate login
+        ctx.redirect(ROUTE_ADMIN_DASHBOARD);
+    }
 }
