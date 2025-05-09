@@ -5,31 +5,24 @@ public class Order {
     private int orderId;
     private int carportWidth;
     private int carportLength;
-    private boolean isPaid;
+    private String status;
     private int totalPrice;
     private Customer customer;
 
-    public Order(int orderId, int carportWidth, int carportLength, int totalPrice, Customer customer) {
+    public Order(int orderId, int carportWidth, int carportLength, String status, int totalPrice, Customer customer) {
         this.orderId = orderId;
         this.carportWidth = carportWidth;
         this.carportLength = carportLength;
-        this.isPaid = false;
+        this.totalPrice = totalPrice;
+        this.status = status;
         this.customer = customer;
     }
 
-    public Order(int carportWidth, int carportLength, int totalPrice, boolean isPaid, Customer customer) {
+    public Order(int carportWidth, int carportLength, int totalPrice, String status, Customer customer) {
         this.totalPrice = totalPrice;
         this.carportWidth = carportWidth;
         this.carportLength = carportLength;
-        this.isPaid = isPaid;
-        this.customer = customer;
-    }
-
-    public Order(int carportWidth, int carportLength, int totalPrice, Customer customer) {
-        this.totalPrice = totalPrice;
-        this.carportWidth = carportWidth;
-        this.carportLength = carportLength;
-        this.isPaid = false;
+        this.status = status;
         this.customer = customer;
     }
 
@@ -49,8 +42,8 @@ public class Order {
         return carportLength;
     }
 
-    public boolean isPaid() {
-        return isPaid;
+    public String getStatus() {
+        return status;
     }
 
     public Customer getCustomer() {

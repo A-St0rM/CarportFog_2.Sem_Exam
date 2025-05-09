@@ -3,28 +3,17 @@ package app;
 import app.controllers.RoutingController;
 import app.config.SessionConfig;
 import app.config.ThymeleafConfig;
-
 import app.persistence.ConnectionPool;
-
-import com.sendgrid.helpers.mail.objects.Personalization;
 import io.javalin.Javalin;
 import io.javalin.rendering.template.JavalinThymeleaf;
 import java.io.IOException;
 
-import com.sendgrid.SendGrid;
-import com.sendgrid.Request;
-import com.sendgrid.Response;
-import com.sendgrid.Method;
-
-import com.sendgrid.helpers.mail.Mail;
-import com.sendgrid.helpers.mail.objects.Email;
-import com.sendgrid.helpers.mail.objects.Personalization;
 
 public class Main {
 
-    private static final String USER = "postgres";
-    private static final String PASSWORD = "postgres";
-    private static final String URL = "jdbc:postgresql://localhost:5432/%s?currentSchema=public";
+    private static final String USER = System.getenv("user");
+    private static final String PASSWORD = System.getenv("password");
+    private static final String URL = "jdbc:postgresql://" +  System.getenv("ip") + ":5432/%s?currentSchema=public";
     private static final String DB = "CarportFog";
 
     public static final ConnectionPool connectionPool = ConnectionPool.getInstance(USER, PASSWORD, URL, DB);

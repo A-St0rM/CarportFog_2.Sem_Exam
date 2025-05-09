@@ -12,9 +12,9 @@ import java.util.List;
 
 public class CalculateBOM {
 
-    //TODO: kan gøres pænere
-    private static final int PRODUCT_ID_POLES = 1;
-    private static final int PRODUCT_ID_BEAMS_AND_RAFTERS = 2;
+    private int polesProductId;
+    private int beamsProductId;
+    private int raftersProductId;
 
 
     private List<BOM> bomList = new ArrayList<>();
@@ -22,10 +22,15 @@ public class CalculateBOM {
     private int length;
     private ConnectionPool connectionPool;
 
-    public CalculateBOM(int width, int length, ConnectionPool connectionPool ) {
+    public CalculateBOM(int width, int length, ConnectionPool connectionPool ) throws DatabaseException {
         this.width = width;
         this.length = length;
         this.connectionPool = connectionPool;
+
+        // Slå ID'er op fra databasen én gang. Kan nok gøres bedre. Men bare midlertidligt
+        this.polesProductId = ProductMapper.getProductIdByName("97x97 mm. trykimp. Stolpe", connectionPool);
+        this.beamsProductId = ProductMapper.getProductIdByName("45x195 mm. spærtræ ubh.", connectionPool);
+        this.raftersProductId = ProductMapper.getProductIdByName("45x195 mm. spærtræ ubh.", connectionPool);
     }
 
     public void calculateCarport(Order order) throws DatabaseException {
@@ -40,7 +45,7 @@ public class CalculateBOM {
         int quantity = calculatePolesQuantity();
 
         //Finde længde på stolperne - dvs variant
-        List<ProductVariant> productVariants = ProductMapper.getVariantsByProductIdAndMinLength(PRODUCT_ID_POLES, 300, connectionPool);
+        List<ProductVariant> productVariants = ProductMapper.getVariantsByProductIdAndMinLength(polesProductId, 300, connectionPool);
         ProductVariant productVariant = productVariants.get(0);
         BOM bom = new BOM(0, quantity, "Stolper nedgraves 90cm i jorden", order, productVariant);
 
@@ -59,7 +64,7 @@ public class CalculateBOM {
         int quantity = 2; // evt. lav mere avanceret udregning ved skur
 
         // 2. Hent variant (fx 45x195, længde min. carportLength)
-        List<ProductVariant> variants = ProductMapper.getVariantsByProductIdAndMinLength(PRODUCT_ID_BEAMS_AND_RAFTERS, order.getCarportLength(), connectionPool);
+        List<ProductVariant> variants = ProductMapper.getVariantsByProductIdAndMinLength(beamsProductId, order.getCarportLength(), connectionPool);
         ProductVariant variant = variants.get(0);
 
         // 3. Tilføj BOM-linje
@@ -75,7 +80,7 @@ public class CalculateBOM {
         int quantity = (int) Math.ceil((double) carportLength / spacing) + 1; // plus ét for første spær
 
         // 2. Hent passende spærvariant (fx 45x195, længde min. carportWidth)
-        List<ProductVariant> variants = ProductMapper.getVariantsByProductIdAndMinLength(PRODUCT_ID_BEAMS_AND_RAFTERS, order.getCarportWidth(), connectionPool);
+        List<ProductVariant> variants = ProductMapper.getVariantsByProductIdAndMinLength(raftersProductId, order.getCarportWidth(), connectionPool);
         ProductVariant variant = variants.get(0);
 
         // 3. Tilføj BOM-linje

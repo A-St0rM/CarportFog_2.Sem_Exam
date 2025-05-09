@@ -45,4 +45,21 @@ public class ProductMapper {
         }
         return variants;
     }
+
+    public static int getProductIdByName(String name, ConnectionPool connectionPool) throws DatabaseException {
+        String sql = "SELECT product_id FROM products WHERE LOWER(name) = LOWER(?)";
+        try (Connection conn = connectionPool.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, name);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("product_id");
+            } else {
+                throw new DatabaseException("Produkt med navn '" + name + "' blev ikke fundet.");
+            }
+        } catch (SQLException e) {
+            throw new DatabaseException("Fejl ved opslag af produktnavn", e.getMessage());
+        }
+    }
+
 }

@@ -16,12 +16,11 @@ public class OrderController {
         //Get order details from frontend
         int width = ctx.sessionAttribute("width");
         int length = ctx.sessionAttribute("length");
-        boolean isPaid = false; //TODO: hardcoded for now
         int totalPrice = 1999; //TODO: hardcoded for now
 
-        Customer customer = new Customer(1, "Alissa@hotmail.com", "Voltvej 5", "2134343", 2980); //TODO: hardcoded for now
+        Customer customer = new Customer(1, "Alissa Andrea Storm", "Alissa@hotmail.com", "Voltvej 5", "2134343", 2980); //TODO: hardcoded for now
 
-        Order order = new Order(0, width, length, totalPrice, customer);
+        Order order = new Order(0, width, length, "not paid", totalPrice, customer);
         // insert order in database
 
         try{

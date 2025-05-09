@@ -35,10 +35,10 @@ public class OrderMapper {
                 //Order
                 int carportWidth = rs.getInt("carport_width");
                 int carportLength = rs.getInt("carport_length");
-                boolean isPaid = rs.getBoolean("is_paid");
+                String status = rs.getString("status");
                 int totalPrice = rs.getInt("total_price");
 
-                Order order = new Order(carportWidth, carportLength, totalPrice, isPaid, null);
+                Order order = new Order(carportWidth, carportLength, totalPrice, status, null);
 
                 //product
                 int productId = rs.getInt("product_id");
@@ -88,7 +88,7 @@ public class OrderMapper {
             ResultSet keySet = preparedStatement.getGeneratedKeys();
 
             if (keySet.next()) {
-                Order newOrder = new Order(keySet.getInt(1), order.getCarportWidth(), order.getCarportLength(), order.getTotalPrice(), order.getCustomer());
+                Order newOrder = new Order(keySet.getInt(1), order.getCarportWidth(), order.getCarportLength(), order.getStatus() ,order.getTotalPrice(), order.getCustomer());
                 return newOrder;
             } else {
                 return null;
