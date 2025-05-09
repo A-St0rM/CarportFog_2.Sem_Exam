@@ -4,9 +4,12 @@ import app.entities.Customer;
 import app.entities.Order;
 import app.exceptions.DatabaseException;
 import app.persistence.ConnectionPool;
+import app.persistence.CustomerMapper;
 import app.persistence.OrderMapper;
 import app.service.CalculateBOM;
 import io.javalin.http.Context;
+
+import java.sql.SQLException;
 
 
 public class OrderController {

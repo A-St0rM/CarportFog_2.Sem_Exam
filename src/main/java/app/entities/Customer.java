@@ -51,4 +51,8 @@ public class Customer {
     public String getName() {
         return name;
     }
+
+    public void setCustomerId(int generatedId) {
+        this.customerId = generatedId;
+    }
 }

@@ -9,27 +9,20 @@ public class Order {
     private int totalPrice;
     private Customer customer;
 
-    public Order(int orderId, int carportWidth, int carportLength, int totalPrice, Customer customer) {
+    public Order(int orderId, int carportWidth, int carportLength, String status, int totalPrice, Customer customer, boolean trapezeRoof) {
         this.orderId = orderId;
+        this.totalPrice = totalPrice;
         this.carportWidth = carportWidth;
         this.carportLength = carportLength;
         this.isPaid = false;
         this.customer = customer;
     }
 
-    public Order(int carportWidth, int carportLength, int totalPrice, boolean isPaid, Customer customer) {
+    public Order(int carportWidth, int carportLength,String status, int totalPrice, Customer customer, boolean trapezeRoof) {
         this.totalPrice = totalPrice;
         this.carportWidth = carportWidth;
         this.carportLength = carportLength;
-        this.isPaid = isPaid;
-        this.customer = customer;
-    }
-
-    public Order(int carportWidth, int carportLength, int totalPrice, Customer customer) {
-        this.totalPrice = totalPrice;
-        this.carportWidth = carportWidth;
-        this.carportLength = carportLength;
-        this.isPaid = false;
+        this.status = status;
         this.customer = customer;
     }
 
@@ -54,12 +47,15 @@ public class Order {
         return carportLength;
     }
 
-    public boolean isPaid() {
-        return isPaid;
-    }
-
     public Customer getCustomer() {
         return customer;
     }
 
+    public boolean getTrapezeRoof() {
+        return trapezeRoof;
+    }
+
+    public String getStatus() {
+        return status;
+    }
 }

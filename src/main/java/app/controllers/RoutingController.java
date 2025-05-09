@@ -49,6 +49,7 @@ public class RoutingController {
         app.post(ROUTE_DETAILS, ctx -> handleDetailsForm(ctx, connectionPool));
         app.post(ROUTE_ADMIN_LOGIN, adminController::adminLogin); // Uses AdminController instance
         app.post(ROUTE_ADMIN_CREATE, adminController::createAdmin); // Uses AdminController instance
+        app.post("/details", ctx -> OrderController.handleDetailsPost(ctx, connectionPool));
         // app.post("/process-payment", ...); // Removed as per your request
 
         // TODO: app.post(ROUTE_ADMIN_OPTIONS, ctx -> handleAdminOptionsUpdate(ctx, connectionPool));
@@ -192,7 +193,7 @@ public class RoutingController {
         }
     }
 
-    private static void handleDetailsForm(Context ctx, ConnectionPool connectionPool) throws Exception {
+   /* private static void handleDetailsForm(Context ctx, ConnectionPool connectionPool) throws Exception {
         try {
             String name = ctx.formParamAsClass("customerName", String.class).check(s -> s != null && !s.isBlank(), "Name is required").get();
             String address = ctx.formParamAsClass("customerAddress", String.class).check(s -> s != null && !s.isBlank(), "Address is required").get();
@@ -233,6 +234,8 @@ public class RoutingController {
             throw e;
         }
     }
+    */
+
 
     // handleAdminLoginAttempt and handleAdminCreateAttempt should call methods on AdminController instance
     // This is a simplified placeholder if AdminController is not passed to startRouting
