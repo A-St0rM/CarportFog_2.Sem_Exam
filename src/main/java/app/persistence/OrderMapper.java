@@ -91,7 +91,7 @@ public class OrderMapper {
             ResultSet keySet = preparedStatement.getGeneratedKeys();
 
             if (keySet.next()) {
-                Order newOrder = new Order(keySet.getInt(1), order.getCarportWidth(), order.getCarportLength(), order.getTotalPrice(), order.getCustomer());
+                Order newOrder = new Order(keySet.getInt(1), order.getCarportWidth(), order.getCarportLength(), order.getStatus(), order.getTotalPrice(), order.getCustomer(), order.getTrapezeRoof());
                 return newOrder;
             } else {
                 return null;

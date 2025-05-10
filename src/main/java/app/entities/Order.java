@@ -5,17 +5,19 @@ public class Order {
     private int orderId;
     private int carportWidth;
     private int carportLength;
-    private boolean isPaid;
+    private String status;
     private int totalPrice;
     private Customer customer;
+    private boolean trapezeRoof;
 
     public Order(int orderId, int carportWidth, int carportLength, String status, int totalPrice, Customer customer, boolean trapezeRoof) {
         this.orderId = orderId;
         this.totalPrice = totalPrice;
         this.carportWidth = carportWidth;
         this.carportLength = carportLength;
-        this.isPaid = false;
+        this.status = status;
         this.customer = customer;
+        this.trapezeRoof = trapezeRoof;
     }
 
     public Order(int carportWidth, int carportLength,String status, int totalPrice, Customer customer, boolean trapezeRoof) {
@@ -24,6 +26,7 @@ public class Order {
         this.carportLength = carportLength;
         this.status = status;
         this.customer = customer;
+        this.trapezeRoof = trapezeRoof;
     }
 
     public int getTotalPrice() {
@@ -58,4 +61,6 @@ public class Order {
     public String getStatus() {
         return status;
     }
+
+
 }
