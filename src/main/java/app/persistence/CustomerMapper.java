@@ -1,20 +1,21 @@
 package app.persistence;
-
 import app.entities.Customer;
 import app.exceptions.DatabaseException;
-
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import static app.Main.connectionPool;
 
 public class CustomerMapper {
 
+    private final ConnectionPool connectionPool;
+
+
     public CustomerMapper(ConnectionPool connectionPool) {
+        this.connectionPool = connectionPool;
     }
 
-    public static List<Customer> getCustomersByCustomerId(ConnectionPool connectionPool, int customerId) throws DatabaseException {
+    public List<Customer> getCustomersByCustomerId(ConnectionPool connectionPool, int customerId) throws DatabaseException {
 
         List<Customer> customerList = new ArrayList<>();
         String sql = "SELECT * FROM customers WHERE customer_id = ?";
@@ -44,7 +45,7 @@ public class CustomerMapper {
         return customerList;
     }
 
-    public static Customer createCustomer(Customer customer, ConnectionPool connectionPool) throws SQLException {
+    public Customer createCustomer(Customer customer) throws SQLException {
         String sql = "INSERT INTO customers (email, address, postal_code, name, phone) VALUES (?, ?, ?, ?, ?)";
 
         try (

@@ -12,14 +12,13 @@ import java.util.List;
 
 public class OrderMapper {
 
-//    public static List<Order> getAllOrders(ConnectionPool connectionPool) { //TODO:
-//
-//        List<Order> orders = new ArrayList<Order>();
-//        String query = "SELECT * FROM orders";
-//        return orders;
-//    }
+    private final ConnectionPool connectionPool;
 
-    public static List<BOM> getBOMItemsByOrderId(ConnectionPool connectionPool, int orderId) throws DatabaseException {
+    public OrderMapper(ConnectionPool connectionPool) {
+        this.connectionPool = connectionPool;
+    }
+
+    public List<BOM> getBOMItemsByOrderId(int orderId) throws DatabaseException {
 
         List<BOM> bomList = new ArrayList<>();
         String query = "SELECT * FROM bill_of_products_view WHERE order_id = ?";
@@ -71,10 +70,10 @@ public class OrderMapper {
     }
 
 
-    public static Order insertOrder(Order order, ConnectionPool connectionPool) throws DatabaseException {
+    public Order insertOrder(Order order) throws DatabaseException {
 
-        String query = "INSERT INTO orders (carport_width, carport_length, is_paid, customer_id, total_price)" +
-                "VALUES(?,?,?,?,?)";
+        String query = "INSERT INTO orders (carport_width, carport_length, status, customer_id, total_price, trapeze_roof)" +
+                "VALUES(?,?,?,?,?,?,?)";
         try (
                 Connection connection = connectionPool.getConnection();
                 PreparedStatement preparedStatement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
@@ -101,7 +100,7 @@ public class OrderMapper {
         }
     }
 
-    public static void insertBOMItems(List<BOM> bomlist, ConnectionPool connectionPool) throws DatabaseException {
+    public void insertBOMItems(List<BOM> bomlist) throws DatabaseException {
 
         String query = "INSERT INTO bom_Items (order_id, product_variant_id, quantity, description)" + "VALUES(?,?,?,?)";
 

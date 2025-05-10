@@ -1,14 +1,9 @@
 package app;
 
-import app.controllers.AdminController;
 import app.controllers.RoutingController;
 import app.config.SessionConfig;
 import app.config.ThymeleafConfig;
-import app.persistence.AdminMapper;
 import app.persistence.ConnectionPool;
-import app.persistence.CustomerMapper;
-import app.util.PasswordUtil;
-import com.sendgrid.helpers.mail.objects.Personalization;
 import io.javalin.Javalin;
 import io.javalin.rendering.template.JavalinThymeleaf;
 import java.io.IOException;

@@ -1,28 +1,14 @@
 package app.service;
-
-import app.controllers.RoutingController;
-import app.config.SessionConfig;
-import app.config.ThymeleafConfig;
-
 import app.entities.Customer;
 import app.entities.Order;
-import app.persistence.ConnectionPool;
-
 import com.sendgrid.helpers.mail.objects.Personalization;
-import io.javalin.Javalin;
-import io.javalin.rendering.template.JavalinThymeleaf;
-
 import java.io.IOException;
-
-
 import com.sendgrid.SendGrid;
 import com.sendgrid.Request;
 import com.sendgrid.Response;
 import com.sendgrid.Method;
-
 import com.sendgrid.helpers.mail.Mail;
 import com.sendgrid.helpers.mail.objects.Email;
-import com.sendgrid.helpers.mail.objects.Personalization;
 
 public class EmailService {
 
