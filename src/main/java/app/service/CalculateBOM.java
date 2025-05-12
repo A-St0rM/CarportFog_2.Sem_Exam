@@ -26,7 +26,7 @@ public class CalculateBOM {
         calculateRoofs(order);
     }
 
-    private void calculatePoles(Order order) throws DatabaseException {
+    public void calculatePoles(Order order) throws DatabaseException {
         int quantity = calculatePolesQuantity(order);
 
         List<ProductVariant> productVariants = _productMapper.getVariantsByProductIdAndMinLength(_productMapper.getProductIdByName("97x97 mm. trykimp. Stolpe"), 300);
@@ -48,7 +48,7 @@ public class CalculateBOM {
         return totalAmountOfPoles * 2;
     }
 
-    private void calculateBeams(Order order) throws DatabaseException {
+    public void calculateBeams(Order order) throws DatabaseException {
         int totalLength = order.getCarportLength();
         int sides = 2;
 
@@ -77,7 +77,7 @@ public class CalculateBOM {
         }
     }
 
-    private Map<Integer, Integer> getOptimalBeamCombination(int length) {
+    public Map<Integer, Integer> getOptimalBeamCombination(int length) {
         int[] beamLengths = _productMapper.getAvailableBeamLengths();
 
         Map<Integer, Integer> optimalCombination = new HashMap<>();
