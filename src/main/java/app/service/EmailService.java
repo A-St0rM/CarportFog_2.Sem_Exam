@@ -61,6 +61,39 @@ public class EmailService {
         }
     }
 
+    public void sendPayment(Order order) throws IOException {
+        Customer customer = order.getCustomer();
+        Email from = new Email("Johannes@johannesfoog.dk");
+        from.setName("Johannes Fog Byggemarked");
+
+        Mail mail = new Mail();
+        mail.setFrom(from);
+        Personalization personalization = new Personalization();
+        personalization.addTo(new Email(customer.getEmail()));
+        personalization.addDynamicTemplateData("name", customer.getName());
+        personalization.addDynamicTemplateData("email", customer.getEmail());
+        personalization.addDynamicTemplateData("price", order.getTotalPrice());
+        personalization.addDynamicTemplateData("orderNumber", order.getOrderId());
+        personalization.addDynamicTemplateData("paymentSite", "https://carportfog.showmecode.dk/payment");
+        mail.addPersonalization(personalization);
+
+        mail.setTemplateId("d-6a883a6128f542d58457b712c21853df");
+
+        SendGrid sg = new SendGrid(API_KEY);
+        Request request = new Request();
+
+        try{
+            request.setMethod(Method.POST);
+            request.setEndpoint("mail/send");
+            request.setBody(mail.build());
+            Response response = sg.api(request);
+            System.out.println("SendGrid Payment Response Status Code: " + response.getStatusCode());
+        } catch (IOException ex) {
+            System.out.println("Fejl ved afsendelse af betalingsmail: " + ex.getMessage());
+            throw ex;
+        }
+    }
+
     public void sendConfirmation(Order order) throws IOException {
         Customer customer = order.getCustomer();
         Email from = new Email("Johannes@johannesfoog.dk");
