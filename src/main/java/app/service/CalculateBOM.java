@@ -190,7 +190,7 @@ public class CalculateBOM {
             List<ProductVariant> variants = _productMapper.getVariantsByProductIdAndMinWidth(width, productId);
             ProductVariant chosenVariant = null;
             for (ProductVariant variant : variants) {
-                if (variant.getLength() == width) {
+                if (variant.getWidth() == width) {
                     chosenVariant = variant;
                     break;
                 }
