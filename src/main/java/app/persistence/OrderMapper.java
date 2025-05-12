@@ -72,31 +72,33 @@ public class OrderMapper {
 
     public Order insertOrder(Order order) throws DatabaseException {
 
-        String query = "INSERT INTO orders (carport_width, carport_length, status, customer_id, total_price, trapeze_roof)" +
-                "VALUES(?,?,?,?,?,?,?)";
+        String query = "INSERT INTO orders (carport_width, carport_length, status, customer_id, total_price, trapeze_roof) " +
+                "VALUES (?, ?, ?, ?, ?, ?)";
+
         try (
                 Connection connection = connectionPool.getConnection();
-                PreparedStatement preparedStatement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
-
+                PreparedStatement preparedStatement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)
         ) {
             preparedStatement.setInt(1, order.getCarportWidth());
             preparedStatement.setInt(2, order.getCarportLength());
-            preparedStatement.setBoolean(3, false);
+            preparedStatement.setString(3, order.getStatus());
             preparedStatement.setInt(4, order.getCustomer().getCustomerId());
             preparedStatement.setInt(5, order.getTotalPrice());
             preparedStatement.setBoolean(6, order.getTrapezeRoof());
+
             preparedStatement.executeUpdate();
 
             ResultSet keySet = preparedStatement.getGeneratedKeys();
-
             if (keySet.next()) {
-                Order newOrder = new Order(keySet.getInt(1), order.getCarportWidth(), order.getCarportLength(), order.getStatus(), order.getTotalPrice(), order.getCustomer(), order.getTrapezeRoof());
-                return newOrder;
+                int orderId = keySet.getInt(1);
+                return new Order(orderId, order.getCarportWidth(), order.getCarportLength(),
+                        order.getStatus(), order.getTotalPrice(), order.getCustomer(),
+                        order.getTrapezeRoof());
             } else {
-                return null;
+                throw new DatabaseException("No generated key returned after inserting order.");
             }
         } catch (SQLException e) {
-            throw new DatabaseException("Could not insert order into the Database " + e.getMessage());
+            throw new DatabaseException("Could not insert order into the Database: " + e.getMessage());
         }
     }
 

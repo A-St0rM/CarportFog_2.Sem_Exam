@@ -11,6 +11,7 @@ public static void startRouting(Javalin app, ConnectionPool connectionPool) {
     DependencyInjector di = new DependencyInjector(connectionPool);
 
     OrderController orderController = di.getOrderController();
+    AdminController adminController = di.getAdminController();
 
 
     //General Routing
@@ -18,9 +19,16 @@ public static void startRouting(Javalin app, ConnectionPool connectionPool) {
     app.get("/details", ctx -> ctx.render("details.html"));
     app.get("/additions", ctx -> ctx.render("additions.html"));
     app.get("/specifications", ctx -> ctx.render("specifications.html"));
+    app.get("/admin/login", ctx -> ctx.render("admin_login.html"));
+    app.get("/admin/create", ctx -> ctx.render("create_admin.html"));
+    app.get("/admin_dashboard", ctx -> ctx.render("admin_dashboard.html"));
 
 
     app.post("/details", ctx -> orderController.handleDetailsPost(ctx));
+    app.post("/additions", ctx -> orderController.handleAdditionsPost(ctx));
+    app.post("/specifications", ctx -> orderController.handleSpecificationsPost(ctx));
+    app.post("/admin/login", ctx -> adminController.adminLogin(ctx));
+    app.post("/admin/create", ctx -> adminController.createAdmin(ctx));
 
 }
 

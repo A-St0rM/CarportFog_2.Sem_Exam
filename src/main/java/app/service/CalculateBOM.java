@@ -43,7 +43,7 @@ public class CalculateBOM {
 
         int effectiveLength = order.getCarportLength() - distanceFirstPole - overhangRear;
         int polesBetween = (int) Math.ceil((double) effectiveLength / maxDistanceBetweenPoles);
-        int totalAmountOfPoles = Math.max(2 + polesBetween, 2);
+        int totalAmountOfPoles = Math.max(2, polesBetween);
 
         return totalAmountOfPoles * 2;
     }

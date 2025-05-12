@@ -59,8 +59,11 @@ public class AdminMapper {
             ps.setString(2, hashedPassword); // Store the HASHED password
 
             int rowsAffected = ps.executeUpdate();
+            if (rowsAffected == 0) {
+                throw new DatabaseException("Ingen rækker blev oprettet. Prøv igen.");
+            }
         } catch (SQLException e) {
-            String msg = "Der er sket en fejl under oprettelse. Prøv igen";
+            throw new DatabaseException("Der er sket en fejl under oprettelse. Prøv igen ", e.getMessage());
         }
     }
 }

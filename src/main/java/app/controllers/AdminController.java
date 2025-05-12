@@ -33,7 +33,7 @@ public class AdminController {
             // success with login
             ctx.sessionAttribute("currentAdmin", adminDTO); // Use a consistent session key
             // Redirect to the admin dashboard
-            ctx.redirect("/templates/admin_dashboard.html");
+            ctx.redirect("/admin_dashboard");
 
         } catch (DatabaseException e) {
             // Handle known login errors (email not found, wrong password)
@@ -61,7 +61,7 @@ public class AdminController {
             adminMapper.createAdmin(email, hashedPassword);
             ctx.attribute("message", "Admin oprettet: " + email);
             // Redirect to dashboard
-            ctx.redirect("/templates/admin_dashboard.html");
+            ctx.redirect("/admin_dashboard");
 
         } catch (DatabaseException e) {
             // Handle errors from mapper (e.g., duplicate email)

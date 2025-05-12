@@ -25,46 +25,15 @@ public class OrderController {
         this._calculateBOM = calculateBOM;
     }
 
-//    private void sendRequest(Context ctx) {
-//
-//        //Get order details from frontend
-//        int width = ctx.sessionAttribute("width");
-//        int length = ctx.sessionAttribute("length");
-//        String status = "Not paid";
-//        boolean trapezeRoof = false; //TODO: hardcoded for now
-//        int totalPrice = 1999; //TODO: hardcoded for now
-//
-//        Customer customer = new Customer(1,"Voltvej 5", "21343432","999999999", "Lars",2100); //TODO: hardcoded for now
-//
-//        Order order = new Order(0, width, length, status, totalPrice, customer, trapezeRoof);
-//        // insert order in database
-//
-//        try{
-//            order = _orderMapper.insertOrder(order);
-//
-//            //calculate bom items
-//            _calculateBOM.calculateCarport(order);
-//
-//            //save bom items in database
-//            _orderMapper.insertBOMItems(_calculateBOM.getBom());
-//
-//            //create message to customer and render order /request confirmation
-//            ctx.render("orderflow/requestconfirmation.html");
-//
-//        } catch (DatabaseException e) { //TODO: handle exception later
-//            throw new RuntimeException(e);
-//        }
-//    }
-
     public void handleSpecificationsPost(Context ctx) {
-        int width = Integer.parseInt(ctx.formParam("width"));
-        int length = Integer.parseInt(ctx.formParam("length"));
-        ctx.sessionAttribute("width", width);
-        ctx.sessionAttribute("length", length);
-        boolean trapezeRoof = Boolean.parseBoolean(ctx.formParam("trapezeRoof"));
-        ctx.sessionAttribute("trapezeRoof", trapezeRoof);
+        int width = Integer.parseInt(ctx.formParam("carportWidth"));
+        int length = Integer.parseInt(ctx.formParam("carportLength"));
+        boolean trapezeRoof = Boolean.parseBoolean(ctx.formParam("hasTrapezRoof"));
+        ctx.sessionAttribute("carportWidth", width);
+        ctx.sessionAttribute("carportLength", length);
+        ctx.sessionAttribute("hasTrapezRoof", trapezeRoof);
 
-        ctx.redirect("/specifications");
+        ctx.redirect("/additions");
     }
 
     public void handleAdditionsPost(Context ctx) {
@@ -87,9 +56,9 @@ public class OrderController {
             Customer savedCustomer = _customerMapper.createCustomer(customer);
 
             // 3. Get earlier step data from session
-            int width = ctx.sessionAttribute("width");
-            int length = ctx.sessionAttribute("length");
-            boolean trapezeRoof = ctx.sessionAttribute("trapezeRoof");
+            int width = ctx.sessionAttribute("carportWidth");
+            int length = ctx.sessionAttribute("carportLength");
+            boolean trapezeRoof = ctx.sessionAttribute("hasTrapezRoof");
             int totalPrice = 1999; // Placeholder
             String status = "Not paid";
 
