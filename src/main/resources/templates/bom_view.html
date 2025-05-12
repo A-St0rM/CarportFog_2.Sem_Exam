@@ -9,6 +9,7 @@
 <div class="container">
   <h2>Stykliste for Ordre</h2>
 
+  <!-- FORM 1: Prisændringer pr. produkt -->
   <form method="post" th:action="@{/admin/order/update-prices}">
     <table>
       <thead>
@@ -26,21 +27,34 @@
         <td th:text="${bom.productVariant.length + ' cm'}">Længde</td>
         <td th:text="${bom.quantity}">Antal</td>
         <td th:text="${bom.description}">Beskrivelse</td>
-        <td th:text="${bom.productVariant.product.price}"/>
+        <td>
+          <input type="number"
+                 th:name="'price_' + ${bom.bomId}"
+                 th:value="${bom.productVariant.product.price}"
+                 step="0.01"/>
         </td>
       </tr>
       </tbody>
     </table>
-      <div class="total-price">
-        <h3>Samlet pris: <span th:text="${order.totalPrice} + ' kr'">0 kr</span></h3>
-      </div>
-    <br>
     <button type="submit" class="btn btn-primary">💾 Opdater priser</button>
   </form>
+
+  <br><br>
+
+  <!-- FORM 2: Manuel opdatering af samlet pris -->
+  <div class="manual-price-update">
+    <h3>Manuel opdatering af samlet pris</h3>
+    <form method="post" th:action="@{'/admin/order/set-total/' + ${order.orderId}}">
+      <input type="hidden" th:name="orderId" th:value="${order.orderId}" />
+      <label for="newTotalPrice">Ny samlet pris (kr):</label>
+      <input type="number" step="1" id="newTotalPrice" name="newTotalPrice"
+             th:value="${order.totalPrice}" required />
+      <button type="submit" class="btn btn-success">💾 Gem ny pris</button>
+    </form>
+  </div>
 
   <br>
   <a class="btn btn-secondary" th:href="@{/admin_dashboard}">⬅ Tilbage til dashboard</a>
 </div>
-
 </body>
 </html>
