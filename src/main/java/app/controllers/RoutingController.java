@@ -21,7 +21,11 @@ public static void startRouting(Javalin app, ConnectionPool connectionPool) {
     app.get("/specifications", ctx -> ctx.render("specifications.html"));
     app.get("/admin/login", ctx -> ctx.render("admin_login.html"));
     app.get("/admin/create", ctx -> ctx.render("create_admin.html"));
-    app.get("/admin_dashboard", ctx -> ctx.render("admin_dashboard.html"));
+    app.get("/admin_dashboard", ctx -> orderController.showAllOrders(ctx));
+    app.get("/admin/options", ctx -> ctx.render("admin_options.html"));
+    app.get("/admin/order/{orderId}/bom", ctx -> orderController.showBOMPage(ctx));
+
+
 
 
     app.post("/details", ctx -> orderController.handleDetailsPost(ctx));

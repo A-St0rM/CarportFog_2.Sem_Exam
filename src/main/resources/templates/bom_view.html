@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="da" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Stykliste for Ordre</title>
+  <link href="../public/css/index.css" th:href="@{/css/index.css}" rel="stylesheet"/>
+</head>
+<body>
+<div class="container">
+  <h2>Stykliste for Ordre</h2>
+
+  <form method="post" th:action="@{/admin/order/update-prices}">
+    <table>
+      <thead>
+      <tr>
+        <th>Produktnavn</th>
+        <th>Længde</th>
+        <th>Antal</th>
+        <th>Beskrivelse</th>
+        <th>Pris pr. meter (kr)</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="bom : ${bomList}">
+        <td th:text="${bom.productVariant.product.productName}">Produktnavn</td>
+        <td th:text="${bom.productVariant.length + ' cm'}">Længde</td>
+        <td th:text="${bom.quantity}">Antal</td>
+        <td th:text="${bom.description}">Beskrivelse</td>
+        <td th:text="${bom.productVariant.product.price}"/>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+      <div class="total-price">
+        <h3>Samlet pris: <span th:text="${order.totalPrice} + ' kr'">0 kr</span></h3>
+      </div>
+    <br>
+    <button type="submit" class="btn btn-primary">💾 Opdater priser</button>
+  </form>
+
+  <br>
+  <a class="btn btn-secondary" th:href="@{/admin_dashboard}">⬅ Tilbage til dashboard</a>
+</div>
+
+</body>
+</html>

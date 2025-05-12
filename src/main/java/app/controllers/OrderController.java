@@ -1,5 +1,6 @@
 package app.controllers;
 
+import app.entities.BOM;
 import app.entities.Customer;
 import app.entities.Order;
 import app.persistence.ConnectionPool;
@@ -8,6 +9,7 @@ import app.persistence.OrderMapper;
 import app.service.CalculateBOM;
 import io.javalin.http.Context;
 
+import java.util.List;
 
 
 public class OrderController {
@@ -79,4 +81,34 @@ public class OrderController {
             ctx.status(500).result("Error saving order.");
         }
     }
+
+    public void showAllOrders(Context ctx) {
+        try {
+            List<Order> orders = _orderMapper.getAllOrdersWithCustomerInfo();
+            ctx.attribute("orders", orders);
+            ctx.render("admin_dashboard.html");
+        } catch (Exception e) {
+            e.printStackTrace();
+            ctx.status(500).result("Fejl ved hentning af ordrer");
+        }
+    }
+
+    public void showBOMPage(Context ctx) {
+        int orderId = Integer.parseInt(ctx.pathParam("orderId"));
+
+        try {
+            Order order = _orderMapper.getOrderById(orderId);
+            List<BOM> bomList = _orderMapper.getBOMForOrder(orderId);
+
+            ctx.attribute("order", order);
+            ctx.attribute("bomList", bomList);
+            ctx.render("bom_view.html");
+        } catch (Exception e) {
+            ctx.status(500).result("Kunne ikke hente stykliste.");
+        }
+    }
+
+
+
+
 }

@@ -23,13 +23,18 @@ public class CalculateBOM {
         calculatePoles(order);
         calculateBeams(order);
         calculateRafters(order);
-        calculateRoofs(order);
+//        calculateRoofs(order);
     }
 
     private void calculatePoles(Order order) throws DatabaseException {
         int quantity = calculatePolesQuantity(order);
 
-        List<ProductVariant> productVariants = _productMapper.getVariantsByProductIdAndMinLength(_productMapper.getProductIdByName("97x97 mm. trykimp. Stolpe"), 300);
+        List<ProductVariant> productVariants = _productMapper.getVariantsByProductIdAndMinLength(300, _productMapper.getProductIdByName("97x97 mm. trykimp. Stolpe"));
+
+        if (productVariants.isEmpty()) {
+            throw new DatabaseException("Ingen produktvarianter fundet for produktet");
+        }
+
         ProductVariant productVariant = productVariants.get(0);
         BOM bom = new BOM(0, quantity, "Stolper nedgraves 90cm i jorden", order, productVariant);
 
@@ -58,7 +63,7 @@ public class CalculateBOM {
             int countForOneSide = combination.get(length);
             int totalCount = countForOneSide * sides;
 
-            List<ProductVariant> variants = _productMapper.getVariantsByProductIdAndMinLength(_productMapper.getProductIdByName("45x195 mm. spærtræ ubh."), length);
+            List<ProductVariant> variants = _productMapper.getVariantsByProductIdAndMinLength(length, _productMapper.getProductIdByName("45x195 mm. spærtræ ubh."));
 
             ProductVariant chosenVariant = null;
             for (ProductVariant variant : variants) {
@@ -107,7 +112,7 @@ public class CalculateBOM {
         int innerLength = (int) (order.getCarportLength() - (rafterWidth * 2));
         int quantity = (int) Math.ceil((double) innerLength / spacing) + 2;
 
-        List<ProductVariant> variants = _productMapper.getVariantsByProductIdAndMinLength(_productMapper.getProductIdByName("45x195 mm. spærtræ ubh."), order.getCarportWidth());
+        List<ProductVariant> variants = _productMapper.getVariantsByProductIdAndMinLength(order.getCarportWidth(), _productMapper.getProductIdByName("45x195 mm. spærtræ ubh."));
         ProductVariant variant = variants.get(0);
 
         BOM bom = new BOM(0, quantity, "Spær monteres på rem", order, variant);
@@ -173,7 +178,7 @@ public class CalculateBOM {
             int countPerRow = entry.getValue();
             int totalCount = countPerRow * amountOfRoofsLength;
 
-            List<ProductVariant> variants = _productMapper.getVariantsByProductIdAndMinLength(_productMapper.getProductIdByName("Plastmo Ecolite Blåtonet 109 mm."), width);
+            List<ProductVariant> variants = _productMapper.getVariantsByProductIdAndMinLength(width, _productMapper.getProductIdByName("Plastmo Ecolite Blåtonet 109 mm."));
             ProductVariant chosenVariant = null;
             for (ProductVariant variant : variants) {
                 if (variant.getLength() == width) {

@@ -42,4 +42,6 @@ public class BOM {
     public ProductVariant getProductVariant() {
         return productVariant;
     }
+
+
 }
