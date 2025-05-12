@@ -29,7 +29,14 @@ public class CalculateBOM {
     public void calculatePoles(Order order) throws DatabaseException {
         int quantity = calculatePolesQuantity(order);
 
-        List<ProductVariant> productVariants = _productMapper.getVariantsByProductIdAndMinLength(_productMapper.getProductIdByName("97x97 mm. trykimp. Stolpe"), 300);
+        int productId = _productMapper.getProductIdByName("97x97 mm. trykimp. Stolpe");
+
+        List<ProductVariant> productVariants = _productMapper.getVariantsByProductIdAndMinLength(300, productId);
+
+        if (productVariants.isEmpty()) {
+            throw new DatabaseException("Product not found for id " + productId + " with min. length: " + 300);
+        }
+
         ProductVariant productVariant = productVariants.get(0);
         BOM bom = new BOM(0, quantity, "Stolper nedgraves 90cm i jorden", order, productVariant);
 
@@ -52,14 +59,15 @@ public class CalculateBOM {
         int totalLength = order.getCarportLength();
         int sides = 2;
 
+        int productId = _productMapper.getProductIdByName("45x195 mm. spærtræ ubh.");
+
         Map<Integer, Integer> combination = getOptimalBeamCombination(totalLength);
 
         for (Integer length : combination.keySet()) {
             int countForOneSide = combination.get(length);
             int totalCount = countForOneSide * sides;
 
-            List<ProductVariant> variants = _productMapper.getVariantsByProductIdAndMinLength(_productMapper.getProductIdByName("45x195 mm. spærtræ ubh."), length);
-
+            List<ProductVariant> variants = _productMapper.getVariantsByProductIdAndMinLength(length, productId);
             ProductVariant chosenVariant = null;
             for (ProductVariant variant : variants) {
                 if (variant.getLength() == length) {
@@ -107,7 +115,10 @@ public class CalculateBOM {
         int innerLength = (int) (order.getCarportLength() - (rafterWidth * 2));
         int quantity = (int) Math.ceil((double) innerLength / spacing) + 2;
 
-        List<ProductVariant> variants = _productMapper.getVariantsByProductIdAndMinLength(_productMapper.getProductIdByName("45x195 mm. spærtræ ubh."), order.getCarportWidth());
+        int productId = _productMapper.getProductIdByName("45x195 mm. spærtræ ubh.");
+
+        // TODO: Hvorfor henter jeg carport bredde her? Dobbelttjek.
+        List<ProductVariant> variants = _productMapper.getVariantsByProductIdAndMinLength(order.getCarportWidth(), productId);
         ProductVariant variant = variants.get(0);
 
         BOM bom = new BOM(0, quantity, "Spær monteres på rem", order, variant);
@@ -166,6 +177,8 @@ public class CalculateBOM {
 
         int amountOfRoofsLength = calculateRoofLengthQuantity(order);
 
+        int productId = _productMapper.getProductIdByName("Plastmo Ecolite Blåtonet 109 mm.");
+
         Map<Integer, Integer> widthCombination = getOptimalRoofCombination(carportWidth);
 
         for (Map.Entry<Integer, Integer> entry : widthCombination.entrySet()) {
@@ -173,7 +186,8 @@ public class CalculateBOM {
             int countPerRow = entry.getValue();
             int totalCount = countPerRow * amountOfRoofsLength;
 
-            List<ProductVariant> variants = _productMapper.getVariantsByProductIdAndMinLength(_productMapper.getProductIdByName("Plastmo Ecolite Blåtonet 109 mm."), width);
+            // TODO: Igen her, skal vi bruge bredde. Ny mapper måske?
+            List<ProductVariant> variants = _productMapper.getVariantsByProductIdAndMinLength(width, productId);
             ProductVariant chosenVariant = null;
             for (ProductVariant variant : variants) {
                 if (variant.getLength() == width) {
@@ -183,7 +197,7 @@ public class CalculateBOM {
             }
 
             if (chosenVariant == null) {
-                throw new DatabaseException("Kunne ikke finde produktvariant med bredde" + width + "cm.");
+                throw new DatabaseException("Kunne ikke finde produktvariant med bredde " + width + " cm.");
             }
             BOM bom = new BOM(0, totalCount, "Tagplader monteres på spær", order, chosenVariant);
             bomList.add(bom); //Could be wrong with this.

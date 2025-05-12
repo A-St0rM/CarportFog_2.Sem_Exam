@@ -23,7 +23,9 @@ public class ProductMapper {
 
         List<ProductVariant> variants = new ArrayList<ProductVariant>();
 
-        String query = "SELECT * FROM product_variants" + "INNER JOIN products m USING(product_id)" + "WHERE product_id = ? AND length = >= ?";
+        String query = "SELECT * FROM product_variants " +
+                "INNER JOIN products USING(product_id) " +
+                "WHERE product_id = ? AND length >= ?";
 
         try(Connection con = connectionPool.getConnection())
         {
@@ -38,7 +40,8 @@ public class ProductMapper {
                 int length = rs.getInt("length");
                 String name = rs.getString("name");
                 String unit = rs.getString("unit");
-                int price = rs.getInt("price");
+                int width = rs.getInt("width");
+                int price = rs.getInt("price_meter");
                 Product product = new Product(product_id, name, unit, price);
                 ProductVariant productVariant = new ProductVariant(variantId, length, product);
                 variants.add(productVariant);

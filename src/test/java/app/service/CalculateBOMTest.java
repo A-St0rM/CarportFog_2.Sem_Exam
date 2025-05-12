@@ -43,8 +43,15 @@ class CalculateBOMTest {
     }
 
     @Test
-    void calculateCarportTest() {
+    void calculateCarportTest() throws DatabaseException {
+        // BOM skal være tom til at starte med
+        assertEquals(0, calculateBOM.getBom().size());
 
+        // Kald den samlede beregning
+        calculateBOM.calculateCarport(order);
+
+        // Bekræft at BOM ikke er tom bagefter
+        assertTrue(calculateBOM.getBom().size() > 0);
     }
 
 
@@ -101,7 +108,7 @@ class CalculateBOMTest {
         // Laver testen false hvis kombinationen er tom. Det skal den ikke være.
         assertFalse(combination.isEmpty());
 
-        // Tjekker at den indeholder de optimale længder (i dette tilfælde er det 240 + 240 der er mest optimal)
+        // Tjekker at den indeholder de optimale længder (i dette tilfælde er det 240+360 || 300 + 300 der er mest optimal)
         assertTrue(combination.containsKey(240) || combination.containsKey(300));
         assertTrue(combination.containsKey(360) || combination.containsKey(300));
     }
