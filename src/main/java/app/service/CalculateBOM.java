@@ -114,7 +114,7 @@ public class CalculateBOM {
         bomList.add(bom);
     }
 
-    // TODO: Denne metode tager kun den totale mængde af tagplader. Den siger ikke fx 2 240cm, 2 360cm
+    // Denne metode tager kun den totale mængde af tagplader. Den siger ikke fx 2 240cm, 2 360cm
     private int calculateTrapezRoofQuantity(Order order) throws DatabaseException {
         return calculateRoofLengthQuantity(order) * calculateRoofWidthQuantity(order);
     }

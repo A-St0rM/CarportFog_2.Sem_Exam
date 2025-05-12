@@ -28,9 +28,64 @@ class CalculateBOMTest {
     }
 
     @Test
-    void calculatePolesQuantity() {
+    void calculateCarportTest() {
 
+    }
+
+
+    @Test
+    void calculatePolesTest() {
+
+    }
+    @Test
+    void calculatePolesQuantityTest() {
         assertEquals(6, calculateBOM.calculatePolesQuantity(order));
+
+    }
+
+
+    @Test
+    void calculateBeamsTest(){
+
+    }
+
+    @Test
+    void getOptimalBeamCombinationTest(){
+
+    }
+
+    @Test
+    void calculateRaftersTest(){
+
+    }
+
+    @Test
+    void calculateTrapezRoofQuantityTest(){
+
+    }
+
+    @Test
+    void calculateRoofWidthQuantityTest(){
+
+    }
+
+    @Test
+    void calculateRoofLengthQuantityTest(){
+
+    }
+
+    @Test
+    void getOptimalRoofCombinationTest(){
+
+    }
+
+    @Test
+    void calculateRoofsTest(){
+
+    }
+
+    @Test
+    void getBomTest(){
 
     }
 }
