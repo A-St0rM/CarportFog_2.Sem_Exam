@@ -53,6 +53,37 @@ public class ProductMapper {
         return variants;
     }
 
+    public List<ProductVariant> getVariantsByProductIdAndMinWidth(int minWidth, int productId) throws DatabaseException {
+        List<ProductVariant> variants = new ArrayList<>();
+
+        String query = "SELECT * FROM product_variants INNER JOIN products m USING(product_id) WHERE product_id = ? AND width >= ?";
+
+        try (Connection con = connectionPool.getConnection()) {
+            PreparedStatement ps = con.prepareStatement(query);
+            ps.setInt(1, productId);
+            ps.setInt(2, minWidth);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                int variantId = rs.getInt("product_variant_id");
+                int product_id = rs.getInt("product_id");
+                int length = rs.getInt("length");
+                int width = rs.getInt("width");
+                String name = rs.getString("name");
+                String unit = rs.getString("unit");
+                int price = rs.getInt("price_meter");
+
+                Product product = new Product(product_id, name, unit, price);
+                ProductVariant variant = new ProductVariant(variantId, length, product);
+                variants.add(variant);
+            }
+        } catch (SQLException e) {
+            throw new DatabaseException("Couldn't get variants by width: " + e.getMessage());
+        }
+
+        return variants;
+    }
+
     public int getProductIdByName(String name) throws DatabaseException {
         String sql = "SELECT product_id FROM products WHERE LOWER(name) = LOWER(?)";
         try (Connection conn = connectionPool.getConnection();

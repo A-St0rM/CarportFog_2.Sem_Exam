@@ -50,7 +50,7 @@ public class CalculateBOM {
 
         int effectiveLength = order.getCarportLength() - distanceFirstPole - overhangRear;
         int polesBetween = (int) Math.ceil((double) effectiveLength / maxDistanceBetweenPoles);
-        int totalAmountOfPoles = Math.max(2 + polesBetween, 2);
+        int totalAmountOfPoles = Math.max(2, polesBetween);
 
         return totalAmountOfPoles * 2;
     }
@@ -187,7 +187,7 @@ public class CalculateBOM {
             int totalCount = countPerRow * amountOfRoofsLength;
 
             // TODO: Igen her, skal vi bruge bredde. Ny mapper måske?
-            List<ProductVariant> variants = _productMapper.getVariantsByProductIdAndMinLength(width, productId);
+            List<ProductVariant> variants = _productMapper.getVariantsByProductIdAndMinWidth(width, productId);
             ProductVariant chosenVariant = null;
             for (ProductVariant variant : variants) {
                 if (variant.getLength() == width) {
@@ -200,7 +200,7 @@ public class CalculateBOM {
                 throw new DatabaseException("Kunne ikke finde produktvariant med bredde " + width + " cm.");
             }
             BOM bom = new BOM(0, totalCount, "Tagplader monteres på spær", order, chosenVariant);
-            bomList.add(bom); //Could be wrong with this.
+            bomList.add(bom);
         }
     }
 
