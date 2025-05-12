@@ -31,7 +31,6 @@ public class CustomerMapper {
                 String address = rs.getString("address");
                 String phone = rs.getString("phone");
                 String email = rs.getString("email");
-                String city = rs.getString("city");
                 int postalCode = rs.getInt("postalCode");
 
                 Customer customer;

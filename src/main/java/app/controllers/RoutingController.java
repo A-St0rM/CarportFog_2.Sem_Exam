@@ -18,10 +18,23 @@ public static void startRouting(Javalin app, ConnectionPool connectionPool) {
     app.get("/", ctx -> ctx.render("index.html"));
     app.get("/details", ctx -> ctx.render("details.html"));
     app.get("/additions", ctx -> ctx.render("additions.html"));
+
+    //Middleware beskytte admin ruter
+    app.before("/admin/*", ctx -> {
+        // Undtagelse: login- og oprettelsessider
+        String path = ctx.path();
+        if (!path.equals("/admin/login")) {
+            if (ctx.sessionAttribute("currentAdmin") == null) {
+                ctx.redirect("/admin/login");
+            }
+        }
+    });
+
     app.get("/admin/login", ctx -> ctx.render("admin_login.html"));
     app.get("/admin/create", ctx -> ctx.render("create_admin.html"));
-    app.get("/admin_dashboard", ctx -> orderController.showAllOrders(ctx));
+    app.get("/admin/dashboard", ctx -> orderController.showAllOrders(ctx));
     app.get("/admin/order/{orderId}/bom", ctx -> orderController.showBOMPage(ctx));
+    app.get("/specifications", ctx -> ctx.render("specifications.html"));
 
 
 

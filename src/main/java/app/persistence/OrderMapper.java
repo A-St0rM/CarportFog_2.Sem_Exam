@@ -201,27 +201,6 @@ public class OrderMapper {
         throw new DatabaseException("Ordre med ID " + orderId + " blev ikke fundet.");
     }
 
-    //Metode til at beregne totalprisen:
-    public int calculateTotalPriceForOrder(int orderId) throws DatabaseException {
-        String sql = "SELECT SUM(b.quantity * p.price_meter) AS total " +
-                "FROM bom_items b " +
-                "JOIN product_variants pv ON b.product_variant_id = pv.product_variant_id " +
-                "JOIN products p ON pv.product_id = p.product_id " +
-                "WHERE b.order_id = ?";
-
-        try (Connection conn = connectionPool.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, orderId);
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                return rs.getInt("total");
-            }
-        } catch (SQLException e) {
-            throw new DatabaseException("Kunne ikke beregne totalprisen: " + e.getMessage());
-        }
-        return 0;
-    }
-
     public void updateOrderTotalPrice(int orderId, int newTotalPrice) throws DatabaseException {
         String sql = "UPDATE orders SET total_price = ? WHERE order_id = ?";
         try (Connection conn = connectionPool.getConnection();
