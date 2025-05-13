@@ -126,7 +126,10 @@ public class CalculateBOM {
 //    }
 
     public void calculateRafters(Order order) throws DatabaseException {
+        // Regner med 60 cm mellem spær
         int spacing = 60;
+
+        // Hvert spærtræ er 45mm brede
         double rafterWidth = 4.5;
 
         // Vi udregner her den egentlige indre længde minus spær i hver endes bredde (altså derfor * 2)
