@@ -8,6 +8,7 @@ import app.persistence.ConnectionPool;
 import app.persistence.CustomerMapper;
 import app.persistence.OrderMapper;
 import app.service.CalculateBOM;
+import app.service.EmailService;
 import io.javalin.http.Context;
 
 import java.util.List;
@@ -57,6 +58,7 @@ public class OrderController {
 
         try {
             Customer savedCustomer = _customerMapper.createCustomer(customer);
+            EmailService emailService = new EmailService();
 
             int width = ctx.sessionAttribute("carportWidth");
             int length = ctx.sessionAttribute("carportLength");
@@ -75,6 +77,8 @@ public class OrderController {
 
             // 7. Save BOM items
             _orderMapper.insertBOMItems(_calculateBOM.getBom());
+
+            emailService.sendMailOffer(name, email, zip, order.getTotalPrice());
 
             // 8. Clean up session and redirect
             ctx.req().getSession().invalidate();
