@@ -78,9 +78,10 @@ public class OrderController {
             // 7. Save BOM items
             _orderMapper.insertBOMItems(_calculateBOM.getBom());
 
+            //8
             emailService.sendMailOffer(name, email, zip, order.getTotalPrice());
 
-            // 8. Clean up session and redirect
+            // 9. Clean up session and redirect
             ctx.req().getSession().invalidate();
             ctx.render("confirmation.html");
 
