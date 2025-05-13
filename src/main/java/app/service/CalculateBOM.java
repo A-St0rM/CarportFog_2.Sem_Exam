@@ -128,9 +128,14 @@ public class CalculateBOM {
     public void calculateRafters(Order order) throws DatabaseException {
         int spacing = 60;
         double rafterWidth = 4.5;
+
+        // Vi udregner her den egentlige indre længde minus spær i hver endes bredde (altså derfor * 2)
         int innerLength = (int) (order.getCarportLength() - (rafterWidth * 2));
+
+        // Vi udregner her hvor mange mellemrum der er, men der er altid 1 spær mere end der er mellemrum, derfor + 1 til sidst
         int quantity = (int) Math.ceil((double) innerLength / spacing) + 1;
 
+        // Her henter vi produktID på det træ vi bruger. Det kunne måske være gjort hardcoded.
         int productId = _productMapper.getProductIdByName("45x195 mm. spærtræ ubh.");
 
         // Bruger carportens bredde som længdemål til spær (vi bruger samme produkt til spær & remme).
@@ -224,6 +229,7 @@ public class CalculateBOM {
         }
     }
 
+    // Denne metode returnerer hele styklisten.
     public List<BOM> getBom() {
         return bomList;
     }
