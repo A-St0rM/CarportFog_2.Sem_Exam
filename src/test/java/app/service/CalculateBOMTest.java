@@ -119,32 +119,60 @@ class CalculateBOMTest {
     }
 
     @Test
-    void calculateTrapezRoofQuantityTest() {
+    void calculateRoofWidthQuantityTest() throws DatabaseException {
+        Order order500 = new Order(500, 600, "Test", 10000, customer, false);
+        int actual = calculateBOM.calculateRoofWidthQuantity(order500);
 
-    }
-
-    @Test
-    void calculateRoofWidthQuantityTest() {
-
+        // Forventer 2 (240 + 300 cm plader per række)
+        assertEquals(2, actual);
     }
 
     @Test
     void calculateRoofLengthQuantityTest() {
+        int length = 470;
+        int expected = (int) Math.ceil(length / 109.0);
+        int actual = calculateBOM.calculateRoofLengthQuantity(order);
 
+        assertEquals(expected, actual);
     }
+
+
 
     @Test
     void getOptimalRoofCombinationTest() {
+        // Test 1 bredde på 300 cm skal matche med 1 tagplade på 300 cm
+        Map<Integer, Integer> combination1 = calculateBOM.getOptimalRoofCombination(300);
+        assertEquals(1, combination1.size());
+        assertTrue(combination1.containsKey(300));
 
+        // Test 2 bredde på 500 cm skal matche med 2 tagplade på 240+300 cm (for 1 på 600cm ville være 100cm overskud, dette er 60cm spild i stedet)
+        Map<Integer, Integer> combination2 = calculateBOM.getOptimalRoofCombination(500);
+        assertEquals(2, combination2.size());
+        assertTrue(combination2.containsKey(240) && combination2.containsKey(300));
     }
 
     @Test
-    void calculateRoofsTest() {
+    void calculateRoofsTest() throws DatabaseException {
+        calculateBOM.calculateRoofs(order);
 
+        // Forventer mindst én BOM-indgang for tagplader
+        boolean hasRoofEntry = false;
+        for (BOM bom : calculateBOM.getBom()) {
+            if (bom.getDescription().equals("Tagplader monteres på spær")) {
+                hasRoofEntry = true;
+                break;
+            }
+        }
+        assertTrue(hasRoofEntry);
+
+        // Test fejlhåndtering: Simuler en ugyldig bredde
+        Order invalidOrder = new Order(9999, 600, "Test", 10000, customer, false);
+        assertThrows(DatabaseException.class, () -> calculateBOM.calculateRoofs(invalidOrder));
     }
 
     @Test
     void getBomTest() {
 
     }
+
 }

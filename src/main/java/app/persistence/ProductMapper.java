@@ -56,7 +56,7 @@ public class ProductMapper {
     public List<ProductVariant> getVariantsByProductIdAndMinWidth(int minWidth, int productId) throws DatabaseException {
         List<ProductVariant> variants = new ArrayList<>();
 
-        String query = "SELECT * FROM product_variants INNER JOIN products m USING(product_id) WHERE product_id = ? AND width >= ?";
+        String query = "SELECT * FROM product_variants INNER JOIN products m USING (product_id) WHERE product_id = ? AND width >= ?";
 
         try (Connection con = connectionPool.getConnection()) {
             PreparedStatement ps = con.prepareStatement(query);
@@ -130,12 +130,12 @@ public class ProductMapper {
 
     public int[] getAvailableRoofWidths() throws DatabaseException {
         List<Integer> roofWidths = new ArrayList<>();
-        String query = "SELECT width FROM product_variants WHERE product_id = ?";
+        String query = "SELECT width FROM product_variants WHERE product_id = ? AND width >= 240";
 
         try (Connection con = connectionPool.getConnection()) {
             PreparedStatement ps = con.prepareStatement(query);
-            int productIdForBeams = 3; // Det er produkt-ID’et for tag
-            ps.setInt(1, productIdForBeams);
+            int productIdForRoofs = 3; // Det er produkt-ID’et for tag
+            ps.setInt(1, productIdForRoofs);
 
             ResultSet rs = ps.executeQuery();
 

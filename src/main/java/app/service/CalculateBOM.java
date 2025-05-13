@@ -130,7 +130,7 @@ public class CalculateBOM {
         return calculateRoofLengthQuantity(order) * calculateRoofWidthQuantity(order);
     }
 
-    private int calculateRoofWidthQuantity(Order order) throws DatabaseException {
+    public int calculateRoofWidthQuantity(Order order) throws DatabaseException {
         int carportWidth = order.getCarportWidth();
         Map<Integer, Integer> combination = getOptimalRoofCombination(carportWidth);
 
@@ -141,26 +141,40 @@ public class CalculateBOM {
         return amountOfRoofsWidth;
     }
 
-    private int calculateRoofLengthQuantity(Order order) throws DatabaseException {
+    public int calculateRoofLengthQuantity(Order order) throws DatabaseException {
         int carportLength = order.getCarportLength();
         int amountOfRoofsLength = (int) Math.ceil(carportLength / 109.0);
 
-        return amountOfRoofsLength * amountOfRoofsLength;
+        return amountOfRoofsLength;
     }
 
-    private Map<Integer, Integer> getOptimalRoofCombination(int width) {
+    public Map<Integer, Integer> getOptimalRoofCombination(int width) {
         int[] roofWidths = _productMapper.getAvailableRoofWidths();
 
         Map<Integer, Integer> optimalCombination = new HashMap<>();
         int bestOvershoot = Integer.MAX_VALUE;
 
+        // Vi starter med at tjekke om en enkelt plade kan dække hele bredden
+
+        for (int roofWidth : roofWidths) {
+            if (roofWidth >= width) {
+                int overshoot = roofWidth - width;
+                if (overshoot < bestOvershoot) {
+                    bestOvershoot = overshoot;
+                    optimalCombination.clear();
+                    optimalCombination.put(roofWidth, 1); // Brug én plade
+                }
+            }
+        }
+
+        // Hvis ingen enkelt tagplade findes, så tjekker vi kombinationerne
+
         for (int i = 0; i < roofWidths.length; i++) {
             for (int j = i; j < roofWidths.length; j++) {
-                int totalLength = roofWidths[i] + roofWidths[j];
-
-                if (totalLength >= width) {
-                    int overshoot = totalLength - width;
-                    if (overshoot < bestOvershoot) {
+                int totalWidth = roofWidths[i] + roofWidths[j];
+                if (totalWidth >= width) {
+                    int overshoot = totalWidth - width;
+                    if (overshoot < bestOvershoot) { // Sammenlign med den bedste løsning indtil videre
                         bestOvershoot = overshoot;
                         optimalCombination.clear();
                         optimalCombination.put(roofWidths[i], 1);
@@ -169,10 +183,11 @@ public class CalculateBOM {
                 }
             }
         }
+
         return optimalCombination;
     }
 
-    private void calculateRoofs(Order order) throws DatabaseException {
+    public void calculateRoofs(Order order) throws DatabaseException {
         int carportWidth = order.getCarportWidth();
 
         int amountOfRoofsLength = calculateRoofLengthQuantity(order);
