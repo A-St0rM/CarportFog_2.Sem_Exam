@@ -2,7 +2,7 @@ name: Deploy to VM
 
 on:
   push:
-    branches: [master]  # Trigger når der pushes til master
+    branches: [master]
 
 jobs:
   deploy:
@@ -21,28 +21,16 @@ jobs:
     - name: Build with Maven
       run: mvn clean package -DskipTests
 
-    - name: Rename JAR with commit SHA
-      run: mv target/app.jar target/app-${{ github.sha }}.jar
-
-    - name: Clean old JARs from VM
-      uses: appleboy/ssh-action@master
-      with:
-        host: ${{ secrets.VM_HOST }}
-        username: jetty
-        key: ${{ secrets.VM_SSH_KEY }}
-        script: |
-          rm -f /home/jetty/deployment/carportfog2sem/app-*.jar
-
-    - name: Upload new JAR to VM
+    - name: Upload fat jar to VM
       uses: appleboy/scp-action@master
       with:
         host: ${{ secrets.VM_HOST }}
         username: jetty
         key: ${{ secrets.VM_SSH_KEY }}
-        source: target/app-${{ github.sha }}.jar
+        source: target/app.jar
         target: /home/jetty/deployment/carportfog2sem/
 
-    - name: Restart Docker with fresh build
+    - name: Restart Docker containers on VM
       uses: appleboy/ssh-action@master
       with:
         host: ${{ secrets.VM_HOST }}
@@ -51,6 +39,4 @@ jobs:
         script: |
           cd /home/jetty/deployment
           docker compose down
-          docker builder prune -af
-          docker compose build --no-cache
-          docker compose up -d
+          docker compose up -d --build
