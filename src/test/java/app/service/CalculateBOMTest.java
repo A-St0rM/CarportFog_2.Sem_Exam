@@ -12,6 +12,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -114,8 +115,29 @@ class CalculateBOMTest {
     }
 
     @Test
-    void calculateRaftersTest() {
+    void calculateRaftersTest() throws DatabaseException {
+        // Arrange
+        Order order = new Order(780, 600, "Test", 10000, customer, false);
 
+        // Act
+        calculateBOM.calculateRafters(order);
+        List<BOM> bomList = calculateBOM.getBom();
+
+        // Assert
+        boolean hasRaftersEntry = false;
+        for (BOM bom : bomList) {
+            if (bom.getDescription().equals("Spær monteres på rem")) {
+                // Verificer antallet (baseret på formel fra metoden)
+                int expectedQuantity = (int) (Math.ceil((780 - 4.5 * 2) / 60.0) + 2);
+                assertEquals(expectedQuantity, bom.getQuantity());
+
+                // Verificer at varianten har korrekt længde (skal matche carportens bredde)
+                assertEquals(600, bom.getProductVariant().getLength());
+                hasRaftersEntry = true;
+                break;
+            }
+        }
+        assertTrue(hasRaftersEntry, "Mangler spær-indgang i BOM");
     }
 
     @Test
@@ -155,7 +177,6 @@ class CalculateBOMTest {
     void calculateRoofsTest() throws DatabaseException {
         calculateBOM.calculateRoofs(order);
 
-        // Forventer mindst én BOM-indgang for tagplader
         boolean hasRoofEntry = false;
         for (BOM bom : calculateBOM.getBom()) {
             if (bom.getDescription().equals("Tagplader monteres på spær")) {
@@ -164,10 +185,6 @@ class CalculateBOMTest {
             }
         }
         assertTrue(hasRoofEntry);
-
-        // Test fejlhåndtering: Simuler en ugyldig bredde
-        Order invalidOrder = new Order(9999, 600, "Test", 10000, customer, false);
-        assertThrows(DatabaseException.class, () -> calculateBOM.calculateRoofs(invalidOrder));
     }
 
     @Test

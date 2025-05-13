@@ -84,6 +84,37 @@ public class ProductMapper {
         return variants;
     }
 
+    public ProductVariant getVariantByProductIdAndWidth(int productId, int width) throws DatabaseException {
+        String sql = "SELECT pv.*, p.name, p.unit, p.price_meter " +
+                "FROM product_variants pv " +
+                "JOIN products p ON pv.product_id = p.product_id " +
+                "WHERE pv.product_id = ? AND pv.width = ?";
+
+        try (Connection con = connectionPool.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, productId);
+            ps.setInt(2, width);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                return new ProductVariant(
+                        rs.getInt("product_variant_id"),
+                        rs.getInt("length"),
+                        new Product(
+                                productId,
+                                rs.getString("name"),
+                                rs.getString("unit"),
+                                rs.getInt("price_meter") // Rettet til price_meter
+                        )
+                );
+            } else {
+                throw new DatabaseException("Ingen variant med bredde " + width + " cm for produkt " + productId);
+            }
+        } catch (SQLException e) {
+            throw new DatabaseException("Databasefejl: " + e.getMessage());
+        }
+    }
+
     public int getProductIdByName(String name) throws DatabaseException {
         String sql = "SELECT product_id FROM products WHERE LOWER(name) = LOWER(?)";
         try (Connection conn = connectionPool.getConnection();

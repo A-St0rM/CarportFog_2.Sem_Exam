@@ -109,7 +109,7 @@ public class CalculateBOM {
         return optimalCombination;
     }
 
-    private void calculateRafters(Order order) throws DatabaseException {
+    public void calculateRafters(Order order) throws DatabaseException {
         int spacing = 60;
         double rafterWidth = 4.5;
         int innerLength = (int) (order.getCarportLength() - (rafterWidth * 2));
@@ -117,7 +117,7 @@ public class CalculateBOM {
 
         int productId = _productMapper.getProductIdByName("45x195 mm. spærtræ ubh.");
 
-        // TODO: Hvorfor henter jeg carport bredde her? Dobbelttjek.
+        // Her henter spærtræ ud fra bredden af carporten (hvilket inputtes som minLength i mapperen)
         List<ProductVariant> variants = _productMapper.getVariantsByProductIdAndMinLength(order.getCarportWidth(), productId);
         ProductVariant variant = variants.get(0);
 
@@ -189,32 +189,17 @@ public class CalculateBOM {
 
     public void calculateRoofs(Order order) throws DatabaseException {
         int carportWidth = order.getCarportWidth();
-
-        int amountOfRoofsLength = calculateRoofLengthQuantity(order);
-
         int productId = _productMapper.getProductIdByName("Plastmo Ecolite Blåtonet 109 mm.");
-
         Map<Integer, Integer> widthCombination = getOptimalRoofCombination(carportWidth);
 
         for (Map.Entry<Integer, Integer> entry : widthCombination.entrySet()) {
             int width = entry.getKey();
-            int countPerRow = entry.getValue();
-            int totalCount = countPerRow * amountOfRoofsLength;
+            int totalCount = entry.getValue() * calculateRoofLengthQuantity(order);
 
-            // TODO: Igen her, skal vi bruge bredde. Ny mapper måske?
-            List<ProductVariant> variants = _productMapper.getVariantsByProductIdAndMinWidth(width, productId);
-            ProductVariant chosenVariant = null;
-            for (ProductVariant variant : variants) {
-                if (variant.getWidth() == width) {
-                    chosenVariant = variant;
-                    break;
-                }
-            }
+            // Henter vors product_variant med matchende bredde
+            ProductVariant variant = _productMapper.getVariantByProductIdAndWidth(productId, width);
 
-            if (chosenVariant == null) {
-                throw new DatabaseException("Kunne ikke finde produktvariant med bredde " + width + " cm.");
-            }
-            BOM bom = new BOM(0, totalCount, "Tagplader monteres på spær", order, chosenVariant);
+            BOM bom = new BOM(0, totalCount, "Tagplader monteres på spær", order, variant);
             bomList.add(bom);
         }
     }
