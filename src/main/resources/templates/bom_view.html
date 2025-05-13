@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="da" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Stykliste for Ordre</title>
+  <link href="../public/css/index.css" th:href="@{/css/index.css}" rel="stylesheet"/>
+</head>
+<body>
+<div class="container">
+  <h2>Stykliste for Ordre</h2>
+
+  <table>
+    <thead>
+    <tr>
+      <th>Produktnavn</th>
+      <th>Længde</th>
+      <th>Antal</th>
+      <th>Beskrivelse</th>
+      <th>Pris pr. meter (kr)</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="bom : ${bomList}">
+      <td th:text="${bom.productVariant.product.productName}">Produktnavn</td>
+      <td th:text="${bom.productVariant.length + ' cm'}">Længde</td>
+      <td th:text="${bom.quantity}">Antal</td>
+      <td th:text="${bom.description}">Beskrivelse</td>
+      <td th:text="${bom.productVariant.product.price}">Pris pr. meter</td>
+    </tr>
+    </tbody>
+  </table>
+
+  <br><br>
+
+  <!-- FORM 2: Manuel opdatering af samlet pris -->
+  <div class="manual-price-update">
+    <form method="post" th:action="@{'/admin/order/set-total/' + ${order.orderId}}">
+      <input type="hidden" th:name="orderId" th:value="${order.orderId}" />
+      <label for="newTotalPrice">Ny samlet pris (kr):</label>
+      <input type="number" step="1" id="newTotalPrice" name="newTotalPrice"
+             th:value="${order.totalPrice}" required />
+      <button type="submit" class="btn btn-success">Gem ny pris</button>
+    </form>
+  </div>
+
+  <!-- KNAP: Send tilbud -->
+  <div class="send-offer">
+    <form method="post" th:action="@{'/admin/order/send-offer/' + ${order.orderId}}">
+      <input type="hidden" th:name="orderId" th:value="${order.orderId}" />
+      <button type="submit" class="btn btn-warning">📧 Send tilbud</button>
+    </form>
+  </div>
+
+  <br>
+  <a class="btn btn-secondary" th:href="@{/admin/dashboard}">⬅ Tilbage til dashboard</a>
+</div>
+</body>
+</html>

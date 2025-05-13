@@ -33,7 +33,7 @@ public class AdminController {
             // success with login
             ctx.sessionAttribute("currentAdmin", adminDTO); // Use a consistent session key
             // Redirect to the admin dashboard
-            ctx.redirect("/templates/admin_dashboard.html");
+            ctx.redirect("/admin/dashboard");
 
         } catch (DatabaseException e) {
             // Handle known login errors (email not found, wrong password)
@@ -61,7 +61,7 @@ public class AdminController {
             adminMapper.createAdmin(email, hashedPassword);
             ctx.attribute("message", "Admin oprettet: " + email);
             // Redirect to dashboard
-            ctx.redirect("/templates/admin_dashboard.html");
+            ctx.redirect("/admin/dashboard");
 
         } catch (DatabaseException e) {
             // Handle errors from mapper (e.g., duplicate email)
@@ -69,23 +69,4 @@ public class AdminController {
             ctx.render("admin/create_admin.html");
         }
     }
-
-
-    /* eksempel på brug af password hashing der skal implementeres
-    //        String userEmail = "admin@test.dk";
-    //        String userPassword = "password123";
-    //        String hashedPassword = PasswordUtil.hashPassword(userPassword);
-    //        System.out.println("Password hashed to: " + hashedPassword);
-    //        String storedHashForUser = hashedPassword;
-    //        System.out.println("--> Hashed password stored for user " + userEmail);
-    //
-    //        String loginEmailAttempt1 = "admin@test.dk";
-    //        String loginPasswordAttempt1 = "password123";
-    //        System.out.println("Simulating login attempt for: " + loginEmailAttempt1 + " with password: " + loginPasswordAttempt1);
-    //        String retrievedHash = storedHashForUser;
-    //        boolean loginSuccess = PasswordUtil.checkPassword(loginPasswordAttempt1, retrievedHash);
-    //        System.out.println("Login successful? " + loginSuccess);
-    //       */
-
-    // Other admin controller methods...
 }

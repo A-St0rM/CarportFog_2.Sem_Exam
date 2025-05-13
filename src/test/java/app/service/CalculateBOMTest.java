@@ -1,6 +1,9 @@
 package app.service;
 
+import app.entities.Customer;
+import app.entities.Order;
 import app.persistence.ConnectionPool;
+import app.persistence.ProductMapper;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,7 +18,10 @@ class CalculateBOMTest {
     private static final String DB = "CarportFog";
 
     public static final ConnectionPool connectionPool = ConnectionPool.getInstance(USER, PASSWORD, URL, DB);
-
+    public static final ProductMapper productMapper = new ProductMapper(connectionPool);
+    public static final CalculateBOM calculateBOM = new CalculateBOM(productMapper);
+    Customer customer = new Customer("Casper@example.com", "Voltvej 5", "12345678", "Casper", 1000);
+    Order order = new Order(300, 470, "Kommer", 10000, customer, false);
     @BeforeAll
     static void setUp() {
 
@@ -23,9 +29,8 @@ class CalculateBOMTest {
 
     @Test
     void calculatePolesQuantity() {
-        CalculateBOM calculateBOM = new CalculateBOM(600, 700, connectionPool);
 
-        assertEquals(6, calculateBOM.calculatePolesQuantity());
+        assertEquals(6, calculateBOM.calculatePolesQuantity(order));
 
     }
 }

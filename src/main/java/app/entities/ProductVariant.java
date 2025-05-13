@@ -28,4 +28,5 @@ public class ProductVariant {
     public Product getProduct() {
         return product;
     }
+
 }

@@ -1,22 +1,21 @@
 package app.persistence;
-
 import app.entities.Customer;
 import app.exceptions.DatabaseException;
-
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import static app.Main.connectionPool;
 
 public class CustomerMapper {
 
+    private final ConnectionPool connectionPool;
+
+
     public CustomerMapper(ConnectionPool connectionPool) {
+        this.connectionPool = connectionPool;
     }
 
-    public static List<Customer> getCustomersByCustomerId(ConnectionPool connectionPool, int customerId) throws DatabaseException {
+    public List<Customer> getCustomersByCustomerId(ConnectionPool connectionPool, int customerId) throws DatabaseException {
 
         List<Customer> customerList = new ArrayList<>();
         String sql = "SELECT * FROM customers WHERE customer_id = ?";
@@ -32,7 +31,6 @@ public class CustomerMapper {
                 String address = rs.getString("address");
                 String phone = rs.getString("phone");
                 String email = rs.getString("email");
-                String city = rs.getString("city");
                 int postalCode = rs.getInt("postalCode");
 
                 Customer customer;
@@ -46,22 +44,38 @@ public class CustomerMapper {
         return customerList;
     }
 
-    public void createCustomer(String email, String address, String phone, String name, int postalCode ) throws SQLException {
-        String sql = "INSERT INTO customers (email, address, phone, name, postalCode) VALUES (?, ?, ?, ?, ?)";
+    public Customer createCustomer(Customer customer) throws SQLException {
+        String sql = "INSERT INTO customers (email, address, postal_code, name, phone) VALUES (?, ?, ?, ?, ?)";
 
-        try(Connection connection = connectionPool.getConnection();
-            PreparedStatement ps = connection.prepareStatement(sql))
-        {
-            ps.setString(1, email);
-            ps.setString(2, address);
-            ps.setString(3, phone);
-            ps.setString(4, name);
-            ps.setInt(5, postalCode);
-            ps.executeUpdate();
+        try (
+                Connection connection = connectionPool.getConnection();
+                PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)
+        ) {
+            ps.setString(1, customer.getEmail());
+            ps.setString(2, customer.getAddress());
+            ps.setInt(3, customer.getPostalCode());
+            ps.setString(4, customer.getName());
+            ps.setString(5, customer.getPhone());
 
-        }catch (SQLException e) {
-            String msg = e.getMessage();
+            int rowsAffected = ps.executeUpdate();
+
+            if (rowsAffected == 0) {
+                throw new SQLException("Customer could not be inserted, no rows affected.");
+            }
+
+            try (ResultSet rs = ps.getGeneratedKeys()) {
+                if (rs.next()) {
+                    int generatedId = rs.getInt(1);
+                    customer.setCustomerId(generatedId);
+                    return customer;
+                } else {
+                    throw new SQLException("Creating customer failed, no ID obtained.");
+                }
+            }
+
+        } catch (SQLException e) {
+            throw new SQLException("Error inserting customer: " + e.getMessage(), e);
         }
-
     }
+
 }

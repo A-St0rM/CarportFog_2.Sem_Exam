@@ -1,45 +1,136 @@
 package app.controllers;
 
+import app.entities.BOM;
 import app.entities.Customer;
 import app.entities.Order;
 import app.exceptions.DatabaseException;
 import app.persistence.ConnectionPool;
+import app.persistence.CustomerMapper;
 import app.persistence.OrderMapper;
 import app.service.CalculateBOM;
 import io.javalin.http.Context;
 
+import java.util.List;
+
 
 public class OrderController {
 
-    private static void SendRequest(Context ctx, ConnectionPool connectionPool) {
+    private final OrderMapper _orderMapper;
+    private final ConnectionPool _connectionPool;
+    private final CustomerMapper _customerMapper;
+    private final CalculateBOM _calculateBOM;
 
-        //Get order details from frontend
-        int width = ctx.sessionAttribute("width");
-        int length = ctx.sessionAttribute("length");
-        boolean isPaid = false; //TODO: hardcoded for now
-        int totalPrice = 1999; //TODO: hardcoded for now
-
-        Customer customer = new Customer(1,"Voltvej 5", "21343432","999999999", "Lars",2100); //TODO: hardcoded for now
-
-        Order order = new Order(0, width, length, totalPrice, customer);
-        // insert order in database
-
-        try{
-            order = OrderMapper.insertOrder(order, connectionPool);
-
-            //calculate bom items
-            CalculateBOM calculateBOM = new CalculateBOM(width, length, connectionPool);
-            calculateBOM.calculateCarport(order);
-
-            //save bom items in database
-            OrderMapper.insertBOMItems(calculateBOM.getBom(), connectionPool);
-
-            //create message to customer and render order /request confirmation
-            ctx.render("orderflow/requestconfirmation.html");
-
-        } catch (DatabaseException e) { //TODO: handle exception later
-            throw new RuntimeException(e);
-        }
-
+    public OrderController(OrderMapper orderMapper, ConnectionPool connectionPool, CustomerMapper customerMapper, CalculateBOM calculateBOM)
+    {
+        this._orderMapper = orderMapper;
+        this._connectionPool = connectionPool;
+        this._customerMapper = customerMapper;
+        this._calculateBOM = calculateBOM;
     }
+
+    public void handleSpecificationsPost(Context ctx) {
+        int width = Integer.parseInt(ctx.formParam("carportWidth"));
+        int length = Integer.parseInt(ctx.formParam("carportLength"));
+        boolean trapezeRoof = Boolean.parseBoolean(ctx.formParam("hasTrapezRoof"));
+        ctx.sessionAttribute("carportWidth", width);
+        ctx.sessionAttribute("carportLength", length);
+        ctx.sessionAttribute("hasTrapezRoof", trapezeRoof);
+
+        ctx.redirect("/additions");
+    }
+
+    public void handleAdditionsPost(Context ctx) {
+        boolean trapezeRoof = Boolean.parseBoolean(ctx.formParam("trapezeRoof"));
+        ctx.sessionAttribute("trapezeRoof", trapezeRoof);
+
+        ctx.redirect("/details"); // Go to contact info
+    }
+
+    public void handleDetailsPost(Context ctx) {
+        String name = ctx.formParam("customerName");
+        String address = ctx.formParam("customerAddress");
+        int zip = Integer.parseInt(ctx.formParam("customerZip"));
+        String phone = ctx.formParam("customerPhone");
+        String email = ctx.formParam("customerEmail");
+
+        Customer customer = new Customer(email, address, phone, name, zip);
+
+        try {
+            Customer savedCustomer = _customerMapper.createCustomer(customer);
+
+            int width = ctx.sessionAttribute("carportWidth");
+            int length = ctx.sessionAttribute("carportLength");
+            boolean trapezeRoof = ctx.sessionAttribute("hasTrapezRoof");
+
+            // 4. Create order WITHOUT totalPrice yet
+            Order order = new Order(0, width, length, "Not paid", 0, savedCustomer, trapezeRoof);
+            Order savedOrder = _orderMapper.insertOrder(order);
+
+            // 5. Calculate BOM
+            _calculateBOM.calculateCarport(savedOrder);
+            int calculatedTotal = _calculateBOM.calculateTotalPriceFromBOM();
+
+            // 6. Update order with totalPrice
+            _orderMapper.updateOrderTotalPrice(savedOrder.getOrderId(), calculatedTotal);
+
+            // 7. Save BOM items
+            _orderMapper.insertBOMItems(_calculateBOM.getBom());
+
+            // 8. Clean up session and redirect
+            ctx.req().getSession().invalidate();
+            ctx.render("confirmation.html");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            ctx.status(500).result("Error saving order.");
+        }
+    }
+
+
+    public void showAllOrders(Context ctx) {
+        try {
+            List<Order> orders = _orderMapper.getAllOrdersWithCustomerInfo();
+            ctx.attribute("orders", orders);
+            ctx.render("admin_dashboard.html");
+        } catch (Exception e) {
+            e.printStackTrace();
+            ctx.status(500).result("Fejl ved hentning af ordrer");
+        }
+    }
+
+    public void showBOMPage(Context ctx) {
+        int orderId = Integer.parseInt(ctx.pathParam("orderId"));
+
+        try {
+            Order order = _orderMapper.getOrderById(orderId);
+            List<BOM> bomList = _orderMapper.getBOMForOrder(orderId);
+
+            ctx.attribute("order", order);
+            ctx.attribute("bomList", bomList);
+            ctx.render("bom_view.html");
+        } catch (Exception e) {
+            ctx.status(500).result("Kunne ikke hente stykliste.");
+        }
+    }
+
+    public void handleUpdateTotalPrice(Context ctx) {
+        int orderId = Integer.parseInt(ctx.pathParam("orderId"));
+        int newTotalPrice = Integer.parseInt(ctx.formParam("newTotalPrice"));
+
+        try {
+            _orderMapper.updateOrderTotalPrice(orderId, newTotalPrice);
+            ctx.redirect("/admin_dashboard"); // eller redirect til styklisten igen hvis ønsket
+        } catch (DatabaseException e) {
+            e.printStackTrace();
+            ctx.status(500).result("Kunne ikke opdatere prisen: " + e.getMessage());
+        }
+    }
+
+
+
+
+
+
+
+
 }
