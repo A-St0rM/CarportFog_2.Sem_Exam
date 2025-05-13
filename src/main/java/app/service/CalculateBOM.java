@@ -109,18 +109,38 @@ public class CalculateBOM {
         return optimalCombination;
     }
 
+//    public void calculateRafters(Order order) throws DatabaseException {
+//        int spacing = 60;
+//        double rafterWidth = 4.5;
+//        int innerLength = (int) (order.getCarportLength() - (rafterWidth * 2));
+//        int quantity = (int) Math.ceil((double) innerLength / spacing) + 2;
+//
+//        int productId = _productMapper.getProductIdByName("45x195 mm. spærtræ ubh.");
+//
+//        // Her henter spærtræ ud fra bredden af carporten (hvilket inputtes som minLength i mapperen)
+//        List<ProductVariant> variants = _productMapper.getVariantsByProductIdAndMinLength(order.getCarportWidth(), productId);
+//        ProductVariant variant = variants.get(0);
+//
+//        BOM bom = new BOM(0, quantity, "Spær monteres på rem", order, variant);
+//        bomList.add(bom);
+//    }
+
     public void calculateRafters(Order order) throws DatabaseException {
         int spacing = 60;
         double rafterWidth = 4.5;
         int innerLength = (int) (order.getCarportLength() - (rafterWidth * 2));
-        int quantity = (int) Math.ceil((double) innerLength / spacing) + 2;
+        int quantity = (int) Math.ceil((double) innerLength / spacing) + 1;
 
         int productId = _productMapper.getProductIdByName("45x195 mm. spærtræ ubh.");
 
-        // Her henter spærtræ ud fra bredden af carporten (hvilket inputtes som minLength i mapperen)
+        // Bruger carportens bredde som længdemål til spær (vi bruger samme produkt til spær & remme).
         List<ProductVariant> variants = _productMapper.getVariantsByProductIdAndMinLength(order.getCarportWidth(), productId);
-        ProductVariant variant = variants.get(0);
 
+        if (variants.isEmpty()) {
+            throw new DatabaseException("No rafters found for width " + order.getCarportWidth());
+        }
+
+        ProductVariant variant = variants.get(0);
         BOM bom = new BOM(0, quantity, "Spær monteres på rem", order, variant);
         bomList.add(bom);
     }

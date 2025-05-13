@@ -19,39 +19,63 @@ public class ProductMapper {
         this.connectionPool = connectionPool;
     }
 
+//    public List<ProductVariant> getVariantsByProductIdAndMinLength(int minLength, int productId) throws DatabaseException {
+//
+//        List<ProductVariant> variants = new ArrayList<ProductVariant>();
+//
+//        String query = "SELECT * FROM product_variants " +
+//                "INNER JOIN products USING (product_id) " +
+//                "WHERE product_id = ? AND length >= ?";
+//
+//        try(Connection con = connectionPool.getConnection())
+//        {
+//            PreparedStatement ps = con.prepareStatement(query);
+//            ps.setInt(1, productId);
+//            ps.setInt(2, minLength);
+//            ResultSet rs = ps.executeQuery();
+//
+//            while(rs.next()){
+//                int variantId = rs.getInt("product_variant_id");
+//                int product_id = rs.getInt("product_id");
+//                int length = rs.getInt("length");
+//                String name = rs.getString("name");
+//                String unit = rs.getString("unit");
+//                int width = rs.getInt("width");
+//                int price = rs.getInt("price_meter");
+//                Product product = new Product(product_id, name, unit, price);
+//                ProductVariant productVariant = new ProductVariant(variantId, length, product);
+//                variants.add(productVariant);
+//            }
+//
+//        } catch (SQLException e) {
+//            throw new DatabaseException("Couldn't get variants " + e.getMessage());
+//        }
+//        return variants;
+//    }
+
     public List<ProductVariant> getVariantsByProductIdAndMinLength(int minLength, int productId) throws DatabaseException {
+        List<ProductVariant> variants = new ArrayList<>();
+        String query = "SELECT * FROM product_variants WHERE product_id = ? AND length >= ?";
 
-        List<ProductVariant> variants = new ArrayList<ProductVariant>();
-
-        String query = "SELECT * FROM product_variants " +
-                "INNER JOIN products USING(product_id) " +
-                "WHERE product_id = ? AND length >= ?";
-
-        try(Connection con = connectionPool.getConnection())
-        {
-            PreparedStatement ps = con.prepareStatement(query);
+        try (Connection con = connectionPool.getConnection();
+             PreparedStatement ps = con.prepareStatement(query)) {
             ps.setInt(1, productId);
             ps.setInt(2, minLength);
             ResultSet rs = ps.executeQuery();
 
-            while(rs.next()){
+            while (rs.next()) {
                 int variantId = rs.getInt("product_variant_id");
-                int product_id = rs.getInt("product_id");
                 int length = rs.getInt("length");
-                String name = rs.getString("name");
-                String unit = rs.getString("unit");
-                int width = rs.getInt("width");
-                int price = rs.getInt("price_meter");
-                Product product = new Product(product_id, name, unit, price);
-                ProductVariant productVariant = new ProductVariant(variantId, length, product);
-                variants.add(productVariant);
+//                System.out.println("DEBUG - Found variant: length=" + length);  Brugt denne linje for at debugge
+                Product product = new Product(productId, "", "", 0);
+                variants.add(new ProductVariant(variantId, length, product));
             }
-
         } catch (SQLException e) {
-            throw new DatabaseException("Couldn't get variants " + e.getMessage());
+            throw new DatabaseException("Couldn't get variants: " + e.getMessage());
         }
         return variants;
     }
+
 
     public List<ProductVariant> getVariantsByProductIdAndMinWidth(int minWidth, int productId) throws DatabaseException {
         List<ProductVariant> variants = new ArrayList<>();
@@ -116,7 +140,7 @@ public class ProductMapper {
     }
 
     public int getProductIdByName(String name) throws DatabaseException {
-        String sql = "SELECT product_id FROM products WHERE LOWER(name) = LOWER(?)";
+        String sql = "SELECT product_id FROM products WHERE LOWER(TRIM(name)) = LOWER(TRIM(?))"; // Trim and lowercase
         try (Connection conn = connectionPool.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, name);
@@ -127,7 +151,7 @@ public class ProductMapper {
         } catch (SQLException e) {
             throw new DatabaseException("Fejl ved opslag af produktnavn", e.getMessage());
         }
-        return 0;
+        throw new DatabaseException("Product not found: " + name);
     }
 
 

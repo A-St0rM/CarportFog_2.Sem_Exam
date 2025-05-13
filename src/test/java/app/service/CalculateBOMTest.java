@@ -29,6 +29,7 @@ class CalculateBOMTest {
     Customer customer = new Customer("Casper@example.com", "Voltvej 5", "12345678", "Casper", 1000);
     Order order = new Order(300, 470, "Kommer", 10000, customer, false);
 
+
     private CalculateBOM calculateBOM;
     private ProductMapper productMapper;
 
@@ -116,29 +117,25 @@ class CalculateBOMTest {
 
     @Test
     void calculateRaftersTest() throws DatabaseException {
-        // Arrange
-        Order order = new Order(780, 600, "Test", 10000, customer, false);
-
-        // Act
+        // Opretter en ny test order med lidt større tal
+        Order order = new Order(600, 780, "Test", 10000, customer, false);
         calculateBOM.calculateRafters(order);
-        List<BOM> bomList = calculateBOM.getBom();
 
-        // Assert
-        boolean hasRaftersEntry = false;
+        List<BOM> bomList = calculateBOM.getBom();
+        BOM rafterBom = null;
+
         for (BOM bom : bomList) {
             if (bom.getDescription().equals("Spær monteres på rem")) {
-                // Verificer antallet (baseret på formel fra metoden)
-                int expectedQuantity = (int) (Math.ceil((780 - 4.5 * 2) / 60.0) + 2);
-                assertEquals(expectedQuantity, bom.getQuantity());
-
-                // Verificer at varianten har korrekt længde (skal matche carportens bredde)
-                assertEquals(600, bom.getProductVariant().getLength());
-                hasRaftersEntry = true;
+                rafterBom = bom;
                 break;
             }
         }
-        assertTrue(hasRaftersEntry, "Mangler spær-indgang i BOM");
+
+        assertNotNull(rafterBom, "Rafters entry missing in BOM");
+        assertEquals(14, rafterBom.getQuantity());
+        assertEquals(600, rafterBom.getProductVariant().getLength());
     }
+
 
     @Test
     void calculateRoofWidthQuantityTest() throws DatabaseException {
@@ -157,8 +154,6 @@ class CalculateBOMTest {
 
         assertEquals(expected, actual);
     }
-
-
 
     @Test
     void getOptimalRoofCombinationTest() {
@@ -188,8 +183,16 @@ class CalculateBOMTest {
     }
 
     @Test
-    void getBomTest() {
+    void getBomTest() throws DatabaseException {
+        // Vi tjekker om styklisten starter med at være tom
+        assertTrue(calculateBOM.getBom().isEmpty());
 
+        // Tilføjer ting til styklisten ved eksempelvis at regne stolperne ud (kan bruge enhver anden metode til udregning også)
+        calculateBOM.calculatePoles(order);
+
+        // Verificerer at styklisten har 1 produkt i sig.
+        assertFalse(calculateBOM.getBom().isEmpty());
+        assertEquals(1, calculateBOM.getBom().size());
     }
 
 }
