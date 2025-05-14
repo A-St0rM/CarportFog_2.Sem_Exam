@@ -23,16 +23,17 @@ public class CalculateBOM {
         calculatePoles(order);
         calculateBeams(order);
         calculateRafters(order);
-//        calculateRoofs(order);
+        calculateRoofs(order);
     }
 
-    private void calculatePoles(Order order) throws DatabaseException {
+    public void calculatePoles(Order order) throws DatabaseException {
         int quantity = calculatePolesQuantity(order);
+        int productId = _productMapper.getProductIdByName("97x97 mm. trykimp. Stolpe");
 
-        List<ProductVariant> productVariants = _productMapper.getVariantsByProductIdAndMinLength(300, _productMapper.getProductIdByName("97x97 mm. trykimp. Stolpe"));
+        List<ProductVariant> productVariants = _productMapper.getVariantsByProductIdAndMinLength(300, productId);
 
         if (productVariants.isEmpty()) {
-            throw new DatabaseException("Ingen produktvarianter fundet for produktet");
+            throw new DatabaseException("Product not found for id " + productId + " with min. length: " + 300);
         }
 
         ProductVariant productVariant = productVariants.get(0);
@@ -53,9 +54,11 @@ public class CalculateBOM {
         return totalAmountOfPoles * 2;
     }
 
-    private void calculateBeams(Order order) throws DatabaseException {
+    public void calculateBeams(Order order) throws DatabaseException {
         int totalLength = order.getCarportLength();
         int sides = 2;
+
+        int productId = _productMapper.getProductIdByName("45x195 mm. spærtræ ubh.");
 
         Map<Integer, Integer> combination = getOptimalBeamCombination(totalLength);
 
@@ -63,7 +66,8 @@ public class CalculateBOM {
             int countForOneSide = combination.get(length);
             int totalCount = countForOneSide * sides;
 
-            List<ProductVariant> variants = _productMapper.getVariantsByProductIdAndMinLength(length, _productMapper.getProductIdByName("45x195 mm. spærtræ ubh."));
+
+            List<ProductVariant> variants = _productMapper.getVariantsByProductIdAndMinLength(length, productId);
 
             ProductVariant chosenVariant = null;
             for (ProductVariant variant : variants) {
@@ -82,7 +86,7 @@ public class CalculateBOM {
         }
     }
 
-    private Map<Integer, Integer> getOptimalBeamCombination(int length) {
+    public Map<Integer, Integer> getOptimalBeamCombination(int length) {
         int[] beamLengths = _productMapper.getAvailableBeamLengths();
 
         Map<Integer, Integer> optimalCombination = new HashMap<>();
@@ -106,25 +110,40 @@ public class CalculateBOM {
         return optimalCombination;
     }
 
-    private void calculateRafters(Order order) throws DatabaseException {
+    public void calculateRafters(Order order) throws DatabaseException {
+        // Regner med 60 cm mellem spær
         int spacing = 60;
+
+        // Hvert spærtræ er 45mm brede
         double rafterWidth = 4.5;
+
+        // Vi udregner her den egentlige indre længde minus spær i hver endes bredde (altså derfor * 2)
         int innerLength = (int) (order.getCarportLength() - (rafterWidth * 2));
-        int quantity = (int) Math.ceil((double) innerLength / spacing) + 2;
 
-        List<ProductVariant> variants = _productMapper.getVariantsByProductIdAndMinLength(order.getCarportWidth(), _productMapper.getProductIdByName("45x195 mm. spærtræ ubh."));
+        // Vi udregner her hvor mange mellemrum der er, men der er altid 1 spær mere end der er mellemrum, derfor + 1 til sidst
+        int quantity = (int) Math.ceil((double) innerLength / spacing) + 1;
+
+        // Her henter vi produktID på det træ vi bruger. Det kunne måske være gjort hardcoded.
+        int productId = _productMapper.getProductIdByName("45x195 mm. spærtræ ubh.");
+
+        // Bruger carportens bredde som længdemål til spær (vi bruger samme produkt til spær & remme).
+        List<ProductVariant> variants = _productMapper.getVariantsByProductIdAndMinLength(order.getCarportWidth(), productId);
+
+        if (variants.isEmpty()) {
+            throw new DatabaseException("No rafters found for width " + order.getCarportWidth());
+        }
+
         ProductVariant variant = variants.get(0);
-
         BOM bom = new BOM(0, quantity, "Spær monteres på rem", order, variant);
         bomList.add(bom);
     }
 
-    // TODO: Denne metode tager kun den totale mængde af tagplader. Den siger ikke fx 2 240cm, 2 360cm
+    // Denne metode tager kun den totale mængde af tagplader. Den siger ikke fx 2 240cm, 2 360cm
     private int calculateTrapezRoofQuantity(Order order) throws DatabaseException {
         return calculateRoofLengthQuantity(order) * calculateRoofWidthQuantity(order);
     }
 
-    private int calculateRoofWidthQuantity(Order order) throws DatabaseException {
+    public int calculateRoofWidthQuantity(Order order) throws DatabaseException {
         int carportWidth = order.getCarportWidth();
         Map<Integer, Integer> combination = getOptimalRoofCombination(carportWidth);
 
@@ -135,26 +154,40 @@ public class CalculateBOM {
         return amountOfRoofsWidth;
     }
 
-    private int calculateRoofLengthQuantity(Order order) throws DatabaseException {
+    public int calculateRoofLengthQuantity(Order order) throws DatabaseException {
         int carportLength = order.getCarportLength();
         int amountOfRoofsLength = (int) Math.ceil(carportLength / 109.0);
 
-        return amountOfRoofsLength * amountOfRoofsLength;
+        return amountOfRoofsLength;
     }
 
-    private Map<Integer, Integer> getOptimalRoofCombination(int width) {
+    public Map<Integer, Integer> getOptimalRoofCombination(int width) {
         int[] roofWidths = _productMapper.getAvailableRoofWidths();
 
         Map<Integer, Integer> optimalCombination = new HashMap<>();
         int bestOvershoot = Integer.MAX_VALUE;
 
+        // Vi starter med at tjekke om en enkelt plade kan dække hele bredden
+
+        for (int roofWidth : roofWidths) {
+            if (roofWidth >= width) {
+                int overshoot = roofWidth - width;
+                if (overshoot < bestOvershoot) {
+                    bestOvershoot = overshoot;
+                    optimalCombination.clear();
+                    optimalCombination.put(roofWidth, 1); // Brug én plade
+                }
+            }
+        }
+
+        // Hvis ingen enkelt tagplade findes, så tjekker vi kombinationerne
+
         for (int i = 0; i < roofWidths.length; i++) {
             for (int j = i; j < roofWidths.length; j++) {
-                int totalLength = roofWidths[i] + roofWidths[j];
-
-                if (totalLength >= width) {
-                    int overshoot = totalLength - width;
-                    if (overshoot < bestOvershoot) {
+                int totalWidth = roofWidths[i] + roofWidths[j];
+                if (totalWidth >= width) {
+                    int overshoot = totalWidth - width;
+                    if (overshoot < bestOvershoot) { // Sammenlign med den bedste løsning indtil videre
                         bestOvershoot = overshoot;
                         optimalCombination.clear();
                         optimalCombination.put(roofWidths[i], 1);
@@ -163,35 +196,24 @@ public class CalculateBOM {
                 }
             }
         }
+
         return optimalCombination;
     }
 
-    private void calculateRoofs(Order order) throws DatabaseException {
+    public void calculateRoofs(Order order) throws DatabaseException {
         int carportWidth = order.getCarportWidth();
-
-        int amountOfRoofsLength = calculateRoofLengthQuantity(order);
-
+        int productId = _productMapper.getProductIdByName("Plastmo Ecolite Blåtonet 109 mm.");
         Map<Integer, Integer> widthCombination = getOptimalRoofCombination(carportWidth);
 
         for (Map.Entry<Integer, Integer> entry : widthCombination.entrySet()) {
             int width = entry.getKey();
-            int countPerRow = entry.getValue();
-            int totalCount = countPerRow * amountOfRoofsLength;
+            int totalCount = entry.getValue() * calculateRoofLengthQuantity(order);
 
-            List<ProductVariant> variants = _productMapper.getVariantsByProductIdAndMinLength(width, _productMapper.getProductIdByName("Plastmo Ecolite Blåtonet 109 mm."));
-            ProductVariant chosenVariant = null;
-            for (ProductVariant variant : variants) {
-                if (variant.getLength() == width) {
-                    chosenVariant = variant;
-                    break;
-                }
-            }
+            // Henter vors product_variant med matchende bredde
+            ProductVariant variant = _productMapper.getVariantByProductIdAndWidth(productId, width);
 
-            if (chosenVariant == null) {
-                throw new DatabaseException("Kunne ikke finde produktvariant med bredde" + width + "cm.");
-            }
-            BOM bom = new BOM(0, totalCount, "Tagplader monteres på spær", order, chosenVariant);
-            bomList.add(bom); //Could be wrong with this.
+            BOM bom = new BOM(0, totalCount, "Tagplader monteres på spær", order, variant);
+            bomList.add(bom);
         }
     }
 
@@ -205,7 +227,7 @@ public class CalculateBOM {
         return total;
     }
 
-
+// Denne metode returnerer hele styklisten.
     public List<BOM> getBom() {
         return bomList;
     }

@@ -19,42 +19,95 @@ public class ProductMapper {
         this.connectionPool = connectionPool;
     }
 
+
     public List<ProductVariant> getVariantsByProductIdAndMinLength(int minLength, int productId) throws DatabaseException {
+        List<ProductVariant> variants = new ArrayList<>();
+        String query = "SELECT * FROM product_variants WHERE product_id = ? AND length >= ?";
 
-        List<ProductVariant> variants = new ArrayList<ProductVariant>();
-
-        String query = "SELECT * FROM product_variants " +
-                "INNER JOIN products USING(product_id) " +
-                "WHERE product_id = ? AND length >= ?";
-
-        try(Connection con = connectionPool.getConnection())
-        {
-            PreparedStatement ps = con.prepareStatement(query);
+        try (Connection con = connectionPool.getConnection();
+             PreparedStatement ps = con.prepareStatement(query)) {
             ps.setInt(1, productId);
             ps.setInt(2, minLength);
             ResultSet rs = ps.executeQuery();
 
-            while(rs.next()){
+            while (rs.next()) {
                 int variantId = rs.getInt("product_variant_id");
-                int product_id = rs.getInt("product_id");
                 int length = rs.getInt("length");
-                String name = rs.getString("name");
-                String unit = rs.getString("unit");
-                int width = rs.getInt("width");
-                int price = rs.getInt("price_meter");
-                Product product = new Product(product_id, name, unit, price);
-                ProductVariant productVariant = new ProductVariant(variantId, length, product);
-                variants.add(productVariant);
+//                System.out.println("DEBUG - Found variant: length=" + length);  Brugt denne linje for at debugge
+                Product product = new Product(productId, "", "", 0);
+                variants.add(new ProductVariant(variantId, length, product));
             }
-
         } catch (SQLException e) {
-            throw new DatabaseException("Couldn't get variants " + e.getMessage());
+            throw new DatabaseException("Couldn't get variants: " + e.getMessage());
         }
         return variants;
     }
 
+    public List<ProductVariant> getVariantsByProductIdAndMinWidth(int minWidth, int productId) throws DatabaseException {
+        List<ProductVariant> variants = new ArrayList<>();
+
+        String query = "SELECT * FROM product_variants INNER JOIN products m USING (product_id) WHERE product_id = ? AND width >= ?";
+
+        try (Connection con = connectionPool.getConnection()) {
+            PreparedStatement ps = con.prepareStatement(query);
+            ps.setInt(1, productId);
+            ps.setInt(2, minWidth);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                int variantId = rs.getInt("product_variant_id");
+                int product_id = rs.getInt("product_id");
+                int length = rs.getInt("length");
+                int width = rs.getInt("width");
+                String name = rs.getString("name");
+                String unit = rs.getString("unit");
+                int width = rs.getInt("width");
+                int price = rs.getInt("price_meter");
+
+                Product product = new Product(product_id, name, unit, price);
+                ProductVariant variant = new ProductVariant(variantId, length, product);
+                variants.add(variant);
+            }
+        } catch (SQLException e) {
+            throw new DatabaseException("Couldn't get variants by width: " + e.getMessage());
+        }
+
+        return variants;
+    }
+
+    public ProductVariant getVariantByProductIdAndWidth(int productId, int width) throws DatabaseException {
+        String sql = "SELECT pv.*, p.name, p.unit, p.price_meter " +
+                "FROM product_variants pv " +
+                "JOIN products p ON pv.product_id = p.product_id " +
+                "WHERE pv.product_id = ? AND pv.width = ?";
+
+        try (Connection con = connectionPool.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, productId);
+            ps.setInt(2, width);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                return new ProductVariant(
+                        rs.getInt("product_variant_id"),
+                        rs.getInt("length"),
+                        new Product(
+                                productId,
+                                rs.getString("name"),
+                                rs.getString("unit"),
+                                rs.getInt("price_meter") // Rettet til price_meter
+                        )
+                );
+            } else {
+                throw new DatabaseException("Ingen variant med bredde " + width + " cm for produkt " + productId);
+            }
+        } catch (SQLException e) {
+            throw new DatabaseException("Databasefejl: " + e.getMessage());
+        }
+    }
+
     public int getProductIdByName(String name) throws DatabaseException {
-        String sql = "SELECT product_id FROM products WHERE LOWER(name) = LOWER(?)";
+        String sql = "SELECT product_id FROM products WHERE LOWER(TRIM(name)) = LOWER(TRIM(?))"; // Trim and lowercase
         try (Connection conn = connectionPool.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, name);
@@ -65,7 +118,7 @@ public class ProductMapper {
         } catch (SQLException e) {
             throw new DatabaseException("Fejl ved opslag af produktnavn", e.getMessage());
         }
-        return 0;
+        throw new DatabaseException("Product not found: " + name);
     }
 
 
@@ -99,12 +152,12 @@ public class ProductMapper {
 
     public int[] getAvailableRoofWidths() throws DatabaseException {
         List<Integer> roofWidths = new ArrayList<>();
-        String query = "SELECT width FROM product_variants WHERE product_id = ?";
+        String query = "SELECT width FROM product_variants WHERE product_id = ? AND width >= 240";
 
         try (Connection con = connectionPool.getConnection()) {
             PreparedStatement ps = con.prepareStatement(query);
-            int productIdForBeams = 3; // Det er produkt-ID’et for tag
-            ps.setInt(1, productIdForBeams);
+            int productIdForRoofs = 3; // Det er produkt-ID’et for tag
+            ps.setInt(1, productIdForRoofs);
 
             ResultSet rs = ps.executeQuery();
 
