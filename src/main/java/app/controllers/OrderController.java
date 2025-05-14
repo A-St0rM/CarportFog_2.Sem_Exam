@@ -143,7 +143,8 @@ public class OrderController {
             boolean result = emailService.sendMailPayment(
                     customer.getName(),
                     customer.getEmail(),
-                    order.getTotalPrice()
+                    order.getTotalPrice(),
+                    orderId
             );
             if (result) {
                 ctx.redirect("/admin/order/" + orderId + "/bom");

@@ -44,7 +44,7 @@ public class EmailService {
     }
 
 
-    public boolean sendMailPayment(String name, String email, int totalPrice) throws IOException {
+    public boolean sendMailPayment(String name, String email, int totalPrice, int orderNumber) throws IOException {
         Email from = new Email("Johannes@johannesfoog.dk");
         from.setName("Johannes Fog Byggemarked");
 
@@ -54,11 +54,13 @@ public class EmailService {
         Personalization personalization = new Personalization();
         personalization.addTo(new Email(email));
         personalization.addDynamicTemplateData("name", name);
-        personalization.addDynamicTemplateData("email", email);
+        personalization.addDynamicTemplateData("orderNumber", orderNumber);
         personalization.addDynamicTemplateData("price", totalPrice);
         personalization.addDynamicTemplateData("paymentSite", "https://carportfog.showmecode.dk/payment");
         mail.addPersonalization(personalization);
         mail.setTemplateId("d-6a883a6128f542d58457b712c21853df");
+        System.out.println("🔔 METODEN BLEV KALDT!");
+        System.out.println("Order ID modtaget fra path: " + orderNumber);
 
         SendGrid sg = new SendGrid(API_KEY);
         Request request = new Request();
