@@ -29,7 +29,7 @@ public class Main {
             config.staticFiles.add("/public");
             config.jetty.modifyServletContextHandler(handler -> handler.setSessionHandler(SessionConfig.sessionConfig()));
             config.fileRenderer(new JavalinThymeleaf(ThymeleafConfig.templateEngine()));
-        }).start(7070);
+        }).start(7171);
 
         AdminMapper adminMapper = new AdminMapper(connectionPool);
         CustomerMapper customerMapper = new CustomerMapper(connectionPool);

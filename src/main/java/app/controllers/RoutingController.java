@@ -33,7 +33,7 @@ public class RoutingController {
         app.get(ROUTE_START, RoutingController::renderStartPage);
         app.get(ROUTE_SPECIFICATIONS, ctx -> renderSpecificationsPage(ctx, connectionPool));
         app.get(ROUTE_ADDITIONS, ctx -> renderAdditionsPage(ctx, connectionPool));
-        app.get(ROUTE_DETAILS, ctx -> renderDetailsPage(ctx, connectionPool));
+        app.get(ROUTE_DETAILS, ctx -> OrderController.showSvg(ctx, connectionPool));
         app.get(ROUTE_CONFIRMATION, RoutingController::renderConfirmationPage);
         app.get(ROUTE_PAYMENT, ctx -> renderPaymentPage(ctx, connectionPool));
         app.get(ROUTE_PAYMENT_CONFIRMATION, RoutingController::renderPaymentConfirmationPage);

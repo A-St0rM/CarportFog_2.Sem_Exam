@@ -6,6 +6,8 @@ import app.exceptions.DatabaseException;
 import app.persistence.ConnectionPool;
 import app.persistence.OrderMapper;
 import app.service.CalculateBOM;
+import app.service.CarportSvg;
+import app.service.Svg;
 import io.javalin.http.Context;
 
 
@@ -41,5 +43,11 @@ public class OrderController {
             throw new RuntimeException(e);
         }
 
+    }
+
+    public static void showSvg(Context ctx, ConnectionPool connectionPool) { // Jon kaldte denne metode for showOrder
+        CarportSvg svg = new CarportSvg(600, 600);
+        ctx.attribute("svg", svg.toString());
+        ctx.render("details.html");
     }
 }

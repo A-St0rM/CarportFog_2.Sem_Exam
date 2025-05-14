@@ -1,9 +1,11 @@
 <!DOCTYPE html>
-<html lang="da" xmlns:th="http://www.thymeleaf.org" th:attr="data-page=${ (currentPage != null ? currentPage : 'details') }">
+<html lang="da" xmlns:th="http://www.thymeleaf.org"
+      th:attr="data-page=${ (currentPage != null ? currentPage : 'details') }">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title th:text="'Fog Carport Service - ' + ${#strings.capitalize( (currentPage != null ? currentPage : 'details') )}">Fog Carport Service</title>
+    <title th:text="'Fog Carport Service - ' + ${#strings.capitalize( (currentPage != null ? currentPage : 'details') )}">
+        Fog Carport Service</title>
     <link href="../public/css/index.css" th:href="@{/css/index.css}" rel="stylesheet"/>
 </head>
 <body>
@@ -52,63 +54,73 @@
             <div class="content-body">
                 <h2 class="page-title">Dine oplysninger</h2>
 
-                <div class="spec-layout"> <div class="spec-form">
-                    <form method="post" th:action="@{/details}" id="details-form">
+                <div class="spec-layout">
+                    <div class="spec-form">
+                        <form method="post" th:action="@{/details}" id="details-form">
 
-                        <div th:if="${error}" class="error-message" th:text="${error}">
-                            Error message goes here...
-                        </div>
+                            <div th:if="${error}" class="error-message" th:text="${error}">
+                                Error message goes here...
+                            </div>
 
-                        <div class="form-group">
-                            <label for="customer-name">Navn</label>
-                            <input type="text" id="customer-name" name="customerName" required placeholder="Indtast navn">
-                        </div>
+                            <div class="form-group">
+                                <label for="customer-name">Navn</label>
+                                <input type="text" id="customer-name" name="customerName" required
+                                       placeholder="Indtast navn">
+                            </div>
 
-                        <div class="form-group">
-                            <label for="customer-address">Adresse</label>
-                            <input type="text" id="customer-address" name="customerAddress" required placeholder="Vejnavn og nummer">
-                        </div>
+                            <div class="form-group">
+                                <label for="customer-address">Adresse</label>
+                                <input type="text" id="customer-address" name="customerAddress" required
+                                       placeholder="Vejnavn og nummer">
+                            </div>
 
-                        <div class="form-group">
-                            <label for="customer-zip">Postnummer</label>
-                            <input type="text" id="customer-zip" name="customerZip" required pattern="[0-9]{4}" title="Indtast 4 cifre" placeholder="Postnummer">
-                        </div>
+                            <div class="form-group">
+                                <label for="customer-zip">Postnummer</label>
+                                <input type="text" id="customer-zip" name="customerZip" required pattern="[0-9]{4}"
+                                       title="Indtast 4 cifre" placeholder="Postnummer">
+                            </div>
 
-                        <div class="form-group">
-                            <label for="customer-city">By</label>
-                            <input type="text" id="customer-city" name="customerCity" required placeholder="Bynavn">
-                        </div>
+                            <div class="form-group">
+                                <label for="customer-city">By</label>
+                                <input type="text" id="customer-city" name="customerCity" required placeholder="Bynavn">
+                            </div>
 
-                        <div class="form-group">
-                            <label for="customer-phone">Telefon</label>
-                            <input type="tel" id="customer-phone" name="customerPhone" required pattern="[0-9]{8}" title="Indtast 8 cifre uden landekode" placeholder="Telefon +45">
-                        </div>
+                            <div class="form-group">
+                                <label for="customer-phone">Telefon</label>
+                                <input type="tel" id="customer-phone" name="customerPhone" required pattern="[0-9]{8}"
+                                       title="Indtast 8 cifre uden landekode" placeholder="Telefon +45">
+                            </div>
 
-                        <div class="form-group">
-                            <label for="customer-email">Email</label>
-                            <input type="email" id="customer-email" name="customerEmail" required placeholder="Indtast email">
-                        </div>
+                            <div class="form-group">
+                                <label for="customer-email">Email</label>
+                                <input type="email" id="customer-email" name="customerEmail" required
+                                       placeholder="Indtast email">
+                            </div>
 
-                        <div class="form-group form-group-checkbox">
-                            <input type="checkbox" id="consent" name="consent" required value="true">
-                            <label for="consent">
-                                Bekræft at vi må benytte de afgivne oplysninger til at kontakte dig
-                                i forbindelse med et tilbud på QuickByg carport.*
-                            </label>
-                        </div>
+                            <div class="form-group form-group-checkbox">
+                                <input type="checkbox" id="consent" name="consent" required value="true">
+                                <label for="consent">
+                                    Bekræft at vi må benytte de afgivne oplysninger til at kontakte dig
+                                    i forbindelse med et tilbud på QuickByg carport.*
+                                </label>
+                            </div>
 
-                        <div class="form-navigation">
-                            <a th:href="@{/additions}" class="btn btn-secondary">Forrige trin</a>
-                            <button type="submit" class="btn btn-primary">Modtag tilbud</button>
-                        </div>
-                    </form>
-                </div>
-
+                            <div class="form-navigation">
+                                <a th:href="@{/additions}" class="btn btn-secondary">Forrige trin</a>
+                                <button type="submit" class="btn btn-primary">Modtag tilbud</button>
+                            </div>
+                        </form>
+                    </div>
                     <div class="spec-info details-svg-container">
                         <h3 class="svg-placeholder-title">SVG tegning af din carport</h3>
-                        <div class="svg-placeholder" id="carport-svg-container">
-                            (Tegning vises her) </div>
+                        <div class="svg-placeholder" th:utext="${svg}">
+                        </div>
                     </div>
-                </div> </div> </main>
-    </div> </div> </body>
+
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+</body>
 </html>
