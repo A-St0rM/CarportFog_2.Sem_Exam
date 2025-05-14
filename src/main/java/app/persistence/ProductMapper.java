@@ -61,7 +61,6 @@ public class ProductMapper {
                 int width = rs.getInt("width");
                 String name = rs.getString("name");
                 String unit = rs.getString("unit");
-                int width = rs.getInt("width");
                 int price = rs.getInt("price_meter");
 
                 Product product = new Product(product_id, name, unit, price);
