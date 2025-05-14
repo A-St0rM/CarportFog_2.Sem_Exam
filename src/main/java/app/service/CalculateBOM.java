@@ -28,7 +28,6 @@ public class CalculateBOM {
 
     public void calculatePoles(Order order) throws DatabaseException {
         int quantity = calculatePolesQuantity(order);
-
         int productId = _productMapper.getProductIdByName("97x97 mm. trykimp. Stolpe");
 
         List<ProductVariant> productVariants = _productMapper.getVariantsByProductIdAndMinLength(300, productId);
@@ -67,7 +66,9 @@ public class CalculateBOM {
             int countForOneSide = combination.get(length);
             int totalCount = countForOneSide * sides;
 
+
             List<ProductVariant> variants = _productMapper.getVariantsByProductIdAndMinLength(length, productId);
+
             ProductVariant chosenVariant = null;
             for (ProductVariant variant : variants) {
                 if (variant.getLength() == length) {
@@ -108,22 +109,6 @@ public class CalculateBOM {
         }
         return optimalCombination;
     }
-
-//    public void calculateRafters(Order order) throws DatabaseException {
-//        int spacing = 60;
-//        double rafterWidth = 4.5;
-//        int innerLength = (int) (order.getCarportLength() - (rafterWidth * 2));
-//        int quantity = (int) Math.ceil((double) innerLength / spacing) + 2;
-//
-//        int productId = _productMapper.getProductIdByName("45x195 mm. spærtræ ubh.");
-//
-//        // Her henter spærtræ ud fra bredden af carporten (hvilket inputtes som minLength i mapperen)
-//        List<ProductVariant> variants = _productMapper.getVariantsByProductIdAndMinLength(order.getCarportWidth(), productId);
-//        ProductVariant variant = variants.get(0);
-//
-//        BOM bom = new BOM(0, quantity, "Spær monteres på rem", order, variant);
-//        bomList.add(bom);
-//    }
 
     public void calculateRafters(Order order) throws DatabaseException {
         // Regner med 60 cm mellem spær
@@ -232,7 +217,17 @@ public class CalculateBOM {
         }
     }
 
-    // Denne metode returnerer hele styklisten.
+    public int calculateTotalPriceFromBOM() {
+        int total = 0;
+        for (BOM bom : bomList) {
+            int pricePerMeter = bom.getProductVariant().getProduct().getPrice();
+            int quantity = bom.getQuantity();
+            total += pricePerMeter * quantity;
+        }
+        return total;
+    }
+
+// Denne metode returnerer hele styklisten.
     public List<BOM> getBom() {
         return bomList;
     }

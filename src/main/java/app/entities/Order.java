@@ -38,7 +38,7 @@ public class Order {
         return totalPrice;
     }
 
-    public int getOrderId() {
+    public int getId() {
         return orderId;
     }
 
@@ -62,5 +62,11 @@ public class Order {
         return status;
     }
 
+    public int getOrderId() {
+        return orderId;
+    }
 
+    public boolean isTrapezeRoof() {
+        return trapezeRoof;
+    }
 }

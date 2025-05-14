@@ -17,8 +17,6 @@ public class Customer {
         this.phone = phone;
         this.name = name;
         this.postalCode = postalCode;
-
-
     }
 
     public Customer(String email, String address, String phone, String name, int postalCode) {

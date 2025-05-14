@@ -1,9 +1,6 @@
 package app.persistence;
 
-import app.entities.BOM;
-import app.entities.Product;
-import app.entities.ProductVariant;
-import app.entities.Order;
+import app.entities.*;
 import app.exceptions.DatabaseException;
 
 import java.sql.*;
@@ -18,7 +15,7 @@ public class OrderMapper {
         this.connectionPool = connectionPool;
     }
 
-    public List<BOM> getBOMItemsByOrderId(int orderId) throws DatabaseException {
+    public List<BOM> getBOMForOrder(int orderId) throws DatabaseException {
 
         List<BOM> bomList = new ArrayList<>();
         String query = "SELECT * FROM bill_of_products_view WHERE order_id = ?";
@@ -34,9 +31,8 @@ public class OrderMapper {
                 //Order
                 int carportWidth = rs.getInt("carport_width");
                 int carportLength = rs.getInt("carport_length");
-                boolean isPaid = rs.getBoolean("is_paid");
                 int totalPrice = rs.getInt("total_price");
-                boolean trapezRoof = rs.getBoolean("trapez_roof");
+                boolean trapezRoof = rs.getBoolean("trapeze_roof");
                 String status = rs.getString("status");
 
                 Order order = new Order(carportWidth, carportLength, status, totalPrice, null, trapezRoof);
@@ -57,7 +53,7 @@ public class OrderMapper {
                 ProductVariant productVariant = new ProductVariant(productVariantId, length, product);
 
                 //BOM
-                int bomId = rs.getInt("bom_id");
+                int bomId = rs.getInt("order_item_id");
                 int quantity = rs.getInt("quantity");
 
                 BOM bom = new BOM(bomId, quantity, description, order, productVariant);
@@ -72,31 +68,33 @@ public class OrderMapper {
 
     public Order insertOrder(Order order) throws DatabaseException {
 
-        String query = "INSERT INTO orders (carport_width, carport_length, status, customer_id, total_price, trapeze_roof)" +
-                "VALUES(?,?,?,?,?,?,?)";
+        String query = "INSERT INTO orders (carport_width, carport_length, status, customer_id, total_price, trapeze_roof) " +
+                "VALUES (?, ?, ?, ?, ?, ?)";
+
         try (
                 Connection connection = connectionPool.getConnection();
-                PreparedStatement preparedStatement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
-
+                PreparedStatement preparedStatement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)
         ) {
             preparedStatement.setInt(1, order.getCarportWidth());
             preparedStatement.setInt(2, order.getCarportLength());
-            preparedStatement.setBoolean(3, false);
+            preparedStatement.setString(3, order.getStatus());
             preparedStatement.setInt(4, order.getCustomer().getCustomerId());
             preparedStatement.setInt(5, order.getTotalPrice());
             preparedStatement.setBoolean(6, order.getTrapezeRoof());
+
             preparedStatement.executeUpdate();
 
             ResultSet keySet = preparedStatement.getGeneratedKeys();
-
             if (keySet.next()) {
-                Order newOrder = new Order(keySet.getInt(1), order.getCarportWidth(), order.getCarportLength(), order.getStatus(), order.getTotalPrice(), order.getCustomer(), order.getTrapezeRoof());
-                return newOrder;
+                int orderId = keySet.getInt(1);
+                return new Order(orderId, order.getCarportWidth(), order.getCarportLength(),
+                        order.getStatus(), order.getTotalPrice(), order.getCustomer(),
+                        order.getTrapezeRoof());
             } else {
-                return null;
+                throw new DatabaseException("No generated key returned after inserting order.");
             }
         } catch (SQLException e) {
-            throw new DatabaseException("Could not insert order into the Database " + e.getMessage());
+            throw new DatabaseException("Could not insert order into the Database: " + e.getMessage());
         }
     }
 
@@ -108,7 +106,7 @@ public class OrderMapper {
             for (BOM bom : bomlist) {
 
                 try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-                    preparedStatement.setInt(1, bom.getOrder().getOrderId());
+                    preparedStatement.setInt(1, bom.getOrder().getId());
                     preparedStatement.setInt(2, bom.getProductVariant().getProductVariantId());
                     preparedStatement.setInt(3, bom.getQuantity());
                     preparedStatement.setString(4, bom.getDescription());
@@ -120,5 +118,102 @@ public class OrderMapper {
         }
 
     }
+
+    public List<Order> getAllOrdersWithCustomerInfo() throws DatabaseException {
+        List<Order> orders = new ArrayList<>();
+
+        String sql = """
+        SELECT o.order_id, o.carport_width, o.carport_length, o.status, o.total_price, o.trapeze_roof,
+               c.customer_id, c.name, c.address, c.postal_code, c.phone, c.email
+        FROM orders o
+        JOIN customers c ON o.customer_id = c.customer_id
+    """;
+
+        try (Connection con = connectionPool.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Customer customer = new Customer(
+                        rs.getInt("customer_id"),
+                        rs.getString("email"),
+                        rs.getString("address"),
+                        rs.getString("phone"),
+                        rs.getString("name"),
+                        rs.getInt("postal_code")
+                );
+
+                Order order = new Order(
+                        rs.getInt("order_id"),
+                        rs.getInt("carport_width"),
+                        rs.getInt("carport_length"),
+                        rs.getString("status"),
+                        rs.getInt("total_price"),
+                        customer,
+                        rs.getBoolean("trapeze_roof")
+                );
+
+                orders.add(order);
+            }
+        } catch (SQLException e) {
+            throw new DatabaseException("Fejl ved hentning af ordrer", e.getMessage());
+        }
+
+        return orders;
+    }
+
+    public Order getOrderById(int orderId) throws DatabaseException {
+        String sql = "SELECT o.*, c.customer_id, c.name AS customer_name, c.email, c.address, c.phone, c.postal_code " +
+                "FROM orders o " +
+                "JOIN customers c ON o.customer_id = c.customer_id " +
+                "WHERE o.order_id = ?";
+
+        try (Connection conn = connectionPool.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, orderId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    // Customer
+                    int customerId = rs.getInt("customer_id");
+                    String customerName = rs.getString("customer_name");
+                    String email = rs.getString("email");
+                    String address = rs.getString("address");
+                    String phone = rs.getString("phone");
+                    int postalCode = rs.getInt("postal_code");
+
+                    Customer customer = new Customer(customerId, email, address, phone, customerName, postalCode);
+
+                    // Order
+                    int width = rs.getInt("carport_width");
+                    int length = rs.getInt("carport_length");
+                    String status = rs.getString("status");
+                    int totalPrice = rs.getInt("total_price");
+                    boolean trapezRoof = rs.getBoolean("trapeze_roof");
+
+                    return new Order(orderId, width, length, status, totalPrice, customer, trapezRoof);
+                }
+            }
+        } catch (SQLException e) {
+            throw new DatabaseException("Kunne ikke hente ordren: " + e.getMessage());
+        }
+
+        throw new DatabaseException("Ordre med ID " + orderId + " blev ikke fundet.");
+    }
+
+    public void updateOrderTotalPrice(int orderId, int newTotalPrice) throws DatabaseException {
+        String sql = "UPDATE orders SET total_price = ? WHERE order_id = ?";
+        try (Connection conn = connectionPool.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, newTotalPrice);
+            ps.setInt(2, orderId);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new DatabaseException("Kunne ikke opdatere ordreprisen: " + e.getMessage());
+        }
+    }
+
+
+
 
 }

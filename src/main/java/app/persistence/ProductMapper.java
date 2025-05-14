@@ -19,39 +19,6 @@ public class ProductMapper {
         this.connectionPool = connectionPool;
     }
 
-//    public List<ProductVariant> getVariantsByProductIdAndMinLength(int minLength, int productId) throws DatabaseException {
-//
-//        List<ProductVariant> variants = new ArrayList<ProductVariant>();
-//
-//        String query = "SELECT * FROM product_variants " +
-//                "INNER JOIN products USING (product_id) " +
-//                "WHERE product_id = ? AND length >= ?";
-//
-//        try(Connection con = connectionPool.getConnection())
-//        {
-//            PreparedStatement ps = con.prepareStatement(query);
-//            ps.setInt(1, productId);
-//            ps.setInt(2, minLength);
-//            ResultSet rs = ps.executeQuery();
-//
-//            while(rs.next()){
-//                int variantId = rs.getInt("product_variant_id");
-//                int product_id = rs.getInt("product_id");
-//                int length = rs.getInt("length");
-//                String name = rs.getString("name");
-//                String unit = rs.getString("unit");
-//                int width = rs.getInt("width");
-//                int price = rs.getInt("price_meter");
-//                Product product = new Product(product_id, name, unit, price);
-//                ProductVariant productVariant = new ProductVariant(variantId, length, product);
-//                variants.add(productVariant);
-//            }
-//
-//        } catch (SQLException e) {
-//            throw new DatabaseException("Couldn't get variants " + e.getMessage());
-//        }
-//        return variants;
-//    }
 
     public List<ProductVariant> getVariantsByProductIdAndMinLength(int minLength, int productId) throws DatabaseException {
         List<ProductVariant> variants = new ArrayList<>();
@@ -76,7 +43,6 @@ public class ProductMapper {
         return variants;
     }
 
-
     public List<ProductVariant> getVariantsByProductIdAndMinWidth(int minWidth, int productId) throws DatabaseException {
         List<ProductVariant> variants = new ArrayList<>();
 
@@ -95,6 +61,7 @@ public class ProductMapper {
                 int width = rs.getInt("width");
                 String name = rs.getString("name");
                 String unit = rs.getString("unit");
+                int width = rs.getInt("width");
                 int price = rs.getInt("price_meter");
 
                 Product product = new Product(product_id, name, unit, price);
