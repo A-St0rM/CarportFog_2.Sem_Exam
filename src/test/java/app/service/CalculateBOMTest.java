@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class CalculateBOMTest {
 
     private static final String USER = "postgres";
-    private static final String PASSWORD = System.getProperty("password");
+    private static final String PASSWORD = System.getenv("password");
     private static final String URL = "jdbc:postgresql://" + System.getenv("ip") + ":5432/%s?currentSchema=public";
     private static final String DB = "CarportFog";
 
