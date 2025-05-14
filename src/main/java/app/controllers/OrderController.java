@@ -78,11 +78,9 @@ public class OrderController {
             // 7. Save BOM items
             _orderMapper.insertBOMItems(_calculateBOM.getBom());
 
-            //To debug
-            System.out.println("E-mail indtastet: " + email);
 
-            //8
-            emailService.sendMailOffer(name, email, zip, order.getTotalPrice());
+            //8. send email
+            emailService.sendMailOffer(name, email, order.getTotalPrice());
 
             // 9. Clean up session and redirect
             ctx.req().getSession().invalidate();
@@ -127,18 +125,36 @@ public class OrderController {
 
         try {
             _orderMapper.updateOrderTotalPrice(orderId, newTotalPrice);
-            ctx.redirect("/admin_dashboard"); // eller redirect til styklisten igen hvis ønsket
+            ctx.redirect("/admin_dashboard");
         } catch (DatabaseException e) {
             e.printStackTrace();
             ctx.status(500).result("Kunne ikke opdatere prisen: " + e.getMessage());
         }
     }
 
+    public void handleSendPaymentEmail(Context ctx) {
+        int orderId = Integer.parseInt(ctx.pathParam("id"));
 
+        try {
+            Order order = _orderMapper.getOrderById(orderId);
+            Customer customer = order.getCustomer();
 
+            EmailService emailService = new EmailService();
+            boolean result = emailService.sendMailPayment(
+                    customer.getName(),
+                    customer.getEmail(),
+                    order.getTotalPrice()
+            );
+            if (result) {
+                ctx.redirect("/admin/order/" + orderId + "/bom");
+            } else {
+                ctx.status(500).result("Fejl: Mailen kunne ikke sendes");
+            }
 
-
-
-
+        } catch (Exception e) {
+            e.printStackTrace();
+            ctx.status(500).result("Fejl ved afsendelse af e-mail");
+        }
+    }
 
 }

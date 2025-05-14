@@ -45,8 +45,8 @@
 
   <!-- KNAP: Send tilbud -->
   <div class="send-offer">
-    <form th:method="post" th:action="@{/admin/order/send-offer/{id}(id=${order.orderId})}">
-      <input type="hidden" name="orderId" th:value="${order.orderId}" />
+    <form th:method="post" th:action="@{/admin/order/send-payment/{id}(id=${order.orderId})}">
+    <input type="hidden" name="orderId" th:value="${order.orderId}" />
       <button type="submit" class="btn btn-warning">📧 Send tilbud</button>
     </form>
   </div>

@@ -44,6 +44,8 @@ public static void startRouting(Javalin app, ConnectionPool connectionPool) {
     app.post("/admin/login", ctx -> adminController.adminLogin(ctx));
     app.post("/admin/create", ctx -> adminController.createAdmin(ctx));
     app.post("/admin/order/set-total/{orderId}", ctx -> orderController.handleUpdateTotalPrice(ctx));
+    app.post("/admin/order/send-payment/{id}", ctx -> orderController.handleSendPaymentEmail(ctx));
+
 
 
 

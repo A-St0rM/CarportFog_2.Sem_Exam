@@ -12,7 +12,7 @@ public class EmailService {
 
     private final static String API_KEY = System.getenv("SENDGRID_API_KEY");
 
-    public boolean sendMailOffer(String name, String email, int zip, int totalPrice) throws IOException {
+    public boolean sendMailOffer(String name, String email, int totalPrice) throws IOException {
         Email from = new Email("Johannes@johannesfoog.dk");
         from.setName("Johannes Fog Byggemarked");
 
@@ -23,7 +23,6 @@ public class EmailService {
         personalization.addTo(new Email(email));
         personalization.addDynamicTemplateData("name", name);
         personalization.addDynamicTemplateData("email", email);
-        personalization.addDynamicTemplateData("zip", zip);
         personalization.addDynamicTemplateData("price", totalPrice);
         mail.addPersonalization(personalization);
         mail.setTemplateId("d-98633b54660e4e6c839007bc756debd9");
@@ -45,7 +44,7 @@ public class EmailService {
     }
 
 
-    public boolean sendMailPayment(String name, String email, int zip, int totalPrice) throws IOException {
+    public boolean sendMailPayment(String name, String email, int totalPrice) throws IOException {
         Email from = new Email("Johannes@johannesfoog.dk");
         from.setName("Johannes Fog Byggemarked");
 
@@ -56,7 +55,6 @@ public class EmailService {
         personalization.addTo(new Email(email));
         personalization.addDynamicTemplateData("name", name);
         personalization.addDynamicTemplateData("email", email);
-        personalization.addDynamicTemplateData("zip", zip);
         personalization.addDynamicTemplateData("price", totalPrice);
         personalization.addDynamicTemplateData("paymentSite", "https://carportfog.showmecode.dk/payment");
         mail.addPersonalization(personalization);
@@ -78,7 +76,7 @@ public class EmailService {
         }
     }
 
-    public boolean sendMailConfirmation(String name, String email, int zip, int totalPrice) throws IOException {
+    public boolean sendMailConfirmation(String name, String email, int totalPrice) throws IOException {
         Email from = new Email("Johannes@johannesfoog.dk");
         from.setName("Johannes Fog Byggemarked");
 
@@ -89,7 +87,6 @@ public class EmailService {
         personalization.addTo(new Email(email));
         personalization.addDynamicTemplateData("name", name);
         personalization.addDynamicTemplateData("email", email);
-        personalization.addDynamicTemplateData("zip", zip);
         personalization.addDynamicTemplateData("price", totalPrice);
         personalization.addDynamicTemplateData("paymentSite", "https://carportfog.showmecode.dk/payment");
         mail.addPersonalization(personalization);
