@@ -10,7 +10,7 @@ import com.sendgrid.helpers.mail.objects.Email;
 
 public class EmailService {
 
-    static String API_KEY = System.getenv("SENDGRID_API_KEY");
+    private final static String API_KEY = System.getenv("SENDGRID_API_KEY");
 
     public boolean sendMailOffer(String name, String email, int zip, int totalPrice) throws IOException {
         Email from = new Email("Johannes@johannesfoog.dk");

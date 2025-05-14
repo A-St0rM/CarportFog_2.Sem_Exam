@@ -78,6 +78,9 @@ public class OrderController {
             // 7. Save BOM items
             _orderMapper.insertBOMItems(_calculateBOM.getBom());
 
+            //To debug
+            System.out.println("E-mail indtastet: " + email);
+
             //8
             emailService.sendMailOffer(name, email, zip, order.getTotalPrice());
 

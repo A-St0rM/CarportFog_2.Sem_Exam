@@ -26,10 +26,7 @@ public class Main {
             config.fileRenderer(new JavalinThymeleaf(ThymeleafConfig.templateEngine()));
         }).start(7070);
 
-
         RoutingController.startRouting(app, connectionPool);
-
-
     }
 
 }
