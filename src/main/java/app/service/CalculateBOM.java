@@ -19,6 +19,7 @@ public class CalculateBOM {
         this._productMapper = productMapper;
     }
 
+    // Kalder alle metoderne til udregning af hele styklisten til carporten
     public void calculateCarport(Order order) throws DatabaseException {
         calculatePoles(order);
         calculateBeams(order);
@@ -26,6 +27,7 @@ public class CalculateBOM {
         calculateRoofs(order);
     }
 
+    // Udregner hvor mange stolper der skal bruges og smider mængden og korrekt vare i stykliste
     public void calculatePoles(Order order) throws DatabaseException {
         int quantity = calculatePolesQuantity(order);
         int productId = _productMapper.getProductIdByName("97x97 mm. trykimp. Stolpe");
@@ -42,6 +44,7 @@ public class CalculateBOM {
         bomList.add(bom);
     }
 
+    // Udregner mængden af stolper der skal bruges baseret på længde
     public int calculatePolesQuantity(Order order) throws DatabaseException {
         int overhangRear = 30;
         int distanceFirstPole = 100;
@@ -54,6 +57,7 @@ public class CalculateBOM {
         return totalAmountOfPoles * 2;
     }
 
+    // Udregner hvilke remme der skal bruges og smider de korrekte længder og mængder i stykliste
     public void calculateBeams(Order order) throws DatabaseException {
         int totalLength = order.getCarportLength();
         int sides = 2;
@@ -86,6 +90,7 @@ public class CalculateBOM {
         }
     }
 
+    // Finder den bedste længde-kombination så der er mindst overskydende spild
     public Map<Integer, Integer> getOptimalBeamCombination(int length) {
         int[] beamLengths = _productMapper.getAvailableBeamLengths();
 
@@ -110,6 +115,7 @@ public class CalculateBOM {
         return optimalCombination;
     }
 
+    // Udregner hvor mange spær der skal bruges baseret på længden og smider dem i styklisten
     public void calculateRafters(Order order) throws DatabaseException {
         // Regner med 60 cm mellem spær
         int spacing = 60;
@@ -143,6 +149,7 @@ public class CalculateBOM {
         return calculateRoofLengthQuantity(order) * calculateRoofWidthQuantity(order);
     }
 
+    // Udregner mængden af tagplader baseret på bredden (altså inklusiv den optimale kombination)
     public int calculateRoofWidthQuantity(Order order) throws DatabaseException {
         int carportWidth = order.getCarportWidth();
         Map<Integer, Integer> combination = getOptimalRoofCombination(carportWidth);
@@ -154,6 +161,7 @@ public class CalculateBOM {
         return amountOfRoofsWidth;
     }
 
+    // Udregner hvor mange tagplader (109cm længde) der skal bruges baseret på længde af carport
     public int calculateRoofLengthQuantity(Order order) throws DatabaseException {
         int carportLength = order.getCarportLength();
         int amountOfRoofsLength = (int) Math.ceil(carportLength / 109.0);
@@ -161,6 +169,7 @@ public class CalculateBOM {
         return amountOfRoofsLength;
     }
 
+    // Finder den optimale tagkombination (altså mht. bredde) md mindst overskydende spild
     public Map<Integer, Integer> getOptimalRoofCombination(int width) {
         int[] roofWidths = _productMapper.getAvailableRoofWidths();
 
@@ -200,6 +209,7 @@ public class CalculateBOM {
         return optimalCombination;
     }
 
+    // Udregner hvilke tagplader der skal bruges og smider korrekte mængder og bredder i styklisten
     public void calculateRoofs(Order order) throws DatabaseException {
         int carportWidth = order.getCarportWidth();
         int productId = _productMapper.getProductIdByName("Plastmo Ecolite Blåtonet 109 mm.");
@@ -217,6 +227,7 @@ public class CalculateBOM {
         }
     }
 
+    // Udregner totalprisen ud fra styklisten
     public int calculateTotalPriceFromBOM() {
         int total = 0;
         for (BOM bom : bomList) {
@@ -227,7 +238,7 @@ public class CalculateBOM {
         return total;
     }
 
-// Denne metode returnerer hele styklisten.
+    // Denne metode returnerer hele styklisten.
     public List<BOM> getBom() {
         return bomList;
     }
