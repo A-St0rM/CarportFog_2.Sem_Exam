@@ -105,6 +105,28 @@ public class ProductMapper {
         }
     }
 
+    public Product getProductByName(String name) throws DatabaseException {
+        try (Connection connection = connectionPool.getConnection()) {
+            String sql = "SELECT * FROM products WHERE name = ?";
+            try (PreparedStatement ps = connection.prepareStatement(sql)) {
+                ps.setString(1, name);
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        return new Product(
+                                rs.getInt("product_id"),
+                                rs.getString("name"),
+                                rs.getString("unit"),
+                                rs.getInt("price_meter")
+                        );
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            throw new DatabaseException("Fejl under hentning af produkt med navn: " + name);
+        }
+        return null;
+    }
+
     public int getProductIdByName(String name) throws DatabaseException {
         String sql = "SELECT product_id FROM products WHERE LOWER(TRIM(name)) = LOWER(TRIM(?))"; // Trim and lowercase
         try (Connection conn = connectionPool.getConnection();
