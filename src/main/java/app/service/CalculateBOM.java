@@ -26,6 +26,13 @@ public class CalculateBOM {
         calculateBeams(order);
         calculateRafters(order);
         calculateRoofs(order);
+        calculateHoleBands(order);
+        calculateScrewsRoofs(order);
+        calculateFittingsBeams(order);
+        calculateBoltsBeams(order);
+        calculateFittingsRaftersLeft(order);
+        calculateFittingsRaftersRight(order);
+        calculateScrewsRafters(order);
     }
 
     // Udregner hvor mange stolper der skal bruges og smider mængden og korrekt vare i stykliste
@@ -235,7 +242,6 @@ public class CalculateBOM {
         }
     }
 
-
     // Skal bare returnere 2 ruller. 1 rulle for hvert led
     public void calculateHoleBands(Order order) throws DatabaseException {
         int quantity = 2;
@@ -249,8 +255,7 @@ public class CalculateBOM {
         bomList.add(bom);
     }
 
-
-    // Bruger plastmo bundskruer (200 stk pr pakke). Vi regner bare med 1 pakke per carport.
+    // Bruger plastmo bundskruer (200 stk pr pakke). Vi regner med 1 pakke per carport.
     public void calculateScrewsRoofs(Order order) throws DatabaseException {
         int quantity = 1;
         Product product = _productMapper.getProductByName("plastmo bundskruer 200 stk.");
@@ -287,7 +292,6 @@ public class CalculateBOM {
         bomList.add(bom);
 
     }
-
 
     // Bruger 2 bræddebolte i stolperne på enderne og 4 bræddebolte på stolperne imellem.
     public void calculateBoltsBeams(Order order) throws DatabaseException {
@@ -327,7 +331,6 @@ public class CalculateBOM {
         BOM bom = new BOM(quantityOfLeftFittings, "Til montering af spær på rem", order, product);
         bomList.add(bom);
     }
-
 
     // Bruger universalbeslag højre. Skal bruge 1 højre for hvert beslag
     public void calculateFittingsRaftersRight(Order order) throws DatabaseException {
