@@ -150,12 +150,15 @@ img {
 .steps-nav li.active::before,
 .steps-nav li.completed::before { opacity: 0; } /* Hide shadow */
 
-/* Sidebar Nav Button Link */
+/* Sidebar Nav Button Link - DEACTIVATED FUNCTIONALITY */
 .steps-nav li a {
     position: relative; z-index: 2; display: flex; align-items: center; padding: 18px 20px;
     background-color: var(--fog-nav-inactive-bg); color: var(--fog-text-dark); text-decoration: none;
     font-size: 1.05rem; font-weight: 500; border-radius: 5px; border: 1px solid var(--fog-nav-behind-box);
     transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+    /* === LINES ADDED TO DEACTIVATE LINK FUNCTIONALITY === */
+    pointer-events: none; /* Prevents click and most hover events */
+    cursor: default;      /* Standard arrow cursor */
 }
 /* Step Indicator Circle */
 .step-indicator {
@@ -168,13 +171,15 @@ img {
 .step-text { flex-grow: 1; } /* Text label */
 
 /* Sidebar Nav Button States */
-.steps-nav li:not(.active):not(.completed) a:hover { background-color: #f0f0f0; }
-.steps-nav li.active a {
+/* The :hover state on 'a' will no longer trigger due to pointer-events: none; */
+/* .steps-nav li:not(.active):not(.completed) a:hover { background-color: #f0f0f0; } */
+
+.steps-nav li.active a { /* Active */
     background-color: var(--fog-nav-active-bg); color: var(--fog-text-dark);
     border-color: var(--fog-nav-active-bg); font-weight: 600;
 }
 .steps-nav li.active .step-indicator { border-color: var(--fog-text-dark); background-color: var(--fog-text-light); color: var(--fog-text-dark); }
-.steps-nav li.completed a {
+.steps-nav li.completed a { /* Completed */
     background-color: var(--fog-nav-completed-bg); color: var(--fog-text-light); border-color: var(--fog-nav-completed-bg);
 }
 .steps-nav li.completed .step-indicator { border-color: var(--fog-text-light); background-color: var(--fog-text-light); color: var(--fog-nav-completed-bg); }
@@ -282,14 +287,16 @@ img {
 .form-group-checkbox label { font-size: 0.85rem; font-weight: normal; color: var(--fog-text-grey); margin-bottom: 0; cursor: pointer; }
 .details-svg-container { width: 100%; padding-top: 10px; }
 .svg-placeholder-title { font-size: 1.2rem; font-weight: 600; color: var(--fog-primary-blue); text-align: center; margin-bottom: 20px; }
-.svg-placeholder { width: 100%; max-width: 450px; min-height: 300px; background-color: var(--fog-content-header-bg); border: 1px solid var(--fog-primary-blue); border-radius: 5px; display: flex; justify-content: center; align-items: center; margin: 0 auto; color: var(--fog-text-dark); font-style: italic; font-size: 0.9rem; }
+.svg-placeholder { width: 100%; max-width: 700px; min-height: 500px; display: flex; justify-content: center; align-items: center; margin: 0 auto; color: var(--fog-text-grey); font-style: italic; font-size: 0.9rem; overflow: hidden; }
+.svg-placeholder svg { display: block; width: 100%; height: auto; max-height: 100%; margin: auto; }
 
 
-/* ========== CUSTOMER FLOW ENDPAGES (Confirmation, Payment) ========== */
-/* Centering content for pages like confirmation and payment */
+
+/* ========== CUSTOMER FLOW ENDPAGES (Confirmation, Payment, Payment Confirmation) ========== */
+/* Centering content for these pages */
 html[data-page='confirmation'] .content-body,
 html[data-page='payment'] .content-body,
-html[data-page='paymentConfirmation'] .content-body { /* Added paymentConfirmation */
+html[data-page='paymentConfirmation'] .content-body {
     display: flex;
     flex-direction: column;
     justify-content: center; /* Center vertically */
@@ -298,41 +305,40 @@ html[data-page='paymentConfirmation'] .content-body { /* Added paymentConfirmati
     text-align: center;      /* Center text within children by default */
 }
 
-/* Container for the centered box on confirmation/payment pages */
-.confirmation-container,
-.payment-container,
-.confirmation-message-box { /* For payment confirmation */
+/* Container for the centered box on these pages */
+.confirmation-container, /* Used on quote confirmation */
+.payment-container,      /* Used on payment page */
+.confirmation-message-box { /* Used on payment confirmation page */
     background-color: var(--fog-content-header-bg); /* Light blue box */
     padding: 40px 50px;
     border-radius: 8px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     max-width: 650px; /* Max width for the content block */
     width: 90%;
-    /* text-align: center; (Inherited from .content-body) */
 }
 
-/* Text styling within confirmation/payment boxes */
-.confirmation-header,
-.payment-greeting {
+/* Shared text styling within these boxes */
+.confirmation-header, /* Quote confirmation and payment confirmation */
+.payment-greeting {   /* Payment page */
     font-size: 1.9rem;
     color: var(--fog-primary-blue);
     margin-bottom: 20px;
     font-weight: 600;
 }
-.confirmation-main,
-.payment-info {
+.confirmation-main, /* Quote confirmation and payment confirmation */
+.payment-info {      /* Payment page */
     font-size: 1.1rem;
     margin-bottom: 15px;
     line-height: 1.6;
 }
-.confirmation-sub,
-.payment-footer-note {
+.confirmation-sub, /* Quote confirmation and payment confirmation */
+.payment-footer-note { /* Payment page */
     font-size: 0.9rem;
     color: var(--fog-text-grey);
     margin-bottom: 40px;
 }
 
-/* Confirmation Page Specifics */
+/* Quote Confirmation Page Specifics */
 .confirmation-container .svg-section { margin-bottom: 40px; }
 .confirmation-container .svg-placeholder { min-height: 250px; }
 .confirmation-button { padding-top: 0; margin-top: 0; }
@@ -424,9 +430,11 @@ td:has(> .input-in-table) { padding-top: 6px; padding-bottom: 6px; }
 .dashboard-save .btn { margin: 0 10px;}
 .save-changes-button { /* Uses .btn and .btn-primary styles */ }
 .options-button { /* Uses .btn and .btn-secondary styles */ }
+.add-admin-button-container .btn { /* Inherits .btn styling */ }
+
 
 /* Admin Options Page Specific */
-.admin-content.options-page .page-title { /* .page-title.admin-title might be better for less specificity */
+.admin-content.options-page .page-title { /* Title for options page */
     margin-bottom: 40px; text-align: center;
 }
 .options-section { margin-bottom: 40px; padding: 25px; border: 1px solid var(--fog-border-grey); border-radius: 8px; background-color: #fdfdfd; max-width: 900px; margin-left: auto; margin-right: auto;}
@@ -446,7 +454,7 @@ td:has(> .input-in-table) { padding-top: 6px; padding-bottom: 6px; }
 @media (max-width: 1200px) {
     .sidebar { flex: 0 0 250px; }
     .steps-nav li { margin: 0 20px 12px 25px; }
-    .steps-nav li a { padding: 16px 18px; font-size: 1rem; }
+    .steps-nav li a { padding: 16px 18px; font-size: 1rem; /* Deactivated link styles apply */ }
     .step-indicator { width: 24px; height: 24px; font-size: 0.85rem; margin-right: 12px;}
     .main-header { padding: 15px 20px; }
     .logo-img { height: 60px; }
@@ -464,7 +472,7 @@ td:has(> .input-in-table) { padding-top: 6px; padding-bottom: 6px; }
     .info-box { padding: 20px; }
     .btn, .btn-secondary { padding: 14px 35px; font-size: 1.1rem; }
     .svg-placeholder { min-height: 250px; }
-    /* Page 5 & Payment & Payment Confirmation */
+    /* Customer Endpages */
     .confirmation-container, .payment-container, .confirmation-message-box { max-width: 90%; }
     html[data-page='confirmation'] .content-body,
     html[data-page='payment'] .content-body,
@@ -480,7 +488,7 @@ td:has(> .input-in-table) { padding-top: 6px; padding-bottom: 6px; }
 @media (max-width: 992px) {
     .sidebar { flex: 0 0 220px; }
     .steps-nav li { margin: 0 15px 10px 20px; }
-    .steps-nav li a { padding: 14px 15px; font-size: 0.9rem; }
+    .steps-nav li a { padding: 14px 15px; font-size: 0.9rem; /* Deactivated link styles apply */ }
     .step-indicator { width: 22px; height: 22px; font-size: 0.8rem; margin-right: 10px;}
     .content-body { padding: 25px; }
     .page-title { font-size: 1.5rem; margin-bottom: 25px; max-width: 90%;}
@@ -498,9 +506,9 @@ td:has(> .input-in-table) { padding-top: 6px; padding-bottom: 6px; }
     .info-box { max-width: 100%; }
     .info-image img { max-width: 70%; } /* Page 2 */
     .additions-image-container img { max-width: 70%; } /* Page 3 */
-    .svg-placeholder { max-width: 90%; min-height: 220px;} /* Page 4 */
+    .svg-placeholder { max-width: 100%; min-height: 500px;} /* Page 4 */
     .form-navigation { margin-top: 30px; }
-    /* Page 5 & Payment & Payment Confirmation */
+    /* Customer Endpages */
     .confirmation-container, .payment-container, .confirmation-message-box { max-width: 95%; padding: 20px 0;}
     html[data-page='confirmation'] .content-body,
     html[data-page='payment'] .content-body,
@@ -540,6 +548,7 @@ td:has(> .input-in-table) { padding-top: 6px; padding-bottom: 6px; }
         text-align: center; padding: 5px; font-size: 0.7rem;
         background-color: transparent !important; color: var(--fog-text-dark);
         border: none; width: 100%; border-radius: 0;
+        /* pointer-events & cursor inherited */
     }
     .steps-nav li.active { border-bottom-color: var(--fog-primary-blue); }
     .steps-nav li.active a { color: var(--fog-primary-blue); font-weight: bold; }
@@ -586,7 +595,7 @@ td:has(> .input-in-table) { padding-top: 6px; padding-bottom: 6px; }
     .confirmation-header, .payment-greeting { font-size: 1.5rem; }
     .confirmation-main, .payment-info { font-size: 0.95rem; }
     .confirmation-sub, .payment-footer-note { font-size: 0.8rem; margin-bottom: 30px; }
-    .svg-section { margin-bottom: 30px; }
+    .svg-section { margin-bottom: 200px; }
     /* Admin Dashboard Mobile */
     .admin-content.dashboard { padding: 15px 10px; }
     .page-title.admin-title { font-size: 1.3rem; }
