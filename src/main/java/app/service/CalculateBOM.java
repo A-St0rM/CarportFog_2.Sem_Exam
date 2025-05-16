@@ -371,13 +371,23 @@ public class CalculateBOM {
     // Udregner totalprisen ud fra styklisten
 //    public int calculateTotalPriceFromBOM() {
 //        int total = 0;
+//
 //        for (BOM bom : bomList) {
-//            int pricePerMeter = bom.getProductVariant().getProduct().getPrice();
-//            int quantity = bom.getQuantity();
-//            total += pricePerMeter * quantity;
+//            if (bom.getProductVariant() != null) {
+//                int pricePerMeter = bom.getProductVariant().getProduct().getPrice(); // kr/m
+//                int lengthInCm = bom.getProductVariant().getLength();                // fx 480
+//                int quantity = bom.getQuantity();
+//
+//                double lengthInMeters = lengthInCm / 100.0;
+//                double lineTotal = pricePerMeter * lengthInMeters * quantity;
+//
+//                total += Math.round(lineTotal); // evt. brug Math.ceil eller floor afhængigt af din ønskede logik
+//            }
 //        }
+//
 //        return total;
 //    }
+
 
     // Denne metode returnerer hele styklisten.
     public List<BOM> getBom() {
