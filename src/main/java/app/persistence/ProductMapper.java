@@ -61,7 +61,7 @@ public class ProductMapper {
                 int width = rs.getInt("width");
                 String name = rs.getString("name");
                 String unit = rs.getString("unit");
-                int price = rs.getInt("price_meter");
+                int price = rs.getInt("price");
 
                 Product product = new Product(product_id, name, unit, price);
                 ProductVariant variant = new ProductVariant(variantId, length, product);
@@ -75,7 +75,7 @@ public class ProductMapper {
     }
 
     public ProductVariant getVariantByProductIdAndWidth(int productId, int width) throws DatabaseException {
-        String sql = "SELECT pv.*, p.name, p.unit, p.price_meter " +
+        String sql = "SELECT pv.*, p.name, p.unit, p.price " +
                 "FROM product_variants pv " +
                 "JOIN products p ON pv.product_id = p.product_id " +
                 "WHERE pv.product_id = ? AND pv.width = ?";
@@ -94,7 +94,7 @@ public class ProductMapper {
                                 productId,
                                 rs.getString("name"),
                                 rs.getString("unit"),
-                                rs.getInt("price_meter") // Rettet til price_meter
+                                rs.getInt("price")
                         )
                 );
             } else {
@@ -103,6 +103,28 @@ public class ProductMapper {
         } catch (SQLException e) {
             throw new DatabaseException("Databasefejl: " + e.getMessage());
         }
+    }
+
+    public Product getProductByName(String name) throws DatabaseException {
+        try (Connection connection = connectionPool.getConnection()) {
+            String sql = "SELECT * FROM products WHERE name = ?";
+            try (PreparedStatement ps = connection.prepareStatement(sql)) {
+                ps.setString(1, name);
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        return new Product(
+                                rs.getInt("product_id"),
+                                rs.getString("name"),
+                                rs.getString("unit"),
+                                rs.getInt("price")
+                        );
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            throw new DatabaseException("Fejl under hentning af produkt med navn: " + name);
+        }
+        return null;
     }
 
     public int getProductIdByName(String name) throws DatabaseException {
