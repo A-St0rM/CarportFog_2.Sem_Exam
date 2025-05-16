@@ -51,7 +51,7 @@ public class CarportSvg {
 
     public void addPoles() {
         int polesPerRow = calculatePoles();
-        double distributionStart = 55; // 55 cm from the front (left)
+        double distributionStart = 100; // 100 cm from the front (left)
         double distributionEnd = this.carportLength - 30.0; //30 cm from the back (right side)
         double lengthToDistributeOn = distributionEnd - distributionStart;
 
@@ -83,7 +83,6 @@ public class CarportSvg {
         // Must have at least 2 if we reach here (one at start, one at end)
         numberOfRaftersToDraw = Math.max(2, numberOfRaftersToDraw);
 
-
         double spaceBetweenRafters = 0;
         if (numberOfRaftersToDraw > 1) {
             // The spacing between them from the first rafter to the last is the length, minus one rafters thickness(4.5 cm).
@@ -114,7 +113,7 @@ public class CarportSvg {
     private void addDimensions() {
         // linje i toppen (fra første pole til sidste)
         carportSvg.addLine(55.0, -20.0, this.carportLength - 30.0, -20.0, "stroke:black; stroke-width:1px;");
-        carportSvg.addLine(55.0, -20.0, 55, -10.0, "stroke:black; stroke-width:1px;");//små indhak
+        carportSvg.addLine(55.0, -20.0, 55, -10.0, "stroke:black; stroke-width:1px;"); // små indhak
         carportSvg.addLine(this.carportLength - 30.0, -20.0, this.carportLength - 30, -10.0, "stroke:black; stroke-width:1px;");//små indhak
 
         // linje til højre (hele carportens bredde
