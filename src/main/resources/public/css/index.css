@@ -291,6 +291,7 @@ img {
 .svg-placeholder svg { display: block; width: 100%; height: auto; max-height: 100%; margin: auto; }
 
 
+
 /* ========== CUSTOMER FLOW ENDPAGES (Confirmation, Payment, Payment Confirmation) ========== */
 /* Centering content for these pages */
 html[data-page='confirmation'] .content-body,
@@ -594,7 +595,7 @@ td:has(> .input-in-table) { padding-top: 6px; padding-bottom: 6px; }
     .confirmation-header, .payment-greeting { font-size: 1.5rem; }
     .confirmation-main, .payment-info { font-size: 0.95rem; }
     .confirmation-sub, .payment-footer-note { font-size: 0.8rem; margin-bottom: 30px; }
-    .svg-section { margin-bottom: 30px; }
+    .svg-section { margin-bottom: 200px; }
     /* Admin Dashboard Mobile */
     .admin-content.dashboard { padding: 15px 10px; }
     .page-title.admin-title { font-size: 1.3rem; }

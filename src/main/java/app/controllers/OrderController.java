@@ -8,6 +8,8 @@ import app.persistence.ConnectionPool;
 import app.persistence.CustomerMapper;
 import app.persistence.OrderMapper;
 import app.service.CalculateBOM;
+import app.service.CarportSvg;
+import app.service.Svg;
 import io.javalin.http.Context;
 
 import java.util.List;
@@ -19,6 +21,7 @@ public class OrderController {
     private final ConnectionPool _connectionPool;
     private final CustomerMapper _customerMapper;
     private final CalculateBOM _calculateBOM;
+
 
     public OrderController(OrderMapper orderMapper, ConnectionPool connectionPool, CustomerMapper customerMapper, CalculateBOM calculateBOM)
     {
@@ -126,10 +129,11 @@ public class OrderController {
         }
     }
 
-
-
-
-
+    public static void showSvg(Context ctx, ConnectionPool connectionPool) {
+        CarportSvg svgDrawer = new CarportSvg(ctx);
+        ctx.attribute("svg", svgDrawer.toString());
+        ctx.render("details.html");
+    }
 
 
 
