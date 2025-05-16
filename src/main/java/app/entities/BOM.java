@@ -39,6 +39,11 @@ public class BOM {
         this.product = product;
     }
 
+
+    public Product getProduct() {
+        return product;
+    }
+
     public int getBomId() {
         return bomId;
     }

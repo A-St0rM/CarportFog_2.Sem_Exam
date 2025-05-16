@@ -372,7 +372,7 @@ public class CalculateBOM {
     public int calculateTotalPriceFromBOM() {
         int total = 0;
         for (BOM bom : bomList) {
-            int pricePerMeter = bom.getProductVariant().getProduct().getPrice();
+            int pricePerMeter = bom.getProductVariant().getProduct().getPrice() + bom.getProduct().getPrice();
             int quantity = bom.getQuantity();
             total += pricePerMeter * quantity;
         }
