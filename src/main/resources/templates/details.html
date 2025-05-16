@@ -32,15 +32,9 @@
                             <span class="step-text">Specifikationer</span>
                         </a>
                     </li>
-                    <li class="completed" th:classappend="${currentPage == 'additions'} ? 'active'">
-                        <a th:href="@{/additions}">
-                            <span class="step-indicator" data-step-number="3"></span>
-                            <span class="step-text">Tilføjelser</span>
-                        </a>
-                    </li>
                     <li th:classappend="${currentPage == 'details'} ? 'active'">
                         <a th:href="@{/details}">
-                            <span class="step-indicator" data-step-number="4"></span>
+                            <span class="step-indicator" data-step-number="3"></span>
                             <span class="step-text">Oplysninger</span>
                         </a>
                     </li>
@@ -71,12 +65,10 @@
 
                         <div class="form-group">
                             <label for="customer-zip">Postnummer</label>
-                            <input type="text" id="customer-zip" name="customerZip" required pattern="[0-9]{4}" title="Indtast 4 cifre" placeholder="Postnummer">
-                        </div>
-
-                        <div class="form-group">
-                            <label for="customer-city">By</label>
-                            <input type="text" id="customer-city" name="customerCity" required placeholder="Bynavn">
+                            <input type="text" id="customer-zip" name="customerZip"
+                                   required pattern="[0-9]{4}" title="Indtast 4 cifre"
+                                   placeholder="Postnummer"
+                                   th:value="${customerZip}">
                         </div>
 
                         <div class="form-group">
@@ -98,7 +90,7 @@
                         </div>
 
                         <div class="form-navigation">
-                            <a th:href="@{/additions}" class="btn btn-secondary">Forrige trin</a>
+                            <a th:href="@{/specifications}" class="btn btn-secondary">Forrige trin</a>
                             <button type="submit" class="btn btn-primary">Modtag tilbud</button>
                         </div>
                     </form>

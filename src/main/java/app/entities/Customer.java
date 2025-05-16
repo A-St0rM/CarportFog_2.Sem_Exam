@@ -27,6 +27,14 @@ public class Customer {
         this.postalCode = postalCode;
     }
 
+    public Customer(String email, String address, String phone, String name, int postalCode, String city) {
+        this.email = email;
+        this.address = address;
+        this.phone = phone;
+        this.name = name;
+        this.postalCode = postalCode;
+    }
+
     public int getCustomerId() {
         return customerId;
     }

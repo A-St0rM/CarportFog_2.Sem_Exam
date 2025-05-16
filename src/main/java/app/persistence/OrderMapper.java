@@ -47,10 +47,11 @@ public class OrderMapper {
 
                 //productVariant
                 int productVariantId = rs.getInt("product_variant_id");
+                int width = rs.getInt("width");
                 String description = rs.getString("description");
                 int length = rs.getInt("length");
 
-                ProductVariant productVariant = new ProductVariant(productVariantId, length, product);
+                ProductVariant productVariant = new ProductVariant(productVariantId, length, width, product);
 
                 //BOM
                 int bomId = rs.getInt("order_item_id");
@@ -100,10 +101,15 @@ public class OrderMapper {
 
     public void insertBOMItems(List<BOM> bomlist) throws DatabaseException {
 
-        String query = "INSERT INTO bom_Items (order_id, product_variant_id, quantity, description)" + "VALUES(?,?,?,?)";
+        String query = "INSERT INTO bom_Items (order_id, product_variant_id, quantity, description) VALUES (?,?,?,?)";
 
         try (Connection connection = connectionPool.getConnection()) {
             for (BOM bom : bomlist) {
+
+                if (bom.getProductVariant() == null) {
+                    System.out.println("⚠️ Skipper BOM uden variant (fx skruer): " + bom.getDescription());
+                    continue; // spring BOM over hvis der ikke er nogen variant
+                }
 
                 try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
                     preparedStatement.setInt(1, bom.getOrder().getId());
@@ -116,8 +122,9 @@ public class OrderMapper {
         } catch (SQLException e) {
             throw new DatabaseException("Could not insert BOM items into the Database " + e.getMessage());
         }
-
     }
+
+
 
     public List<Order> getAllOrdersWithCustomerInfo() throws DatabaseException {
         List<Order> orders = new ArrayList<>();
@@ -212,6 +219,30 @@ public class OrderMapper {
             throw new DatabaseException("Kunne ikke opdatere ordreprisen: " + e.getMessage());
         }
     }
+
+    public void deleteOrderById(int orderId) throws DatabaseException {
+        String deleteBOM = "DELETE FROM bom_items WHERE order_id = ?";
+        String deleteOrder = "DELETE FROM orders WHERE order_id = ?";
+
+        try (Connection conn = connectionPool.getConnection()) {
+
+            // Slet BOM først
+            try (PreparedStatement ps = conn.prepareStatement(deleteBOM)) {
+                ps.setInt(1, orderId);
+                ps.executeUpdate();
+            }
+
+            // Slet selve ordren
+            try (PreparedStatement ps = conn.prepareStatement(deleteOrder)) {
+                ps.setInt(1, orderId);
+                ps.executeUpdate();
+            }
+
+        } catch (SQLException e) {
+            throw new DatabaseException("Kunne ikke slette ordre: " + e.getMessage());
+        }
+    }
+
 
 
 

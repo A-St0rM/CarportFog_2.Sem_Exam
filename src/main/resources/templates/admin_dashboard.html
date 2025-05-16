@@ -71,11 +71,15 @@
                         </select>
                     </td>
                     <td class="actions-cell">
-                        <button type="button" class="btn-action btn-delete" th:attr="data-order-id=${order.id}">Slet</button>
-                        <button type="button" class="btn-action btn-recalculate"
-                                th:onclick="'window.location.href=\'/admin/order/' + ${order.id} + '/bom\''">
+                        <form th:action="@{/admin/order/delete/{id}(id=${order.orderId})}" method="post"
+                              style="display: inline;"
+                              onsubmit="return confirm('Er du sikker på, at du vil slette denne ordre?');">
+                            <button type="submit" class="btn-action btn-delete">Slet</button>
+                        </form>
+
+                        <a th:href="@{/admin/order/{id}/bom(id=${order.id})}" class="btn-action btn-recalculate">
                             Se/redigere stykliste
-                        </button>
+                        </a>
 
                     </td>
                 </tr>
@@ -84,7 +88,8 @@
         </div>
 
         <div class="button-container dashboard-save">
-            <button type="button" class="btn btn-primary save-changes-button">Tilføj nyt produkt</button>
+            <a th:href="@{/admin/products}" class="btn btn-secondary">✏️ Ændr i produktpriser</a>
+            <a th:href="@{/admin/product/create}" class="btn btn-primary save-changes-button">Tilføj nyt produkt</a>
             <a th:href="@{/admin/create}" class="btn btn-secondary add-admin-button">Tilføj Admin</a>
         </div>
     </main>

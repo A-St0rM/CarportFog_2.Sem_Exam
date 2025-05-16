@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="da" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Rediger produkter</title>
+  <link href="/css/index.css" rel="stylesheet" />
+</head>
+<body>
+<div class="container">
+  <h2>Rediger produktpriser</h2>
+
+  <form method="post" th:action="@{/admin/products/update}">
+    <table>
+      <thead>
+      <tr>
+        <th>Navn</th>
+        <th>Enhed</th>
+        <th>Pris (kr)</th>
+        <th>Slet</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="product : ${products}">
+        <td th:text="${product.productName}"></td>
+        <td th:text="${product.unit}"></td>
+        <td>
+          <input type="number"
+                 th:name="'price_' + ${product.productId}"
+                 th:value="${product.price}"
+                 required />
+        </td>
+        <td>
+          <form th:action="@{/admin/products/delete/{id}(id=${product.productId})}"
+                method="post"
+                onsubmit="return confirm('Er du sikker på, at du vil slette dette produkt og alle dets varianter?');">
+            <button type="submit" class="btn btn-danger">Slet</button>
+          </form>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+
+    <br>
+    <button type="submit" class="btn btn-primary">Gem ændringer</button>
+  </form>
+  <a th:href="@{/admin/dashboard}" class="btn btn-light">Tilbage til dashboard</a>
+</div>
+</body>
+</html>

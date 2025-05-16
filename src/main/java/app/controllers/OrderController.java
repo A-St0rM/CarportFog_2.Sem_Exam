@@ -7,6 +7,7 @@ import app.exceptions.DatabaseException;
 import app.persistence.ConnectionPool;
 import app.persistence.CustomerMapper;
 import app.persistence.OrderMapper;
+import app.persistence.PostalCodeMapper;
 import app.service.CalculateBOM;
 import app.service.EmailService;
 import app.service.CarportSvg;
@@ -22,14 +23,16 @@ public class OrderController {
     private final ConnectionPool _connectionPool;
     private final CustomerMapper _customerMapper;
     private final CalculateBOM _calculateBOM;
+    private final PostalCodeMapper _postalCodeMapper;
 
 
-    public OrderController(OrderMapper orderMapper, ConnectionPool connectionPool, CustomerMapper customerMapper, CalculateBOM calculateBOM)
+    public OrderController(OrderMapper orderMapper, ConnectionPool connectionPool, CustomerMapper customerMapper, CalculateBOM calculateBOM, PostalCodeMapper postalCodeMapper)
     {
         this._orderMapper = orderMapper;
         this._connectionPool = connectionPool;
         this._customerMapper = customerMapper;
         this._calculateBOM = calculateBOM;
+        this._postalCodeMapper = postalCodeMapper;
     }
 
     public void handleSpecificationsPost(Context ctx) {
@@ -40,60 +43,68 @@ public class OrderController {
         ctx.sessionAttribute("carportLength", length);
         ctx.sessionAttribute("hasTrapezRoof", trapezeRoof);
 
-        ctx.redirect("/additions");
-    }
-
-    public void handleAdditionsPost(Context ctx) {
-        boolean trapezeRoof = Boolean.parseBoolean(ctx.formParam("trapezeRoof"));
-        ctx.sessionAttribute("trapezeRoof", trapezeRoof);
-
-        ctx.redirect("/details"); // Go to contact info
+        ctx.redirect("/details");
     }
 
     public void handleDetailsPost(Context ctx) {
-        String name = ctx.formParam("customerName");
-        String address = ctx.formParam("customerAddress");
-        int zip = Integer.parseInt(ctx.formParam("customerZip"));
-        String phone = ctx.formParam("customerPhone");
-        String email = ctx.formParam("customerEmail");
-
-        Customer customer = new Customer(email, address, phone, name, zip);
-
         try {
-            Customer savedCustomer = _customerMapper.createCustomer(customer);
-            EmailService emailService = new EmailService();
+            // 1. Hent data fra formular
+            String name = ctx.formParam("customerName");
+            String address = ctx.formParam("customerAddress");
+            String phone = ctx.formParam("customerPhone");
+            String email = ctx.formParam("customerEmail");
+            int zip = Integer.parseInt(ctx.formParam("customerZip"));
 
+            // 2. Slå by op i databasen
+            String city = _postalCodeMapper.getCityByPostalCode(zip);
+
+            // 3. Hvis by ikke findes, vis fejl og behold input
+            if (city == null) {
+                ctx.attribute("error", "Postnummeret findes ikke.");
+                ctx.attribute("customerName", name);
+                ctx.attribute("customerAddress", address);
+                ctx.attribute("customerZip", zip);
+                ctx.attribute("customerPhone", phone);
+                ctx.attribute("customerEmail", email);
+                ctx.render("details.html");
+                return;
+            }
+
+            // 4. Opret Customer-objekt
+            Customer customer = new Customer(email, address, phone, name, zip);
+            Customer savedCustomer = _customerMapper.createCustomer(customer);
+
+            // 5. Hent carport-data fra session
             int width = ctx.sessionAttribute("carportWidth");
             int length = ctx.sessionAttribute("carportLength");
             boolean trapezeRoof = ctx.sessionAttribute("hasTrapezRoof");
 
-            // 4. Create order WITHOUT totalPrice yet
+            // 6. Opret ordre (uden pris)
             Order order = new Order(0, width, length, "Not paid", 0, savedCustomer, trapezeRoof);
             Order savedOrder = _orderMapper.insertOrder(order);
 
-            // 5. Calculate BOM
+            // 7. Beregn BOM og gem
             _calculateBOM.calculateCarport(savedOrder);
-            int calculatedTotal = _calculateBOM.calculateTotalPriceFromBOM();
-
-            // 6. Update order with totalPrice
-            _orderMapper.updateOrderTotalPrice(savedOrder.getOrderId(), calculatedTotal);
-
-            // 7. Save BOM items
             _orderMapper.insertBOMItems(_calculateBOM.getBom());
 
+            // (valgfrit) Hvis du vil opdatere totalpris:
+            // int calculatedTotal = _calculateBOM.calculateTotalPriceFromBOM();
+            // _orderMapper.updateOrderTotalPrice(savedOrder.getOrderId(), calculatedTotal);
 
-            //8. send email
-            emailService.sendMailOffer(name, email, order.getTotalPrice());
+            // 8. Send tilbudsmail
+            EmailService emailService = new EmailService();
+            emailService.sendMailOffer(name, email, savedOrder.getTotalPrice());
 
-            // 9. Clean up session and redirect
+            // 9. Ryd session og vis bekræftelse
             ctx.req().getSession().invalidate();
             ctx.render("confirmation.html");
 
         } catch (Exception e) {
             e.printStackTrace();
-            ctx.status(500).result("Error saving order.");
+            ctx.status(500).result("Fejl ved oprettelse af ordre.");
         }
     }
+
 
 
     public void showAllOrders(Context ctx) {
@@ -146,7 +157,6 @@ public class OrderController {
             boolean result = emailService.sendMailPayment(
                     customer.getName(),
                     customer.getEmail(),
-                    order.getTotalPrice(),
                     orderId
             );
             if (result) {
@@ -165,6 +175,16 @@ public class OrderController {
         ctx.attribute("svg", svgDrawer.toString());
         ctx.render("details.html");
     }
+
+    public void handleDeleteOrder(Context ctx, int orderId) {
+        try {
+            _orderMapper.deleteOrderById(orderId);
+            ctx.redirect("/admin/dashboard"); // Tilbage til oversigt
+        } catch (DatabaseException e) {
+            ctx.status(500).result("Fejl ved sletning: " + e.getMessage());
+        }
+    }
+
 
 
 
