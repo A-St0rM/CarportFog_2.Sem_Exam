@@ -4,7 +4,9 @@ import app.controllers.RoutingController;
 import app.config.SessionConfig;
 import app.config.ThymeleafConfig;
 import app.persistence.ConnectionPool;
+import app.service.CarportSvg;
 import io.javalin.Javalin;
+import io.javalin.http.Context;
 import io.javalin.rendering.template.JavalinThymeleaf;
 import java.io.IOException;
 
@@ -28,7 +30,6 @@ public class Main {
 
 
         RoutingController.startRouting(app, connectionPool);
-
 
     }
 
