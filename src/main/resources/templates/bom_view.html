@@ -15,19 +15,20 @@
       <th>Produktnavn</th>
       <th>Længde</th>
       <th>Antal</th>
+      <th>Enhed</th>
       <th>Beskrivelse</th>
-      <th>Pris pr. meter (kr)</th>
     </tr>
     </thead>
     <tbody>
     <tr th:each="bom : ${bomList}">
       <td th:text="${bom.productVariant.product.productName}">Produktnavn</td>
-      <td th:text="${bom.productVariant.length + ' cm'}">Længde</td>
+      <td th:text="${bom.productVariant.length > 0 ? bom.productVariant.length + ' cm' : '-'}">Længde</td>
       <td th:text="${bom.quantity}">Antal</td>
+      <td th:text="${bom.productVariant.product.unit}">Enhed</td>
       <td th:text="${bom.description}">Beskrivelse</td>
-      <td th:text="${bom.productVariant.product.price}">Pris pr. meter</td>
     </tr>
     </tbody>
+
   </table>
 
   <br><br>

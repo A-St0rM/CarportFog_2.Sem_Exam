@@ -63,12 +63,12 @@
                     <td th:text="${order.carportWidth}"></td>
                     <td th:text="${order.trapezeRoof ? 'Ja' : 'Nej'}"></td>
                     <td class="col-status">
-                        <select class="input-in-table" th:name="'status_' + ${order.id}" th:attr="data-order-id=${order.id}">
-                            <option value="pending" th:selected="${order.status == 'pending'}">Afventende</option>
-                            <option value="paid" th:selected="${order.status == 'paid'}">Betalt</option>
-                            <option value="completed" th:selected="${order.status == 'completed'}">Gennemført</option>
-                            <option value="rejected" th:selected="${order.status == 'rejected'}">Afslået</option>
-                        </select>
+                        <span th:switch="${order.status}">
+                            <span th:case="'under_behandling'">Under behandling</span>
+                            <span th:case="'afventende'">Afventende</span>
+                            <span th:case="'betalt'">Betalt</span>
+                            <span th:case="*">Ukendt</span>
+                        </span>
                     </td>
                     <td class="actions-cell">
                         <form th:action="@{/admin/order/delete/{id}(id=${order.orderId})}" method="post"

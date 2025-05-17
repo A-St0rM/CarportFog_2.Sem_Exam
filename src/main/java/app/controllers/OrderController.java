@@ -80,14 +80,14 @@ public class OrderController {
             boolean trapezeRoof = ctx.sessionAttribute("hasTrapezRoof");
 
             // 6. Opret ordre (uden pris)
-            Order order = new Order(0, width, length, "Not paid", 0, savedCustomer, trapezeRoof);
+            Order order = new Order(0, width, length, "under_behandling", 0, savedCustomer, trapezeRoof);
             Order savedOrder = _orderMapper.insertOrder(order);
 
             // 7. Beregn BOM og gem
             _calculateBOM.calculateCarport(savedOrder);
             _orderMapper.insertBOMItems(_calculateBOM.getBom());
 
-            // (valgfrit) Hvis du vil opdatere totalpris:
+            // Opdatere total prisen
             // int calculatedTotal = _calculateBOM.calculateTotalPriceFromBOM();
             // _orderMapper.updateOrderTotalPrice(savedOrder.getOrderId(), calculatedTotal);
 
@@ -153,6 +153,8 @@ public class OrderController {
             Order order = _orderMapper.getOrderById(orderId);
             Customer customer = order.getCustomer();
 
+            _orderMapper.updateOrderStatus(orderId, "afventende");
+
             EmailService emailService = new EmailService();
             boolean result = emailService.sendMailPayment(
                     customer.getName(),
@@ -170,6 +172,7 @@ public class OrderController {
             ctx.status(500).result("Fejl ved afsendelse af e-mail");
         }
     }
+
     public static void showSvg(Context ctx, ConnectionPool connectionPool) {
         CarportSvg svgDrawer = new CarportSvg(ctx);
         ctx.attribute("svg", svgDrawer.toString());
@@ -184,6 +187,27 @@ public class OrderController {
             ctx.status(500).result("Fejl ved sletning: " + e.getMessage());
         }
     }
+
+    public void handlePaymentConfirmation(Context ctx) {
+        Order order = ctx.sessionAttribute("order");
+
+        if (order == null) {
+            ctx.status(400).result("Ingen ordre fundet i session.");
+            return;
+        }
+
+        try {
+            _orderMapper.updateOrderStatus(order.getId(), "betalt");
+            order.setStatus("betalt");
+            ctx.sessionAttribute("order", order);
+            ctx.attribute("customerName", order.getCustomer().getName());
+            ctx.render("payment-confirmation.html");
+        } catch (DatabaseException e) {
+            e.printStackTrace();
+            ctx.status(500).result("Fejl ved betaling: " + e.getMessage());
+        }
+    }
+
 
 
 

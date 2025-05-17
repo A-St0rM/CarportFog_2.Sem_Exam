@@ -58,7 +58,9 @@ public class EmailService {
         personalization.addTo(new Email(email));
         personalization.addDynamicTemplateData("name", name);
         personalization.addDynamicTemplateData("orderNumber", orderNumber);
-        personalization.addDynamicTemplateData("paymentSite", "https://carportfog.showmecode.dk/payment");
+        String paymentLink = "https://carportfog.showmecode.dk/payment?orderId=" + orderNumber;
+        personalization.addDynamicTemplateData("paymentSite", paymentLink);
+
         mail.addPersonalization(personalization);
         mail.setTemplateId("d-6a883a6128f542d58457b712c21853df");
 

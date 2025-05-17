@@ -69,4 +69,8 @@ public class Order {
     public boolean isTrapezeRoof() {
         return trapezeRoof;
     }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
 }

@@ -199,10 +199,6 @@ public class ProductMapper {
             ps.setInt(2, productId);
             ps.setInt(3, variant.getWidth());
 
-            System.out.println("📦 DB insert → Længde = " + variant.getLength() +
-                    ", Bredde = " + variant.getWidth() +
-                    ", Produkt-ID = " + productId);
-
             ps.executeUpdate();
 
         } catch (SQLException e) {

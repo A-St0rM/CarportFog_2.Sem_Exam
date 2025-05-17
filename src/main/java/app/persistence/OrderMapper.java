@@ -243,6 +243,19 @@ public class OrderMapper {
         }
     }
 
+    public void updateOrderStatus(int orderId, String newStatus) throws DatabaseException {
+        String sql = "UPDATE orders SET status = ? WHERE order_id = ?";
+        try (Connection conn = connectionPool.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, newStatus);
+            ps.setInt(2, orderId);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new DatabaseException("Could not update order status: " + e.getMessage());
+        }
+    }
+
+
 
 
 
