@@ -25,9 +25,12 @@ public class CalculateBOM {
         calculatePoles(order);
         calculateBeams(order);
         calculateRafters(order);
-        calculateRoofs(order);
+        if (order.getTrapezeRoof()) {
+            calculateRoofs(order);
+            calculateScrewsRoofs(order);
+        }
+
         calculateHoleBands(order);
-        calculateScrewsRoofs(order);
         calculateFittingsBeams(order);
         calculateBoltsBeams(order);
         calculateFittingsRaftersLeft(order);
