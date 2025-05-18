@@ -66,6 +66,8 @@ public class OrderController {
                 ctx.attribute("customerZip", zip);
                 ctx.attribute("customerPhone", phone);
                 ctx.attribute("customerEmail", email);
+                ctx.attribute("svg", ctx.sessionAttribute("svg"));
+
                 ctx.render("details.html");
                 return;
             }
@@ -177,11 +179,15 @@ public class OrderController {
         }
     }
 
-    public static void showSvg(Context ctx, ConnectionPool connectionPool) {
+    public static void showSvg(Context ctx) {
         CarportSvg svgDrawer = new CarportSvg(ctx);
-        ctx.attribute("svg", svgDrawer.toString());
+        String svg = svgDrawer.toString(); // gem som variabel
+
+        ctx.attribute("svg", svg);             // til første visning
+        ctx.sessionAttribute("svg", svg);      // til brug ved fejl (fx forkert postnummer)
         ctx.render("details.html");
     }
+
 
     public void handleDeleteOrder(Context ctx, int orderId) {
         try {
