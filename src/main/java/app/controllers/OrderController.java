@@ -70,32 +70,35 @@ public class OrderController {
                 return;
             }
 
-            // 4. Opret Customer-objekt
-            Customer customer = new Customer(email, address, phone, name, zip);
+            // 4. Opret Customer-objekt og gem i DB
+            Customer customer = new Customer(email, address, phone, name, zip, city);
             Customer savedCustomer = _customerMapper.createCustomer(customer);
 
-            // 5. Hent carport-data fra session
+            // 5. Hent carportdata fra session
             int width = ctx.sessionAttribute("carportWidth");
             int length = ctx.sessionAttribute("carportLength");
             boolean trapezeRoof = ctx.sessionAttribute("hasTrapezRoof");
 
-            // 6. Opret ordre (uden pris)
+            // 6. Opret ordre uden totalpris
             Order order = new Order(0, width, length, "under_behandling", 0, savedCustomer, trapezeRoof);
-            Order savedOrder = _orderMapper.insertOrder(order);
+            Order savedOrder = _orderMapper.insertOrder(order); // Får rigtigt orderId
 
-            // 7. Beregn BOM og gem
+            // 7. Beregn BOM med rigtig orderId
             _calculateBOM.calculateCarport(savedOrder);
+
+            // 8. Beregn totalpris og opdater i DB
+            int calculatedTotal = _calculateBOM.calculateTotalPriceFromBOM();
+            savedOrder.setTotalPrice(calculatedTotal);
+            _orderMapper.updateOrderTotalPrice(savedOrder.getOrderId(), calculatedTotal);
+
+            // 9. Gem BOM-linjerne
             _orderMapper.insertBOMItems(_calculateBOM.getBom());
 
-            // Opdatere total prisen
-            // int calculatedTotal = _calculateBOM.calculateTotalPriceFromBOM();
-            // _orderMapper.updateOrderTotalPrice(savedOrder.getOrderId(), calculatedTotal);
-
-            // 8. Send tilbudsmail
+            // 10. Send tilbudsmail
             EmailService emailService = new EmailService();
             emailService.sendMailOffer(name, email, savedOrder.getTotalPrice());
 
-            // 9. Ryd session og vis bekræftelse
+            // 11. Ryd session og vis bekræftelse
             ctx.req().getSession().invalidate();
             ctx.render("confirmation.html");
 
@@ -104,6 +107,7 @@ public class OrderController {
             ctx.status(500).result("Fejl ved oprettelse af ordre.");
         }
     }
+
 
 
 

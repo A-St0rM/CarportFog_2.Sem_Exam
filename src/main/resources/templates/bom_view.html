@@ -9,11 +9,23 @@
 <div class="container">
   <h2>Stykliste for Ordre</h2>
 
+  <div class="customer-info">
+    <h3>Kundeoplysninger</h3>
+    <p><strong>Navn:</strong> <span th:text="${order.customer.name}">Navn</span></p>
+    <p><strong>Adresse:</strong> <span th:text="${order.customer.address}">Adresse</span></p>
+    <p><strong>Postnummer:</strong> <span th:text="${order.customer.postalCode}">0000</span></p>
+    <p><strong>By:</strong> <span th:text="${order.customer.city}">By</span></p>
+    <p><strong>Telefon:</strong> <span th:text="${order.customer.phone}">12345678</span></p>
+    <p><strong>Email:</strong> <span th:text="${order.customer.email}">email@example.com</span></p>
+  </div>
+
+
   <table>
     <thead>
     <tr>
       <th>Produktnavn</th>
       <th>Længde</th>
+      <th>Bredde</th>
       <th>Antal</th>
       <th>Enhed</th>
       <th>Beskrivelse</th>
@@ -23,12 +35,12 @@
     <tr th:each="bom : ${bomList}">
       <td th:text="${bom.productVariant.product.productName}">Produktnavn</td>
       <td th:text="${bom.productVariant.length > 0 ? bom.productVariant.length + ' cm' : '-'}">Længde</td>
+      <td th:text="${bom.productVariant.width > 0 ? bom.productVariant.width + ' cm' : '-'}">Bredde</td>
       <td th:text="${bom.quantity}">Antal</td>
       <td th:text="${bom.productVariant.product.unit}">Enhed</td>
       <td th:text="${bom.description}">Beskrivelse</td>
     </tr>
     </tbody>
-
   </table>
 
   <br><br>
@@ -47,7 +59,7 @@
   <!-- KNAP: Send tilbud -->
   <div class="send-offer">
     <form th:method="post" th:action="@{/admin/order/send-payment/{id}(id=${order.orderId})}">
-    <input type="hidden" name="orderId" th:value="${order.orderId}" />
+      <input type="hidden" name="orderId" th:value="${order.orderId}" />
       <button type="submit" class="btn btn-warning">📧 Send tilbud</button>
     </form>
   </div>

@@ -25,6 +25,7 @@ public class CalculateBOM {
         calculatePoles(order);
         calculateBeams(order);
         calculateRafters(order);
+
         if (order.getTrapezeRoof()) {
             calculateRoofs(order);
             calculateScrewsRoofs(order);
@@ -256,13 +257,21 @@ public class CalculateBOM {
         bomList.add(bom);
     }
 
-    // Bruger plastmo bundskruer (200 stk pr pakke). Vi regner med 1 pakke per carport.
+    // Bruger plastmo bundskruer (200 stk pr pakke). Beregner baseret på tagareal og skruer pr. m².
     public void calculateScrewsRoofs(Order order) throws DatabaseException {
-        int quantity = 1;
+        int screwsPerM2 = 12; // anbefalet antal skruer pr. m²
+        int screwsPerPackage = 200;
+
+        // Beregn arealet af carporten i m²
+        double areaM2 = (order.getCarportWidth() / 100.0) * (order.getCarportLength() / 100.0);
+        int totalScrewsNeeded = (int) Math.ceil(areaM2 * screwsPerM2);
+
+        // Beregn antal nødvendige pakker (altid rund op)
+        int numberOfPackages = (int) Math.ceil((double) totalScrewsNeeded / screwsPerPackage);
 
         int productId = _productMapper.getProductIdByName("plastmo bundskruer 200 stk.");
         ProductVariant variant = _productMapper.getVariantsByProductIdAndMinLength(0, productId).get(0);
-        BOM bom = new BOM(0, quantity, "Skruer til tagplader", order, variant);
+        BOM bom = new BOM(0, numberOfPackages, "Skruer til tagplader", order, variant);
 
         bomList.add(bom);
     }
@@ -352,25 +361,24 @@ public class CalculateBOM {
         bomList.add(bom);
     }
 
-    // Udregner totalprisen ud fra styklisten
-//    public int calculateTotalPriceFromBOM() {
-//        int total = 0;
-//
-//        for (BOM bom : bomList) {
-//            if (bom.getProductVariant() != null) {
-//                int pricePerMeter = bom.getProductVariant().getProduct().getPrice(); // kr/m
-//                int lengthInCm = bom.getProductVariant().getLength();                // fx 480
-//                int quantity = bom.getQuantity();
-//
-//                double lengthInMeters = lengthInCm / 100.0;
-//                double lineTotal = pricePerMeter * lengthInMeters * quantity;
-//
-//                total += Math.round(lineTotal); // evt. brug Math.ceil eller floor afhængigt af din ønskede logik
-//            }
-//        }
-//
-//        return total;
-//    }
+//     Udregner totalprisen ud fra styklisten
+    public int calculateTotalPriceFromBOM() {
+        int total = 0;
+
+        for (BOM bom : bomList) {
+            if (bom.getProductVariant() != null) {
+                int pricePerMeter = bom.getProductVariant().getProduct().getPrice(); // kr/m
+                int lengthInCm = bom.getProductVariant().getLength();                // fx 480
+                int quantity = bom.getQuantity();
+
+                double lengthInMeters = lengthInCm / 100.0;
+                double lineTotal = pricePerMeter * lengthInMeters * quantity;
+
+                total += Math.round(lineTotal);
+            }
+        }
+        return total;
+    }
 
 
     // Denne metode returnerer hele styklisten.
