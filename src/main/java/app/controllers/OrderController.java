@@ -100,6 +100,7 @@ public class OrderController {
             EmailService emailService = new EmailService();
             emailService.sendMailOffer(name, email, savedOrder.getTotalPrice());
 
+            ctx.attribute("svg", ctx.sessionAttribute("svg"));
             // 11. Ryd session og vis bekræftelse
             ctx.req().getSession().invalidate();
             ctx.render("confirmation.html");
@@ -109,9 +110,6 @@ public class OrderController {
             ctx.status(500).result("Fejl ved oprettelse af ordre.");
         }
     }
-
-
-
 
     public void showAllOrders(Context ctx) {
         try {
