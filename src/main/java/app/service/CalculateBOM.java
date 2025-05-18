@@ -22,6 +22,7 @@ public class CalculateBOM {
 
     // Kalder alle metoderne til udregning af hele styklisten til carporten
     public void calculateCarport(Order order) throws DatabaseException {
+        bomList.clear();
         calculatePoles(order);
         calculateBeams(order);
         calculateRafters(order);
@@ -361,23 +362,30 @@ public class CalculateBOM {
         bomList.add(bom);
     }
 
-//     Udregner totalprisen ud fra styklisten
+    // Udregner totalprisen ud fra styklisten
     public int calculateTotalPriceFromBOM() {
-        int total = 0;
+        double unroundedTotal = 0;
 
         for (BOM bom : bomList) {
-            if (bom.getProductVariant() != null) {
-                int pricePerMeter = bom.getProductVariant().getProduct().getPrice(); // kr/m
-                int lengthInCm = bom.getProductVariant().getLength();                // fx 480
-                int quantity = bom.getQuantity();
+            Product p = bom.getProductVariant().getProduct();
+            int price = p.getPrice();
+            int lengthInCm = bom.getProductVariant().getLength();
+            int quantity = bom.getQuantity();
+            double line;
 
-                double lengthInMeters = lengthInCm / 100.0;
-                double lineTotal = pricePerMeter * lengthInMeters * quantity;
-
-                total += Math.round(lineTotal);
+            // Det er kun produktId 2 (Spærtræ og Remme) som sælges baseret på meter.
+            if (p.getProductId() == 2) {
+                line = price * (lengthInCm / 100.0) * quantity;
+            } else {
+                line = price * quantity;
             }
+
+            unroundedTotal += line;
         }
-        return total;
+
+        int roundedTotal = (int) Math.round(unroundedTotal);
+
+        return roundedTotal;
     }
 
 

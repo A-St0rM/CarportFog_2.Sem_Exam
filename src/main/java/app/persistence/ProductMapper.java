@@ -16,27 +16,47 @@ public class ProductMapper {
         this.connectionPool = connectionPool;
     }
 
-
     public List<ProductVariant> getVariantsByProductIdAndMinLength(int minLength, int productId) throws DatabaseException {
         List<ProductVariant> variants = new ArrayList<>();
-        String query = "SELECT * FROM product_variants WHERE product_id = ? AND length >= ?";
+        String sql = """
+        SELECT pv.product_variant_id,
+               pv.length,
+               pv.width,
+               p.product_id,
+               p.name,
+               p.unit,
+               p.price
+        FROM product_variants pv
+        JOIN products p ON pv.product_id = p.product_id
+        WHERE pv.product_id = ? AND pv.length >= ?
+        """;
 
         try (Connection con = connectionPool.getConnection();
-             PreparedStatement ps = con.prepareStatement(query)) {
+             PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, productId);
             ps.setInt(2, minLength);
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
-                int variantId = rs.getInt("product_variant_id");
-                int length = rs.getInt("length");
-                int width = rs.getInt("width");
-                Product product = new Product(productId, "", "", 0);
-                variants.add(new ProductVariant(variantId, length, width, product));
+                Product product = new Product(
+                        rs.getInt("product_id"),
+                        rs.getString("name"),
+                        rs.getString("unit"),
+                        rs.getInt("price")
+                );
+                ProductVariant variant = new ProductVariant(
+                        rs.getInt("product_variant_id"),
+                        rs.getInt("length"),
+                        rs.getInt("width"),
+                        product
+                );
+                variants.add(variant);
             }
-        } catch (SQLException e) {
+        }
+        catch (SQLException e) {
             throw new DatabaseException("Couldn't get variants: " + e.getMessage());
         }
+
         return variants;
     }
 
