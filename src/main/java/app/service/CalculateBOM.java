@@ -323,7 +323,7 @@ public class CalculateBOM {
     // Bruger universalbeslag venstre. Skal bruge 1 venstre for hvert spær.
     public void calculateFittingsRaftersLeft(Order order) throws DatabaseException {
         int amountOfRafters = calculateRafterQuantity(order);
-        int quantityOfLeftFittings = amountOfRafters / 2;
+        int quantityOfLeftFittings = amountOfRafters;
 
         int productId = _productMapper.getProductIdByName("universalbeslag 190 mm. venstre");
         ProductVariant variant = _productMapper.getVariantsByProductIdAndMinLength(0, productId).get(0);
@@ -335,7 +335,7 @@ public class CalculateBOM {
     // Bruger universalbeslag højre. Skal bruge 1 højre for hvert beslag
     public void calculateFittingsRaftersRight(Order order) throws DatabaseException {
         int amountOfRafters = calculateRafterQuantity(order);
-        int quantityOfRightFittings = amountOfRafters / 2;
+        int quantityOfRightFittings = amountOfRafters;
 
         int productId = _productMapper.getProductIdByName("universalbeslag 190 mm. højre");
         ProductVariant variant = _productMapper.getVariantsByProductIdAndMinLength(0, productId).get(0);
