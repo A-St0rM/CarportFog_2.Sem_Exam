@@ -41,23 +41,6 @@
     <main class="admin-content dashboard">
         <h2 class="page-title admin-title">Alle bestillinger</h2>
 
-        <div class="admin-controls">
-            <div class="search-bar">
-                <input type="search" id="order-search" name="search" placeholder="Søg i bestillinger...">
-                <button type="button" class="btn btn-secondary btn-small">Søg</button>
-            </div>
-            <div class="filter-bar">
-                <label for="status-filter">Filter status:</label>
-                <select id="status-filter" name="statusFilter">
-                    <option value="all" selected>Alle</option>
-                    <option value="under_behandling">Under behandling</option>
-                    <option value="afventende">Afventende</option>
-                    <option value="betalt">Betalt</option>
-                </select>
-                <button type="button" class="btn btn-secondary btn-small">Filter</button>
-            </div>
-        </div>
-
         <div class="table-container">
             <table id="orders-table">
                 <thead>
