@@ -54,9 +54,21 @@ public class AdminController {
         String password = ctx.formParam("password");
         String passwordConfirm = ctx.formParam("password2");
 
-        if (password == null || password.isEmpty() || !password.equals(passwordConfirm)) {
-            ctx.attribute("message", "Kodeordene matcher ikke");
-            ctx.render("admin/create_admin.html");
+        if (email == null || email.trim().isEmpty() || !email.contains("@")) {
+            ctx.attribute("message", "Ugyldig email-adresse.");
+            ctx.render("create_admin.html");
+            return;
+        }
+
+        if (password == null || password.isEmpty() || passwordConfirm == null || passwordConfirm.isEmpty()) {
+            ctx.attribute("message", "Kodeord må ikke være tomt.");
+            ctx.render("create_admin.html");
+            return;
+        }
+
+        if (!password.equals(passwordConfirm)) {
+            ctx.attribute("message", "Kodeordene stemmer ikke overens.");
+            ctx.render("create_admin.html");
             return;
         }
         String hashedPassword = PasswordUtil.hashPassword(password);

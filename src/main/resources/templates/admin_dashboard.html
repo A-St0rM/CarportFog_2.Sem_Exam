@@ -5,12 +5,32 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fog Admin - Dashboard</title>
     <link href="../public/css/index.css" th:href="@{/css/index.css}" rel="stylesheet"/>
+    <style>
+
+        thead th.sortable {
+            cursor: pointer;
+            position: relative; /* For sorteringsikoner */
+        }
+        thead th.sortable::after {
+            content: ' \2195'; /* Op/ned pil */
+            font-size: 0.8em;
+            color: #aaa;
+        }
+        thead th.sortable.asc::after {
+            content: ' \2191'; /* Op pil */
+            color: #333;
+        }
+        thead th.sortable.desc::after {
+            content: ' \2193'; /* Ned pil */
+            color: #333;
+        }
+    </style>
 </head>
 <body>
 
 <div class="container">
     <header class="main-header">
-        <img class="logo-img" src="/images/Fog_logo.png" alt="Fog Logo">
+        <img class="logo-img" src="/images/Fog_logo.png" th:src="@{/images/Fog_logo.png}" alt="Fog Logo">
         <a th:href="@{/}" class="admin-action-button">Forside</a>
     </header>
 
@@ -19,7 +39,6 @@
     </div>
 
     <main class="admin-content dashboard">
-
         <h2 class="page-title admin-title">Alle bestillinger</h2>
 
         <div class="admin-controls">
@@ -31,38 +50,47 @@
                 <label for="status-filter">Filter status:</label>
                 <select id="status-filter" name="statusFilter">
                     <option value="all" selected>Alle</option>
-                    <option value="pending">Afventende</option>
-                    <option value="paid">Betalt</option>
-                    <option value="completed">Gennemført</option>
-                    <option value="rejected">Afslået</option>
+                    <option value="under_behandling">Under behandling</option>
+                    <option value="afventende">Afventende</option>
+                    <option value="betalt">Betalt</option>
                 </select>
                 <button type="button" class="btn btn-secondary btn-small">Filter</button>
             </div>
         </div>
 
         <div class="table-container">
-            <table>
+            <table id="orders-table">
                 <thead>
                 <tr>
-                    <th>Navn</th>
-                    <th>Adresse</th>
-                    <th>Telefon</th>
-                    <th>Længde</th>
-                    <th>Bredde</th>
-                    <th>Trapez</th>
-                    <th class="col-status">Status</th>
+                    <th class="sortable" data-sort-by="orderId" data-sort-type="number">Ordre ID</th>
+                    <th class="sortable" data-sort-by="name">Navn</th>
+                    <th class="sortable" data-sort-by="address">Adresse</th>
+                    <th class="sortable" data-sort-by="phone">Telefon</th>
+                    <th class="sortable" data-sort-by="length" data-sort-type="number">Længde</th>
+                    <th class="sortable" data-sort-by="width" data-sort-type="number">Bredde</th>
+                    <th class="sortable" data-sort-by="trapeze">Trapez</th>
+                    <th class="sortable col-status" data-sort-by="status">Status</th>
                     <th>Handlinger</th>
                 </tr>
                 </thead>
-                <tbody>
-                <tr th:each="order : ${orders}">
-                    <td th:text="${order.customer.name}"></td>
-                    <td th:text="${order.customer.address}"></td>
-                    <td th:text="${order.customer.phone}"></td>
-                    <td th:text="${order.carportLength}"></td>
-                    <td th:text="${order.carportWidth}"></td>
-                    <td th:text="${order.trapezeRoof ? 'Ja' : 'Nej'}"></td>
-                    <td class="col-status">
+                <tbody id="orders-table-body">
+                <tr th:each="order : ${orders}" th:attr="data-status=${order.status}"> <td data-label="Ordre ID" th:text="${order.orderId}"></td>
+                    <td data-label="Navn">
+                        <span th:if="${order.customer != null}" th:text="${order.customer.name}"></span>
+                        <span th:unless="${order.customer != null}">N/A</span>
+                    </td>
+                    <td data-label="Adresse">
+                        <span th:if="${order.customer != null}" th:text="${order.customer.address}"></span>
+                        <span th:unless="${order.customer != null}">N/A</span>
+                    </td>
+                    <td data-label="Telefon">
+                        <span th:if="${order.customer != null}" th:text="${order.customer.phone}"></span>
+                        <span th:unless="${order.customer != null}">N/A</span>
+                    </td>
+                    <td data-label="Længde" th:text="${order.carportLength}"></td>
+                    <td data-label="Bredde" th:text="${order.carportWidth}"></td>
+                    <td data-label="Trapez" th:text="${order.trapezeRoof ? 'Ja' : 'Nej'}"></td>
+                    <td data-label="Status" class="col-status">
                         <span th:switch="${order.status}">
                             <span th:case="'under_behandling'">Under behandling</span>
                             <span th:case="'afventende'">Afventende</span>
@@ -76,11 +104,9 @@
                               onsubmit="return confirm('Er du sikker på, at du vil slette denne ordre?');">
                             <button type="submit" class="btn-action btn-delete">Slet</button>
                         </form>
-
-                        <a th:href="@{/admin/order/{id}/bom(id=${order.id})}" class="btn-action btn-recalculate">
+                        <a th:href="@{/admin/order/{id}/bom(id=${order.orderId})}" class="btn-action btn-recalculate">
                             Se/redigere stykliste
                         </a>
-
                     </td>
                 </tr>
                 </tbody>
@@ -88,11 +114,173 @@
         </div>
 
         <div class="button-container dashboard-save">
-            <a th:href="@{/admin/products}" class="btn btn-secondary">✏️ Ændr i produktpriser</a>
+            <a th:href="@{/admin/products}" class="btn btn-secondary"> Ændr i produktpriser</a>
             <a th:href="@{/admin/product/create}" class="btn btn-primary save-changes-button">Tilføj nyt produkt</a>
             <a th:href="@{/admin/create}" class="btn btn-secondary add-admin-button">Tilføj Admin</a>
         </div>
+
     </main>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const getCellValue = (tr, idx, type = 'string') => {
+            const cellContentElement = tr.children[idx].querySelector('span'); // Prøv at finde et span først
+            let cellText;
+            if (cellContentElement) {
+                cellText = cellContentElement.innerText || cellContentElement.textContent;
+            } else {
+                cellText = tr.children[idx].innerText || tr.children[idx].textContent; // Ellers tag hele cellens indhold
+            }
+            const value = cellText || "";
+
+            if (type === 'number') {
+                // Fjern eventuelle ikke-numeriske tegn før parsing, undtagen punktum for decimaler
+                const numericString = value.replace(/[^0-9.-]+/g,"");
+                return parseFloat(numericString) || 0;
+            }
+            return value.trim().toLowerCase();
+        };
+
+        const comparer = (idx, asc, type) => (a, b) => {
+            const v1 = getCellValue(asc ? a : b, idx, type);
+            const v2 = getCellValue(asc ? b : a, idx, type);
+
+            if (type === 'number') {
+                return v1 - v2;
+            }
+            return v1.toString().localeCompare(v2.toString());
+        };
+
+        document.querySelectorAll('#orders-table thead th.sortable').forEach(th => th.addEventListener('click', (() => {
+            const table = th.closest('table');
+            const tbody = table.querySelector('tbody');
+            const columnIndex = Array.from(th.parentNode.children).indexOf(th);
+            const sortType = th.dataset.sortType || 'string';
+
+            table.querySelectorAll('thead th.sortable').forEach(otherTh => {
+                if (otherTh !== th) {
+                    otherTh.classList.remove('asc', 'desc');
+                }
+            });
+
+            let currentIsAsc;
+            if (th.classList.contains('asc')) {
+                th.classList.remove('asc');
+                th.classList.add('desc');
+                currentIsAsc = false;
+            } else if (th.classList.contains('desc')) {
+                th.classList.remove('desc');
+                th.classList.add('asc');
+                currentIsAsc = true;
+            } else {
+                th.classList.add('asc');
+                currentIsAsc = true;
+            }
+
+            Array.from(tbody.querySelectorAll('tr'))
+                .sort(comparer(columnIndex, currentIsAsc, sortType))
+                .forEach(tr => tbody.appendChild(tr));
+        })));
+
+        // JavaScript for søgning (simpel client-side)
+        const searchInput = document.getElementById('order-search');
+        const searchButton = document.querySelector('.search-bar .btn-secondary');
+        const tableBody = document.getElementById('orders-table-body'); // Hent tbody direkte
+        // Vi henter tableRows dynamisk inde i funktionerne for at fange sorterede/filtrerede rækker
+
+        const performSearch = () => {
+            const searchTerm = searchInput.value.toLowerCase().trim();
+            const currentRows = Array.from(tableBody.querySelectorAll('tr')); // Hent aktuelle rækker
+
+            currentRows.forEach(row => {
+                // Hvis rækken allerede er skjult af filteret, ignorer den for søgning
+                if (row.style.display === 'none' && !row.dataset.searchHidden) return;
+
+                const rowText = row.textContent.toLowerCase();
+                if (rowText.includes(searchTerm)) {
+                    row.style.display = '';
+                    delete row.dataset.searchHidden; // Marker at den ikke er skjult af søgning
+                } else {
+                    row.style.display = 'none';
+                    row.dataset.searchHidden = 'true'; // Marker at den er skjult af søgning
+                }
+            });
+        };
+
+
+        if (searchButton) {
+            searchButton.addEventListener('click', () => {
+                // Nulstil filter-skjulte rækker før søgning, hvis filteret er 'all'
+                if (document.getElementById('status-filter').value === 'all') {
+                    Array.from(tableBody.querySelectorAll('tr')).forEach(r => {
+                        delete r.dataset.filterHidden;
+                        r.style.display = ''; // Sørg for at alle er synlige før søgning
+                    });
+                }
+                performSearch();
+            });
+        }
+        if (searchInput){
+            searchInput.addEventListener('keyup', (event) => {
+                if (event.key === 'Enter') {
+                    if (document.getElementById('status-filter').value === 'all') {
+                        Array.from(tableBody.querySelectorAll('tr')).forEach(r => {
+                            delete r.dataset.filterHidden;
+                            r.style.display = '';
+                        });
+                    }
+                    performSearch();
+                }
+            });
+        }
+
+        // JavaScript for filtrering (simpel client-side)
+        const statusFilter = document.getElementById('status-filter');
+        const filterButton = document.querySelector('.filter-bar .btn-secondary');
+
+        const performFilter = () => {
+            const selectedStatus = statusFilter.value.toLowerCase();
+            const currentRows = Array.from(tableBody.querySelectorAll('tr')); // Hent aktuelle rækker
+
+            currentRows.forEach(row => {
+                // Hvis rækken allerede er skjult af søgningen, ignorer den for filtrering
+                if (row.style.display === 'none' && !row.dataset.filterHidden) return;
+
+                const rowStatus = row.dataset.status ? row.dataset.status.toLowerCase() : '';
+
+                if (selectedStatus === 'all' || rowStatus === selectedStatus) {
+                    row.style.display = '';
+                    delete row.dataset.filterHidden; // Marker at den ikke er skjult af filter
+                } else {
+                    row.style.display = 'none';
+                    row.dataset.filterHidden = 'true'; // Marker at den er skjult af filter
+                }
+            });
+        };
+
+
+        if(filterButton) {
+            filterButton.addEventListener('click', () => {
+                // Nulstil søge-skjulte rækker før filtrering
+                Array.from(tableBody.querySelectorAll('tr')).forEach(r => {
+                    delete r.dataset.searchHidden;
+                    r.style.display = ''; // Sørg for at alle er synlige før filtrering
+                });
+                performFilter();
+            });
+        }
+        if(statusFilter) {
+            statusFilter.addEventListener('change', () => {
+                Array.from(tableBody.querySelectorAll('tr')).forEach(r => {
+                    delete r.dataset.searchHidden;
+                    r.style.display = '';
+                });
+                performFilter();
+            });
+        }
+    });
+</script>
+
 </body>
 </html>

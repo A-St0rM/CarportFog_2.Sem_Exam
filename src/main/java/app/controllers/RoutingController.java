@@ -36,9 +36,7 @@ public static void startRouting(Javalin app, ConnectionPool connectionPool) {
     app.get("/specifications", ctx -> ctx.render("specifications.html"));
     app.get("/admin/product/create", ctx -> ctx.render("admin_addProduct.html"));
     app.get("/admin/products", ctx -> adminController.showAllProducts(ctx));
-    app.get("/payment", ctx -> ctx.render("payment.html"));
-
-
+    app.get("/payment", ctx -> orderController.showPaymentPage(ctx));
 
 
     app.post("/details", ctx -> orderController.handleDetailsPost(ctx));
@@ -55,6 +53,7 @@ public static void startRouting(Javalin app, ConnectionPool connectionPool) {
     app.post("/admin/products/update", ctx -> adminController.handleUpdateProductPrices(ctx));
     app.post("/admin/products/delete/{id}", ctx -> adminController.handleDeleteProduct(ctx));
     app.post("/payment-confirmation", ctx -> orderController.handlePaymentConfirmation(ctx));
+
 
 
 }

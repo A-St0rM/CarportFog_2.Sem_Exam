@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title th:text="'Fog Carport - ' + ${#strings.capitalize( (currentPage != null ? currentPage : 'Betaling') )}">Fog Carport - Betaling</title>
+    <title th:text="'Fog Carport - ' + ${ (pageSubtitle != null ? #strings.capitalize(pageSubtitle) : 'Betaling') }">Fog Carport - Betaling</title>
     <link href="../public/css/index.css" th:href="@{/css/index.css}" rel="stylesheet"/>
 </head>
 <body>
@@ -34,7 +34,6 @@
                             <span class="step-text">Specifikationer</span>
                         </a>
                     </li>
-
                     <li class="completed">
                         <a th:href="@{/details}">
                             <span class="step-indicator" data-step-number="3"></span>
@@ -42,8 +41,7 @@
                         </a>
                     </li>
                     <li th:classappend="${currentPage == 'payment'} ? 'active'">
-                        <a th:href="@{/payment}">
-                            <span class="step-indicator" data-step-number="4"></span>
+                        <a th:href="@{/payment(orderId=${orderId})}"> <span class="step-indicator" data-step-number="4"></span>
                             <span class="step-text">Betaling</span>
                         </a>
                     </li>
@@ -60,18 +58,23 @@
                     <p class="payment-info">
                         Du mangler at betale følgende beløb for din Carport:
                     </p>
-                    <p class="payment-amount" th:if="${totalPrice}">
-                        <strong th:text="${#numbers.formatDecimal(totalPrice, 1, 'POINT', 2, 'COMMA')}">28.394,00</strong> KR.
+                    <p class="payment-amount" th:if="${totalPrice != null}">
+                        <strong th:text="${#numbers.formatDecimal(totalPrice, 0, 'COMMA', 2, 'POINT')}">28.394,00</strong> KR.
                     </p>
-                    <p class="payment-amount" th:unless="${totalPrice}">
+                    <p class="payment-amount" th:unless="${totalPrice != null}">
                         Prisoplysninger er ikke tilgængelige i øjeblikket.
                     </p>
 
-                    <form th:action="@{/payment-confirmation}" method="post">
+                    <form th:action="@{/payment-confirmation}" method="post" th:if="${totalPrice != null}">
                         <button type="submit" class="btn btn-primary btn-large">Bekræft og betal</button>
                     </form>
+                    <div th:unless="${totalPrice != null}">
+                        <p>Betaling kan ikke gennemføres i øjeblikket.</p>
+                    </div>
+
                     <div class="payment-footer-note">
-                        <p>Du vil blive viderestilt til bekræftelsessiden.</p> </div>
+                        <p>Du vil blive viderestilt til bekræftelsessiden efter betaling.</p>
+                    </div>
                 </div>
             </div>
         </main>

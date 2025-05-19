@@ -1,6 +1,9 @@
 package app.service;
 import com.sendgrid.helpers.mail.objects.Personalization;
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+
 import com.sendgrid.SendGrid;
 import com.sendgrid.Request;
 import com.sendgrid.Response;
@@ -46,7 +49,7 @@ public class EmailService {
     public boolean sendMailPayment(String name, String email, int orderNumber) {
         System.out.println("➡ Forsøger at sende mail til: " + email);
         System.out.println("Navn: " + name + " | Order ID: " + orderNumber);
-        System.out.println("API_KEY starter med: " + API_KEY.substring(0, 5));  // VIGTIGT til debug
+
 
         Email from = new Email("johannesfoog@gmail.com");
         from.setName("Johannes Fog Byggemarked");
@@ -73,34 +76,37 @@ public class EmailService {
 
             Response response = sg.api(request);
             int status = response.getStatusCode();
-            System.out.println("✅ STATUS: " + status);
+            System.out.println("STATUS: " + status);
             System.out.println("BODY: " + response.getBody());
             System.out.println("HEADERS: " + response.getHeaders());
 
             return status == 202;
 
         } catch (Exception ex) {
-            System.err.println("❌ FEJL under afsendelse: " + ex.getMessage());
+            System.err.println("FEJL under afsendelse: " + ex.getMessage());
             ex.printStackTrace();
             return false;
         }
     }
 
-    public boolean sendMailConfirmation(String name, String email, int totalPrice) throws IOException {
-        Email from = new Email("Johannes@johannesfoog.dk");
+    public boolean sendMailConfirmation(String name, String email, int totalPrice, List<Map<String, Object>> bomItems) throws IOException {
+        Email from = new Email("johannesfoog@gmail.com");
         from.setName("Johannes Fog Byggemarked");
+
 
         Mail mail = new Mail();
         mail.setFrom(from);
+
 
         Personalization personalization = new Personalization();
         personalization.addTo(new Email(email));
         personalization.addDynamicTemplateData("name", name);
         personalization.addDynamicTemplateData("email", email);
         personalization.addDynamicTemplateData("price", totalPrice);
-        personalization.addDynamicTemplateData("paymentSite", "https://carportfog.showmecode.dk/payment");
+        personalization.addDynamicTemplateData("bom_items", bomItems);
         mail.addPersonalization(personalization);
         mail.setTemplateId("d-9ca13dba9799482ca8a989a26e4f92d8");
+
 
         SendGrid sg = new SendGrid(API_KEY);
         Request request = new Request();
@@ -109,14 +115,14 @@ public class EmailService {
             request.setEndpoint("mail/send");
             request.setBody(mail.build());
             Response response = sg.api(request);
-            System.out.println("SendGrid Offer Response Status Code: " + response.getStatusCode());
-            return true;
-
+            System.out.println("SendGrid Confirmation Response Status Code: " + response.getStatusCode());
+            return response.getStatusCode() == 202;
         } catch (IOException ex) {
-            System.err.println("Fejl ved afsendelse af tilbudsmail: " + ex.getMessage());
-            throw ex; // sender fejlen videre
+            System.err.println("Fejl ved afsendelse af bekræftelsesmail: " + ex.getMessage());
+            throw ex;
         }
     }
+
 
 
 
