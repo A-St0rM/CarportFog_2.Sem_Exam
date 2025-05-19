@@ -107,8 +107,7 @@ public class OrderMapper {
             for (BOM bom : bomlist) {
 
                 if (bom.getProductVariant() == null) {
-                    System.out.println("⚠️ Skipper BOM uden variant (fx skruer): " + bom.getDescription());
-                    continue; // Skips BOM if there's no variant
+                    continue; // spring BOM over hvis der ikke er nogen variant
                 }
 
                 try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {

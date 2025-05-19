@@ -103,7 +103,6 @@ public class AdminController {
                 int width = Integer.parseInt(dims[1].trim());
 
                 ProductVariant variant = new ProductVariant(length, width, product);
-                System.out.println("➡ Variant: Længde = " + length + ", Bredde = " + width);
                 productMapper.insertProductVariant(variant, productId);
             }
 
