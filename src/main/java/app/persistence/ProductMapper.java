@@ -53,7 +53,7 @@ public class ProductMapper {
                 variants.add(variant);
             }
         } catch (SQLException e) {
-            throw new DatabaseException("Couldn't get variants: " + e.getMessage());
+            throw new DatabaseException("Kunne ikke hente varianter: " + e.getMessage());
         }
 
         return variants;
@@ -125,7 +125,7 @@ public class ProductMapper {
         } catch (SQLException e) {
             throw new DatabaseException("Fejl ved opslag af produktnavn", e.getMessage());
         }
-        throw new DatabaseException("Product not found: " + name);
+        throw new DatabaseException("Produkt ikke fundet: " + name);
     }
 
 
@@ -146,7 +146,7 @@ public class ProductMapper {
                 beamLengths.add(length);
             }
         } catch (SQLException e) {
-            throw new DatabaseException("Couldn't get beam lengths: " + e.getMessage(), e.getMessage());
+            throw new DatabaseException("Kunne ikke hente længder for remme: " + e.getMessage(), e.getMessage());
         }
 
         // Converts List to array and returns
@@ -174,7 +174,7 @@ public class ProductMapper {
                 roofWidths.add(width);
             }
         } catch (SQLException e) {
-            throw new DatabaseException("Couldn't get roof widths: " + e.getMessage(), e.getMessage());
+            throw new DatabaseException("Kunne ikke hente bredder for tagplader: " + e.getMessage(), e.getMessage());
         }
 
         // Converts List to array and returns

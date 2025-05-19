@@ -48,7 +48,7 @@ public class CalculateBOM {
         List<ProductVariant> productVariants = _productMapper.getVariantsByProductIdAndMinLength(300, productId);
 
         if (productVariants.isEmpty()) {
-            throw new DatabaseException("Product not found for id " + productId + " with min. length: " + 300);
+            throw new DatabaseException("Produkt ikke fundet med ID: " + productId + " med minimum længde på: " + 300);
         }
 
         ProductVariant productVariant = productVariants.get(0);
@@ -156,7 +156,7 @@ public class CalculateBOM {
         List<ProductVariant> variants = _productMapper.getVariantsByProductIdAndMinLength(order.getCarportWidth(), productId);
 
         if (variants.isEmpty()) {
-            throw new DatabaseException("No rafters found for width " + order.getCarportWidth());
+            throw new DatabaseException("Ingen spær fundet med længden: " + order.getCarportWidth());
         }
 
         ProductVariant variant = variants.get(0);

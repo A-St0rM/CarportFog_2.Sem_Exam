@@ -67,7 +67,7 @@ public class CustomerMapper {
             int rowsAffected = ps.executeUpdate();
 
             if (rowsAffected == 0) {
-                throw new SQLException("Customer could not be inserted, no rows affected.");
+                throw new SQLException("Kunde kunne ikke blive tilføjet, ingen rækker ændret.");
             }
 
             try (ResultSet rs = ps.getGeneratedKeys()) {
@@ -76,12 +76,12 @@ public class CustomerMapper {
                     customer.setCustomerId(generatedId);
                     return customer;
                 } else {
-                    throw new SQLException("Creating customer failed, no ID obtained.");
+                    throw new SQLException("Oprettelsen af kunde fejlede, kunne ikke hente ID");
                 }
             }
 
         } catch (SQLException e) {
-            throw new SQLException("Error inserting customer: " + e.getMessage(), e);
+            throw new SQLException("Fejl ved at tilføje kunde: " + e.getMessage(), e);
         }
     }
 
