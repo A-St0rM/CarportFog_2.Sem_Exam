@@ -1,23 +1,20 @@
-/* === CSS Variables and Basic Setup === */
+/* === The Basic Setup === */
 :root {
-    /* Color Palette */
     --fog-primary-blue: #00406C;
-    --fog-content-header-bg: #B1CBFF;    /* Used for content header and some info boxes */
-    --fog-nav-active-bg: #B1CBFF;       /* Sidebar active nav item background */
-    --fog-nav-inactive-bg: #ffffff;     /* Sidebar inactive nav item background */
-    --fog-nav-behind-box: #000452;      /* Sidebar nav "shadow" effect */
-    --fog-nav-completed-bg: #000452;   /* Sidebar completed nav item background */
-    --fog-welcome-box-bg: #00406C;      /* Background for welcome text box on page 1 */
+    --fog-content-header-bg: #B1CBFF;
+    --fog-nav-active-bg: #B1CBFF;
+    --fog-nav-inactive-bg: #ffffff;
+    --fog-nav-behind-box: #000452;      /* Used for the "shadow" behind the sidebar navigation buttons. */
+    --fog-nav-completed-bg: #000452;
+    --fog-welcome-box-bg: #00406C;
     --fog-white: #ffffff;
-    --fog-text-dark: #000452;           /* Dark text, e.g., on light blue backgrounds */
-    --fog-text-light: #ffffff;          /* Light text, e.g., on dark blue backgrounds */
-    --fog-text-grey: #333333;           /* General body text */
-    --fog-border-grey: #dee2e6;         /* Light borders */
-    /* Font */
+    --fog-text-dark: #000452;
+    --fog-text-light: #ffffff;
+    --fog-text-grey: #333333;
+    --fog-border-grey: #dee2e6;
     --font-primary: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
-
-/* Basic Reset */
+/* Basic Reset: Removes browser-default margins/paddings and sets a consistent box-model. */
 * {
     box-sizing: border-box;
     margin: 0;
@@ -25,56 +22,52 @@
 }
 
 html {
-    font-size: 100%;
+    font-size: 100%; /* the base for 'rem', making text scalable. */
 }
 
 body {
     font-family: var(--font-primary);
     color: var(--fog-text-grey);
-    line-height: 1.5;
-    background-color: var(--fog-white); /* Fallback, container usually covers */
-    position: relative; /* Needed for absolute positioned buttons */
-    min-height: 100vh;
+    line-height: 1.5; /* makes it easier to read text blocks. */
+    background-color: var(--fog-white);
+    position: relative;
+    min-height: 100vh; /* makes sure body fills at least the entire viewport height. */
 }
 
 .container {
-    width: 100%;
     min-height: 100vh;
     background-color: var(--fog-white);
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
+    overflow: hidden; /* Prevents content from causing unwanted horizontal scroll. */
+    display: flex; /* Uses Flexbox for the main page structure (header, content, potential footer). */
+    flex-direction: column; /* Stacks flex items vertically. */
 }
 
 img {
-    max-width: 100%;
+    max-width: 100%; /* Makes images responsive, scaling down with their container. */
     height: auto;
-    display: block; /* Removes extra space below images */
+    display: block; /* Removes potential extra space below images. */
 }
 
-/* Helper class for dynamically hiding elements */
 .hidden {
-    display: none !important;
+    display: none !important; /* Utility class to hide elements; !important ensures high priority. */
 }
 
 /* === General Components === */
-
-/* Top-right action buttons (Admin Login / Homepage link) */
 .admin-login-button,
 .admin-action-button {
-    position: absolute;
+    position: absolute; /* Positioned relative to the nearest 'position: relative' ancestor. */
     top: 15px;
     right: 20px;
-    z-index: 100; /* Ensure it's above other elements */
+    z-index: 100; /* Ensures the button is on top of other elements. */
     background-color: rgba(255, 255, 255, 0.8);
     color: var(--fog-primary-blue);
     padding: 5px 10px;
     border-radius: 3px;
     font-size: 0.8rem;
-    text-decoration: none;
-    font-weight: 500;
+    text-decoration: none; /* Removes default underline on links. */
+    font-weight: 500; /* Medium font weight for slight emphasis. */
     opacity: 0.8;
-    transition: background-color 0.2s ease, opacity 0.2s ease;
+    transition: background-color 0.2s ease, opacity 0.2s ease; /* Smooth visual feedback on interaction. */
 }
 .admin-login-button:hover,
 .admin-action-button:hover {
@@ -82,21 +75,19 @@ img {
     opacity: 1;
 }
 
-/* Main Header (Logo) */
 .main-header {
     background-color: var(--fog-primary-blue);
     padding: 15px 20px;
-    display: flex;
+    display: flex; /* Flexbox for centering of the logo. */
     justify-content: center;
     align-items: center;
-    position: relative; /* Context for buttons inside header */
+    position: relative; /* Needed as a positioning context for .admin-action-button if it's placed inside the header. */
 }
 .logo-img {
-    height: 70px; /* Adjust logo size */
+    height: 70px;
     width: auto;
 }
 
-/* Content Header (Sub-logo / Secondary Title Bar) */
 .content-header {
     background-color: var(--fog-content-header-bg);
     min-height: 45px;
@@ -108,129 +99,131 @@ img {
 }
 .content-header .sub-logo {
     font-size: 0.95rem;
-    color: var(--fog-text-light); /* White text */
+    color: var(--fog-text-light);
     text-align: center;
     font-weight: 500;
 }
 
-/* General Page Title (Used inside .content-body on form pages) */
 .page-title {
     font-size: 1.8rem;
     font-weight: 600;
     color: var(--fog-primary-blue);
-    text-align: left;
     margin-bottom: 35px;
-    max-width: 1100px; /* Matches .spec-layout */
+    max-width: 1100px;
     margin-left: auto;
     margin-right: auto;
     padding-top: 10px;
 }
 
-/* Main Layout Area (Sidebar + Content) */
 .main-content-area {
-    display: flex;
-    flex-grow: 1;
+    display: flex; /* Creates the side-by-side layout for sidebar and content. */
+    flex-grow: 1; /* Allows area to take up available vertical space. */
 }
 
-/* Sidebar */
 .sidebar {
-    flex: 0 0 300px;
+    flex: 0 0 300px; /* Sidebar has a fixed width (300px) */
     background-color: var(--fog-primary-blue);
-    padding: 30px 0 30px 0;
+    padding: 30px 0; /* Shorthand for top/bottom padding, no left/right. */
 }
-.steps-nav ul { list-style: none; }
-.steps-nav li { position: relative; margin: 0 25px 15px 30px; }
+.steps-nav ul { list-style: none; } /* Removes default list bullet points. */
+.steps-nav li {
+    position: relative;
+    margin: 0 25px 15px 30px;
+}
 
-/* Sidebar Nav Button "Shadow" effect */
-.steps-nav li::before {
+.steps-nav li::before { /* Shadow effect for a 3D look on navigation buttons. */
     content: ''; display: block; position: absolute;
     background-color: var(--fog-nav-behind-box); height: 100%; width: 100%;
-    top: 5px; left: -5px; z-index: 1; border-radius: 5px; transition: opacity 0.2s ease;
+    top: 5px; left: -5px; /* Positions the shadow slightly offset. */
+    z-index: 1; /* Ensures shadow is behind the actual button (which has z-index: 2). */
+    border-radius: 5px; transition: opacity 0.2s ease;
 }
 .steps-nav li.active::before,
-.steps-nav li.completed::before { opacity: 0; } /* Hide shadow */
+.steps-nav li.completed::before { opacity: 0; } /* Hides shadow for active/completed steps for clarity. */
 
-/* Sidebar Nav Button Link - DEACTIVATED FUNCTIONALITY */
 .steps-nav li a {
-    position: relative; z-index: 2; display: flex; align-items: center; padding: 18px 20px;
+    position: relative; z-index: 2; /* Places the link above the ::before shadow. */
+    display: flex; align-items: center; /* For aligning the step indicator and text. */
+    padding: 18px 20px;
     background-color: var(--fog-nav-inactive-bg); color: var(--fog-text-dark); text-decoration: none;
     font-size: 1.05rem; font-weight: 500; border-radius: 5px; border: 1px solid var(--fog-nav-behind-box);
     transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
-    /* === LINES ADDED TO DEACTIVATE LINK FUNCTIONALITY === */
-    pointer-events: none; /* Prevents click and most hover events */
-    cursor: default;      /* Standard arrow cursor */
+    pointer-events: none; /* Makes the buttons non-clickable. */
+    cursor: default;      /* Changes cursor to indicate non-interactivity. */
 }
-/* Step Indicator Circle */
-.step-indicator {
-    flex-shrink: 0; width: 26px; height: 26px; border: 2px solid var(--fog-text-dark);
-    border-radius: 50%; margin-right: 15px; display: flex; justify-content: center;
-    align-items: center; font-size: 0.9rem; font-weight: bold; color: var(--fog-text-dark);
-    position: relative; transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+.step-indicator { /* Circle with number/checkmark. */
+    flex-shrink: 0; /* Prevents the circle from shrinking if text is long. */
+    width: 26px; height: 26px; border: 2px solid var(--fog-text-dark);
+    border-radius: 50%; /* Makes the element a circle. */
+    margin-right: 15px;
+    display: flex; justify-content: center; align-items: center; /* Centers content (number/checkmark) in the circle. */
+    font-size: 0.9rem; font-weight: bold;
+    color: var(--fog-text-dark);
+    position: relative; /* Needed for absolute positioning of the ::after checkmark. */
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
 }
-.step-indicator::before { content: attr(data-step-number); display: block; } /* Number */
-.step-text { flex-grow: 1; } /* Text label */
+.step-indicator::before { content: attr(data-step-number); display: block; } /* Displays the number from HTML data-attribute. */
+.step-text { flex-grow: 1; } /* Allows the text part to take up remaining space in the link. */
 
-/* Sidebar Nav Button States */
-/* The :hover state on 'a' will no longer trigger due to pointer-events: none; */
-/* .steps-nav li:not(.active):not(.completed) a:hover { background-color: #f0f0f0; } */
-
-.steps-nav li.active a { /* Active */
+.steps-nav li.active a {
     background-color: var(--fog-nav-active-bg); color: var(--fog-text-dark);
     border-color: var(--fog-nav-active-bg); font-weight: 600;
 }
 .steps-nav li.active .step-indicator { border-color: var(--fog-text-dark); background-color: var(--fog-text-light); color: var(--fog-text-dark); }
-.steps-nav li.completed a { /* Completed */
+.steps-nav li.completed a {
     background-color: var(--fog-nav-completed-bg); color: var(--fog-text-light); border-color: var(--fog-nav-completed-bg);
 }
 .steps-nav li.completed .step-indicator { border-color: var(--fog-text-light); background-color: var(--fog-text-light); color: var(--fog-nav-completed-bg); }
-.steps-nav li.completed .step-indicator::before { content: ''; }
-.steps-nav li.completed .step-indicator::after {
+.steps-nav li.completed .step-indicator::before { content: ''; } /* Removes the number for completed steps. */
+.steps-nav li.completed .step-indicator::after { /* Adds a checkmark for completed steps. */
     content: '✓'; font-weight: bold; font-size: 1.1rem; position: absolute;
-    top: 50%; left: 50%; transform: translate(-50%, -50%);
+    top: 50%; left: 50%; transform: translate(-50%, -50%); /* Precise centering of the checkmark. */
 }
 
-/* Main Content Area (Right side) */
 .content {
-    flex-grow: 1; background-color: var(--fog-white);
+    flex-grow: 1; /* Takes up remaining space beside the sidebar. */
+    background-color: var(--fog-white);
     display: flex; flex-direction: column;
 }
-.content-body { /* Holds the specific page content */
-    padding: 40px; /* Base padding */
-    flex-grow: 1;
-    width: 100%;
+.content-body {
+    padding: 40px;
+    flex-grow: 1; /* Ensures the content area itself can grow. */
 }
 
-/* General Button Styling */
 .btn {
-    padding: 16px 45px; border: none; border-radius: 5px; cursor: pointer;
+    padding: 16px 45px; border: none; /* Removes default browser border on buttons. */
+    border-radius: 5px; cursor: pointer;
     font-size: 1.15rem; font-weight: 500; text-align: center; text-decoration: none;
-    display: inline-block; transition: background-color 0.2s ease, transform 0.1s ease;
+    display: inline-block; /* Allows padding/margin and width, without taking full line width. */
+    transition: background-color 0.2s ease, transform 0.1s ease;
 }
-.btn-primary { /* Main action button */
+.btn-primary {
     background-color: var(--fog-nav-active-bg); color: var(--fog-text-dark);
     border: 1px solid var(--fog-text-dark);
 }
 .btn-primary:hover { background-color: #9cbaf0; }
-.btn-primary:active { transform: scale(0.98); }
-.btn-secondary { /* Secondary action button */
+.btn-primary:active { transform: scale(0.98); /* Visual feedback on click. */ }
+.btn-secondary {
     background-color: var(--fog-white); color: var(--fog-primary-blue);
     border: 1px solid var(--fog-primary-blue); padding: 15px 35px;
 }
 .btn-secondary:hover { background-color: #f8f9fa; }
-.btn-small { padding: 8px 15px; font-size: 0.9rem; } /* Smaller button variant */
+.btn-small { padding: 8px 15px; font-size: 0.9rem; }
+.btn-large { padding: 18px 50px; font-size: 1.25rem; } /* Specific styling for larger buttons, e.g., payment button. Applied directly to the button. */
 
-/* General Form Element Styling */
 .form-group { margin-bottom: 28px; }
-.form-group label { display: block; margin-bottom: 8px; font-weight: 500; font-size: 0.95rem; color: var(--fog-text-grey); }
+.form-group label { display: block; /* Places label on its own line above the input field. */
+    margin-bottom: 8px; font-weight: 500; font-size: 0.95rem; color: var(--fog-text-grey); }
 .form-group select,
 .form-group input[type="text"],
 .form-group input[type="tel"],
 .form-group input[type="email"],
 .form-group input[type="password"],
 .form-group textarea {
-    width: 100%; padding: 12px 15px; border: 1px solid var(--fog-border-grey);
+    width: 100%; /* Input fields fill their container's width. */
+    padding: 12px 15px; border: 1px solid var(--fog-border-grey);
     border-radius: 4px; font-size: 1rem; font-family: var(--font-primary);
-    background-color: #f8f9fa; box-sizing: border-box;
+    background-color: #f8f9fa;
 }
 .form-group select:focus,
 .form-group input[type="text"]:focus,
@@ -238,380 +231,232 @@ img {
 .form-group input[type="email"]:focus,
 .form-group input[type="password"]:focus,
 .form-group textarea:focus {
-    outline: none; border-color: var(--fog-primary-blue); box-shadow: 0 0 0 2px rgba(0, 64, 108, 0.2);
+    outline: none; /* Removes default browser focus outline. */
+    border-color: var(--fog-primary-blue); /* Custom focus indicator. */
+    box-shadow: 0 0 0 2px rgba(0, 64, 108, 0.2); /* Subtle outer shadow on focus. */
 }
-.form-group select { /* Dropdown arrow */
-    cursor: pointer; appearance: none;
-    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2300406C%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E');
-    background-repeat: no-repeat; background-position: right 15px center; background-size: 12px auto;
+.form-group select { /* Specific styling for custom dropdown arrow. */
+    cursor: pointer;
+    appearance: none; /* Removes default browser appearance for select (especially arrow). */
+    -webkit-appearance: none; /* For Safari/Chrome. */
+    -moz-appearance: none; /* For Firefox. */
+    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2300406C%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E'); /* Custom arrow using an embedded SVG. */
+    background-repeat: no-repeat;
+    background-position: right 15px center;
+    background-size: 12px auto;
 }
-.form-group textarea { min-height: 80px; resize: vertical; }
+.form-group textarea { min-height: 80px; resize: vertical; /* Allows user to resize textarea height. */ }
 .disclaimer-text { font-size: 0.8rem; color: #6c757d; margin-top: 8px; font-style: italic; padding-left: 5px; }
 .form-navigation { display: flex; justify-content: space-between; align-items: center; margin-top: auto; padding-top: 25px; border-top: 1px solid var(--fog-border-grey); }
 
-
 /* ========== PAGE 1 SPECIFIC STYLING (Welcome) ========== */
-.welcome-container { max-width: 1000px; width: 100%; display: flex; flex-direction: column; margin: 30px auto 0 auto; }
-.welcome-box { display: flex; align-items: stretch; margin-bottom: 40px; background-color: var(--fog-welcome-box-bg); border-radius: 5px; overflow: hidden; }
-.welcome-text-box { color: var(--fog-text-light); padding: 35px; flex: 0.9; display: flex; flex-direction: column; justify-content: center; }
+.welcome-container { max-width: 1000px; display: flex; flex-direction: column; margin: 30px auto 0 auto; }
+.welcome-box { display: flex; align-items: stretch; /* Ensures text and image boxes stretch to the same height. */
+    margin-bottom: 40px; background-color: var(--fog-welcome-box-bg); border-radius: 5px; overflow: hidden; }
+.welcome-text-box { color: var(--fog-text-light); padding: 35px; flex: 0.9; /* Proportional space distribution. */
+    display: flex; flex-direction: column; justify-content: center; }
 .welcome-text-box h1 { font-size: 1.8rem; margin-bottom: 15px; color: var(--fog-text-light); font-weight: 600; line-height: 1.3; }
 .welcome-text-box p { line-height: 1.6; font-size: 1rem; color: var(--fog-text-light); margin-bottom: 0; }
 .welcome-image { flex: 1.1; display: flex; }
-.welcome-image img { object-fit: cover; width: 100%; height: 100%; }
-.button-container { text-align: center; margin-top: auto; padding: 40px 0 20px 0; }
+.welcome-image img { object-fit: cover; /* Ensures image covers the area without distortion. */
+    width: 100%; height: 100%; }
+.button-container { text-align: center; margin-top: auto; /* Pushes button to bottom if .welcome-container has spare height. */
+    padding: 40px 0 20px 0; }
 
+/* ========== PAGE 2, 4 SHARED STYLING (Form Pages) ========== */
+.spec-layout { display: flex; gap: 45px; max-width: 1100px; margin: 0 auto; }
+.spec-form { flex: 1.3; display: flex; flex-direction: column; }
+.spec-info { flex: 0.7; }
 
-/* ========== PAGE 2, 3, 4 SHARED STYLING (Form Pages) ========== */
-.spec-layout { /* Container for 2-column layout */
-    display: flex; gap: 45px; width: 100%;
-    max-width: 1100px; /* Match page-title max-width */
-    margin: 0 auto;    /* Centers layout horizontally */
-}
-.spec-form { flex: 1.3; display: flex; flex-direction: column; } /* Left column */
-.spec-info { flex: 0.7; } /* Right column */
-
-/* --- Page 2 Specific (Info Box / Image) --- */
-.spec-info .info-content-wrapper { display: flex; flex-direction: column; align-items: center; gap: 30px; width: 100%; }
-.spec-info .info-box { background-color: var(--fog-content-header-bg); padding: 25px; border-radius: 5px; border: none; width: 100%; max-width: 400px; }
+.spec-info .info-content-wrapper { display: flex; flex-direction: column; align-items: center; gap: 30px; }
+.spec-info .info-box { background-color: var(--fog-content-header-bg); padding: 25px; border-radius: 5px; border: none; max-width: 400px; }
 .spec-info .info-box p { font-size: 0.9rem; line-height: 1.6; color: var(--fog-text-dark); }
-.spec-info .info-image { text-align: center; width: 100%; max-width: 400px; }
+.spec-info .info-image { text-align: center; max-width: 400px; }
 .spec-info .info-image img { max-width: 100%; margin: 0 auto; border: 1px solid var(--fog-border-grey); }
 
-/* --- Page 3 Specific (Image) --- */
-.additions-image-container { display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; }
-.additions-image-container img { max-width: 100%; max-height: 400px; width: auto; border: 1px solid var(--fog-border-grey); border-radius: 4px; }
-
-/* --- Page 4 Specific (Checkbox / SVG Placeholder) --- */
-.form-group-checkbox { display: flex; align-items: flex-start; gap: 10px; margin-top: 15px; }
-.form-group-checkbox input[type="checkbox"] { margin-top: 5px; flex-shrink: 0; cursor: pointer; width: 16px; height: 16px; }
+.form-group-checkbox { display: flex; align-items: flex-start; /* Aligns checkbox and label. */ gap: 10px; margin-top: 15px; }
+.form-group-checkbox input[type="checkbox"] { margin-top: 5px;  flex-shrink: 0; cursor: pointer; width: 16px; height: 16px; }
 .form-group-checkbox label { font-size: 0.85rem; font-weight: normal; color: var(--fog-text-grey); margin-bottom: 0; cursor: pointer; }
-.details-svg-container { width: 100%; padding-top: 10px; }
+.details-svg-container { padding-top: 10px; }
 .svg-placeholder-title { font-size: 1.2rem; font-weight: 600; color: var(--fog-primary-blue); text-align: center; margin-bottom: 20px; }
-.svg-placeholder { width: 100%; max-width: 700px; min-height: 500px; display: flex; justify-content: center; align-items: center; margin: 0 auto; color: var(--fog-text-grey); font-style: italic; font-size: 0.9rem; overflow: hidden; }
-.svg-placeholder svg { display: block; width: 100%; height: auto; max-height: 100%; margin: auto; }
-
-
+.svg-placeholder { max-width: 700px; min-height: 500px; display: flex; justify-content: center; align-items: center; margin: 0 auto; color: var(--fog-text-grey); font-style: italic; font-size: 0.9rem; overflow: hidden; /* Prevents SVG from breaking layout. */ }
+.svg-placeholder svg { display: block; width: 100%; height: auto; max-height: 100%; margin: auto;  }/* Ensures SVG scales correctly and is centered. */
 
 /* ========== CUSTOMER FLOW ENDPAGES (Confirmation, Payment, Payment Confirmation) ========== */
-/* Centering content for these pages */
 html[data-page='confirmation'] .content-body,
 html[data-page='payment'] .content-body,
 html[data-page='paymentConfirmation'] .content-body {
-    display: flex;
-    flex-direction: column;
-    justify-content: center; /* Center vertically */
-    align-items: center;     /* Center horizontally */
-    padding: 60px 40px;      /* Generous padding */
-    text-align: center;      /* Center text within children by default */
+    display: flex; flex-direction: column;
+    justify-content: center; /* Vertical centering of content. */
+    align-items: center;     /* Horizontal centering. */
+    padding: 60px 40px; text-align: center;
 }
 
-/* Container for the centered box on these pages */
-.confirmation-container, /* Used on quote confirmation */
-.payment-container,      /* Used on payment page */
-.confirmation-message-box { /* Used on payment confirmation page */
-    background-color: var(--fog-content-header-bg); /* Light blue box */
-    padding: 40px 50px;
+.confirmation-container,
+.payment-container,
+.confirmation-message-box { /* Common box styling for these pages. */
+    background-color: var(--fog-content-header-bg); padding: 40px 50px;
     border-radius: 8px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    max-width: 650px; /* Max width for the content block */
-    width: 90%;
+    max-width: 650px; width: 90%;
 }
 
-/* Shared text styling within these boxes */
-.confirmation-header, /* Quote confirmation and payment confirmation */
-.payment-greeting {   /* Payment page */
-    font-size: 1.9rem;
-    color: var(--fog-primary-blue);
-    margin-bottom: 20px;
-    font-weight: 600;
-}
-.confirmation-main, /* Quote confirmation and payment confirmation */
-.payment-info {      /* Payment page */
-    font-size: 1.1rem;
-    margin-bottom: 15px;
-    line-height: 1.6;
-}
-.confirmation-sub, /* Quote confirmation and payment confirmation */
-.payment-footer-note { /* Payment page */
-    font-size: 0.9rem;
-    color: var(--fog-text-grey);
-    margin-bottom: 40px;
-}
+.confirmation-header, .payment-greeting { font-size: 1.9rem; color: var(--fog-primary-blue); margin-bottom: 20px; font-weight: 600; }
+.confirmation-main, .payment-info { font-size: 1.1rem; margin-bottom: 15px; line-height: 1.6; }
+.confirmation-sub, .payment-footer-note { font-size: 0.9rem; color: var(--fog-text-grey); margin-bottom: 40px; }
 
-/* Quote Confirmation Page Specifics */
 .confirmation-container .svg-section { margin-bottom: 40px; }
 .confirmation-container .svg-placeholder { min-height: 250px; }
 .confirmation-button { padding-top: 0; margin-top: 0; }
 
-/* Payment Page Specifics */
 .payment-footer-note { margin-top: 30px; margin-bottom: 0; }
-.payment-amount {
-    font-size: 2.2rem;
-    font-weight: bold;
-    color: var(--fog-text-dark);
-    margin-bottom: 35px;
-}
+.payment-amount { font-size: 2.2rem; font-weight: bold; color: var(--fog-text-dark); margin-bottom: 35px; }
 .payment-amount strong { font-weight: 700; }
-.payment-form-actions { margin-top: 20px; }
-.payment-form-actions .btn-large { padding: 18px 50px; font-size: 1.25rem; }
 
-/* Payment Confirmation Page Specifics */
 .confirmation-message-box .confirmation-header { font-size: 1.8rem; margin-bottom: 25px; }
 .confirmation-message-box .confirmation-main { font-size: 1.05rem; margin-bottom: 20px; }
 .confirmation-message-box .confirmation-sub { font-size: 0.9rem; margin-bottom: 30px; }
 .confirmation-message-box .confirmation-button { margin-top: 20px; }
 
-
 /* ========== Admin Pages Styling ========== */
-
-/* General layout for admin pages */
-.admin-content {
-    flex-grow: 1; display: flex; padding: 30px 40px; flex-direction: column;
+.admin-content { flex-grow: 1; display: flex; padding: 30px 40px; flex-direction: column; }
+.admin-content.dashboard { /* Layout for dashboard-type pages. */
+    justify-content: flex-start; align-items: stretch;
 }
-.admin-content.dashboard { /* Dashboard & Options page uses this */
-    justify-content: flex-start;
-    align-items: stretch;
-}
-.admin-content:not(.dashboard) { /* Login & Create Admin center their content */
-    justify-content: center;
-    align-items: center;
+.admin-content:not(.dashboard) { /* Layout for centered content, e.g., login. */
+    justify-content: center; align-items: center;
 }
 
-/* Admin Login & Create Admin Form Container */
-.login-form-container { /* Also used by create-admin page */
+.login-form-container {
     background-color: var(--fog-content-header-bg); padding: 35px 40px; border-radius: 8px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); max-width: 450px; width: 100%;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); max-width: 450px;
 }
 .login-form-container h3 { text-align: center; margin-bottom: 25px; color: var(--fog-primary-blue); font-size: 1.6rem; }
-.login-form-container .form-group { margin-bottom: 20px; }
-.login-form-container .form-group label { display: block; margin-bottom: 8px; font-weight: 500; font-size: 0.95rem; color: var(--fog-text-grey); }
-.login-form-container .form-group input[type="email"],
-.login-form-container .form-group input[type="password"] { /* Consistent input styling */
-    width: 100%; padding: 12px 15px; border: 1px solid var(--fog-border-grey);
-    border-radius: 4px; font-size: 1rem; font-family: var(--font-primary);
-    background-color: #f8f9fa; box-sizing: border-box;
-}
-.login-button-container { /* For login/create admin submit button */
+.login-button-container { /* container for login button to remove top-border from .form-navigation if it were used. */
     border-top: none; padding-top: 10px; display: flex; justify-content: center;
 }
 .error-message { color: #dc3545; background-color: #f8d7da; border: 1px solid #f5c6cb; padding: 10px 15px; border-radius: 4px; margin-bottom: 20px; text-align: center; font-size: 0.9rem; }
 
-/* Admin Dashboard & Admin Options Common Title */
-.page-title.admin-title { /* Used by Dashboard and Options page for their main title */
+.page-title.admin-title {
     text-align: center; margin-left: auto; margin-right: auto;
-    max-width: none; padding-top: 0; margin-bottom: 20px;
+    max-width: none; /* makes title take full width */
+    padding-top: 0; margin-bottom: 20px;
 }
 
-/* Admin Dashboard Specific */
-.admin-controls { display: flex; justify-content: center; align-items: center; margin-bottom: 25px; gap: 20px; flex-wrap: wrap; }
-.admin-controls .search-bar,
-.admin-controls .filter-bar,
-.admin-controls .add-admin-button-container { display: flex; align-items: center; gap: 10px; }
-#order-search { padding: 8px 12px; border: 1px solid var(--fog-border-grey); border-radius: 4px; min-width: 250px; }
-#status-filter { padding: 8px 12px; border: 1px solid var(--fog-border-grey); border-radius: 4px; background-color: var(--fog-white); }
-.table-container { width: 100%; overflow-x: auto; border: 1px solid var(--fog-border-grey); border-radius: 5px; margin-bottom: 30px; -webkit-overflow-scrolling: touch; }
-table { width: 100%; min-width: 1200px; border-collapse: collapse; font-size: 0.9rem; }
-th, td { padding: 12px 15px; border: 1px solid var(--fog-border-grey); text-align: left; vertical-align: middle; white-space: nowrap; }
-thead th { background-color: #f8f9fa; font-weight: 600; position: sticky; top: 0; z-index: 10; }
-tbody tr:nth-child(even) { background-color: #f8f9fa; }
+.table-container { overflow-x: auto; /* for large tables on small screens. */
+    border: 1px solid var(--fog-border-grey); border-radius: 5px; margin-bottom: 30px; -webkit-overflow-scrolling: touch; /* Improves scroll experience on iOS. */ }
+table { width: 100%; min-width: 1200px; /* Ensures table has a minimum width before scrolling is necessary. */
+    border-collapse: collapse; font-size: 0.9rem; }
+th, td { padding: 12px 15px; border: 1px solid var(--fog-border-grey); vertical-align: middle; white-space: nowrap; }  /* Prevents text wrapping by default. */
+thead th { background-color: #f8f9fa; font-weight: 600; position: sticky; top: 0; z-index: 10; }/* "Sticky header" for the table. */
 tbody tr:hover { background-color: #e9ecef; }
-td.td-small-text { white-space: normal; min-width: 150px; }
-.col-status, .col-comment { min-width: 160px; white-space: normal; }
+.col-status, .col-comment { min-width: 160px; white-space: normal; }  /* Allows text wrapping in these specific columns. */
 .col-status select, .col-comment textarea { width: 100%; }
-td textarea[name^="adminComment"] { min-height: 45px; resize: vertical; }
-.input-in-table { width: 100%; padding: 4px 6px; border: 1px solid var(--fog-border-grey); border-radius: 3px; font-size: 0.85rem; font-family: var(--font-primary); background-color: var(--fog-white); box-sizing: border-box; }
-td:has(> .input-in-table) { padding-top: 6px; padding-bottom: 6px; }
-.actions-cell { white-space: nowrap; text-align: right; }
+.input-in-table { width: 100%; padding: 4px 6px; border: 1px solid var(--fog-border-grey); border-radius: 3px; font-size: 0.85rem; font-family: var(--font-primary); background-color: var(--fog-white); }
+td:has(> .input-in-table) { padding-top: 6px; padding-bottom: 6px; } /* :has() styles parent based on child; reduces padding if cell contains input. */
+.actions-cell { white-space: nowrap; text-align: right; } /* Right-aligns action buttons. */
 .btn-action { background: none; border: none; padding: 5px 8px; margin-left: 5px; cursor: pointer; color: var(--fog-primary-blue); font-size: 0.85rem; border-radius: 3px; transition: background-color 0.2s ease; }
 .btn-action:hover { background-color: #e9ecef; }
-.btn-delete:hover { color: #dc3545; }
-.btn-action i { display: none; }
+.btn-delete:hover { color: #dc3545; /* Red color for "danger" on delete. */ }
 .dashboard-save { padding-top: 20px; text-align: center; padding-bottom: 20px;}
 .dashboard-save .btn { margin: 0 10px;}
-.save-changes-button { /* Uses .btn and .btn-primary styles */ }
-.options-button { /* Uses .btn and .btn-secondary styles */ }
-.add-admin-button-container .btn { /* Inherits .btn styling */ }
+
+.customer-info { margin-bottom: 20px; padding: 15px; background-color: #f8f9fa; border-radius: 5px; }
+.customer-info h3 { margin-bottom: 10px; color: var(--fog-primary-blue); }
+.customer-info p { margin-bottom: 5px; }
+.manual-price-update, .send-offer { margin-top: 20px; text-align: center; }
+.manual-price-update form, .send-offer form { display: inline-block; }
+.manual-price-update label { margin-right: 10px; }
+.manual-price-update input[type="number"] { padding: 8px; border-radius: 4px; border: 1px solid var(--fog-border-grey); margin-right: 10px; }
 
 
-/* Admin Options Page Specific */
-.admin-content.options-page .page-title { /* Title for options page */
-    margin-bottom: 40px; text-align: center;
-}
-.options-section { margin-bottom: 40px; padding: 25px; border: 1px solid var(--fog-border-grey); border-radius: 8px; background-color: #fdfdfd; max-width: 900px; margin-left: auto; margin-right: auto;}
-.options-section h3 { font-size: 1.5rem; color: var(--fog-primary-blue); margin-bottom: 20px; border-bottom: 2px solid var(--fog-primary-blue); padding-bottom: 8px; }
-.options-table table { min-width: unset; }
-.options-table th, .options-table td { white-space: normal; padding: 10px 12px; }
-.options-table .input-in-table { max-width: 150px; }
-.options-table .price-input { max-width: 100px; }
-.options-table td.actions-cell { text-align: center; }
-.input-simple { padding: 8px 12px; border: 1px solid var(--fog-border-grey); border-radius: 4px; font-size: 1rem; max-width: 150px; }
-.trapez-price-group label { display: block; margin-bottom: 8px; font-weight: 500; }
-.options-save { margin-top: 10px; padding-top: 10px; text-align: center; }
-
-
-/* ========== Responsiveness ========== */
-
-@media (max-width: 1200px) {
-    .sidebar { flex: 0 0 250px; }
-    .steps-nav li { margin: 0 20px 12px 25px; }
-    .steps-nav li a { padding: 16px 18px; font-size: 1rem; /* Deactivated link styles apply */ }
-    .step-indicator { width: 24px; height: 24px; font-size: 0.85rem; margin-right: 12px;}
-    .main-header { padding: 15px 20px; }
-    .logo-img { height: 60px; }
-    .content-header { min-height: 40px; padding: 8px 25px;}
-    .content-header .sub-logo { font-size: 0.9rem; }
-    .content-body { padding: 30px; }
-    .page-title { font-size: 1.6rem; margin-bottom: 30px; max-width: 95%;}
-    /* Page 1 */
-    .welcome-container { max-width: 90%; margin-top: 20px; }
-    .welcome-text-box h1 { font-size: 1.6rem; }
-    .welcome-text-box p { font-size: 0.95rem; }
-    /* Page 2+ */
-    .spec-layout { gap: 30px; max-width: 95%;}
-    .form-group { margin-bottom: 24px; }
-    .info-box { padding: 20px; }
-    .btn, .btn-secondary { padding: 14px 35px; font-size: 1.1rem; }
-    .svg-placeholder { min-height: 250px; }
-    /* Customer Endpages */
-    .confirmation-container, .payment-container, .confirmation-message-box { max-width: 90%; }
-    html[data-page='confirmation'] .content-body,
-    html[data-page='payment'] .content-body,
-    html[data-page='paymentConfirmation'] .content-body { padding: 50px 30px; }
-    .confirmation-header, .payment-greeting { font-size: 1.8rem; }
-    /* Admin */
-    .admin-content.dashboard { padding: 25px 30px; }
-    th, td { padding: 10px 12px; }
-    table { min-width: 1000px; }
-    .col-status, .col-comment { min-width: 140px; }
-}
-
-@media (max-width: 992px) {
-    .sidebar { flex: 0 0 220px; }
-    .steps-nav li { margin: 0 15px 10px 20px; }
-    .steps-nav li a { padding: 14px 15px; font-size: 0.9rem; /* Deactivated link styles apply */ }
-    .step-indicator { width: 22px; height: 22px; font-size: 0.8rem; margin-right: 10px;}
-    .content-body { padding: 25px; }
-    .page-title { font-size: 1.5rem; margin-bottom: 25px; max-width: 90%;}
-    /* Page 1 */
-    .welcome-box { flex-direction: column; }
-    .welcome-image { max-height: 300px; }
-    .welcome-container { max-width: 95%; margin-top: 15px;}
-    .welcome-text-box { padding: 30px; }
-    .welcome-text-box h1 { font-size: 1.5rem; }
-    /* Page 2+ (Form Pages) */
-    .spec-layout { flex-direction: column; gap: 35px; max-width: 600px; }
-    .spec-form, .spec-info { flex-basis: auto; width: 100%; }
-    .spec-info { padding-top: 0; }
-    .info-content-wrapper { gap: 25px; }
-    .info-box { max-width: 100%; }
-    .info-image img { max-width: 70%; } /* Page 2 */
-    .additions-image-container img { max-width: 70%; } /* Page 3 */
-    .svg-placeholder { max-width: 100%; min-height: 500px;} /* Page 4 */
-    .form-navigation { margin-top: 30px; }
-    /* Customer Endpages */
-    .confirmation-container, .payment-container, .confirmation-message-box { max-width: 95%; padding: 20px 0;}
-    html[data-page='confirmation'] .content-body,
-    html[data-page='payment'] .content-body,
-    html[data-page='paymentConfirmation'] .content-body { padding: 40px 25px; }
-    .confirmation-header, .payment-greeting { font-size: 1.7rem; }
-    .confirmation-main, .payment-info { font-size: 1rem; }
-    .confirmation-sub, .payment-footer-note { font-size: 0.85rem; }
-    /* Admin */
-    .admin-controls { flex-direction: column; align-items: stretch; gap: 15px;}
-    .search-bar, .filter-bar { width: 100%; justify-content: space-between;}
-    #order-search { min-width: unset; flex-grow: 1;}
-    #status-filter { flex-grow: 1;}
-    th, td { white-space: normal; } /* Allow wrapping */
-    table { min-width: unset; } /* Remove min-width, rely on scrolling */
-    .col-status, .col-comment { min-width: 120px; }
-    .options-section { padding: 20px; } /* Admin Options page tablet */
-    .options-section h3 { font-size: 1.4rem; }
-}
-
+/* --- Phone Usability --- */
 @media (max-width: 768px) {
     .admin-login-button, .admin-action-button { top: 8px; right: 10px; padding: 4px 8px; font-size: 0.75rem;}
-    .main-content-area { flex-direction: column; }
-    .sidebar {
-        order: -1; width: 100%; flex: 0 0 auto;
+    .main-content-area { flex-direction: column; } /* Stacks sidebar (now top-bar) and content. */
+    .sidebar { /* Transforms into a top-bar for navigation. */
+        order: -1; /* Places sidebar (now top-bar) at the top of the flex-item DOM flow. */
+        width: 100%; flex: 0 0 auto; /* Full width, auto height. */
         padding: 10px 0 5px 0; border-bottom: 1px solid var(--fog-border-grey);
     }
-    .steps-nav ul { display: flex; justify-content: space-around; flex-wrap: nowrap; overflow-x: auto;}
+    .steps-nav ul { display: flex; justify-content: space-around; flex-wrap: nowrap; overflow-x: auto;} /* Horizontal scroll for many nav items. */
     .steps-nav li {
         flex-direction: column; align-items: center; flex-grow: 0;
-        flex-basis: 80px; margin: 0 5px; padding-bottom: 5px;
-        border-bottom: 3px solid transparent;
+        flex-basis: 80px; /* Gives each nav item a width. */
+        margin: 0 5px; padding-bottom: 5px;
+        border-bottom: 3px solid transparent; /* Prepares for active state underline. */
     }
-    .steps-nav li::before { display: none; }
+    .steps-nav li::before { display: none; /* Remove shadow effect on mobile nav. */ }
     .step-indicator { margin: 5px auto; width: 20px; height: 20px; font-size: 0.7rem; border-width: 1px;}
     .steps-nav li.completed .step-indicator::after { font-size: 1rem; }
     .steps-nav li a {
         text-align: center; padding: 5px; font-size: 0.7rem;
-        background-color: transparent !important; color: var(--fog-text-dark);
-        border: none; width: 100%; border-radius: 0;
-        /* pointer-events & cursor inherited */
+        background-color: transparent !important; /* override desktop background for transparency. */
+        color: var(--fog-text-dark);
+        border: none; width: 100%; border-radius: 0; /* Removes desktop border and radius. */
     }
-    .steps-nav li.active { border-bottom-color: var(--fog-primary-blue); }
+    .steps-nav li.active { border-bottom-color: var(--fog-primary-blue);} /* Underline for active step. */
     .steps-nav li.active a { color: var(--fog-primary-blue); font-weight: bold; }
-    .steps-nav li.completed a { color: var(--fog-text-dark); font-weight: normal; }
-    .main-header { padding: 15px 20px; }
-    .logo-img { height: 40px; }
+    .steps-nav li.completed a { color: var(--fog-text-dark); font-weight: normal; }/* Resets font weight. */
+    .logo-img { height: 40px; } /* Smaller logo. */
     .content-header { padding: 10px 20px; min-height: 35px; }
     .content-header .sub-logo { font-size: 0.75rem; color: var(--fog-text-light); }
     .content-body { padding: 20px; }
     .page-title { font-size: 1.4rem; margin-bottom: 25px; max-width: 95%; padding-top: 5px;}
-    /* Page 1 Mobile */
     .welcome-container { max-width: 100%; margin-bottom: 20px; margin-top: 0;}
-    .welcome-box { border-radius: 0; margin-bottom: 30px;}
+    .welcome-box { border-radius: 0; margin-bottom: 30px;} /* Removes rounded corners for edge-to-edge look. */
     .welcome-image { max-height: 250px;}
     .welcome-text-box { padding: 25px; }
     .welcome-text-box h1 { font-size: 1.4rem; }
     .welcome-text-box p { font-size: 0.9rem; }
-    .button-container { padding: 0 15px; margin-top: auto; }
-    .btn { width: 100%; font-size: 1rem; padding: 14px 20px;}
-    /* Page 2+ Mobile */
-    .spec-layout { max-width: 100%; gap: 25px; margin: 0 auto;}
+    .button-container { padding: 0 0 20px 0; }
+    .btn { width: 100%; font-size: 1rem; padding: 14px 20px;} /* All buttons take full width for easier tapping. */
+    .spec-layout { max-width: 100%; gap: 25px; margin: 0 auto; flex-direction: column; }/* Explicitly stack spec-form and spec-info on mobile */
+    .spec-form, .spec-info { width: 100%; }/* Ensure they take full width when stacked */
     .form-group { margin-bottom: 22px; }
     .form-group label { font-size: 0.9rem; }
     .form-group select,
     .form-group input[type="text"],
     .form-group input[type="tel"],
     .form-group input[type="email"],
+    .form-group input[type="password"],
     .form-group textarea { padding: 11px 13px; font-size: 0.95rem; }
-    .form-navigation { margin-top: 35px; padding-top: 20px; flex-wrap: wrap; gap: 10px; }
-    .btn, .btn-secondary { width: 100%; font-size: 0.9rem; padding: 12px 15px;} /* Stack buttons */
-    .info-box { padding: 20px;}
-    .info-image img { max-width: 80%; } /* Page 2 */
-    .additions-image-container img { max-width: 80%; } /* Page 3 */
-    .svg-placeholder { min-height: 180px; } /* Page 4 */
-    /* Page 5 & Payment & Payment Confirmation Mobile */
+    .form-navigation { margin-top: 35px; padding-top: 20px; flex-wrap: wrap; gap: 10px; }  /* Allows buttons to wrap. */
+    .btn-secondary { width: 100%; font-size: 0.9rem; padding: 12px 15px;} /* Ensures secondary button is also full width. */
+    .spec-info .info-box { padding: 20px;}
+    .spec-info .info-image img { max-width: 80%; }
+    .details-svg-container .svg-placeholder { min-height: 200px; }
+
     html[data-page='confirmation'] .content-body,
     html[data-page='payment'] .content-body,
     html[data-page='paymentConfirmation'] .content-body {
-        padding: 30px 15px; /* Less padding on smallest screens */
-        justify-content: flex-start; /* Align to top */
-        padding-top: 30px; /* Ensure some space from top */
+        padding: 30px 15px;
+        justify-content: flex-start; /* Aligns content to top to avoid keyboard pushing content off-screen. */
     }
-    .confirmation-container, .payment-container, .confirmation-message-box { padding: 10px 0; }
+    .confirmation-container, .payment-container, .confirmation-message-box { padding: 25px 20px; width:100%;}
     .confirmation-header, .payment-greeting { font-size: 1.5rem; }
     .confirmation-main, .payment-info { font-size: 0.95rem; }
     .confirmation-sub, .payment-footer-note { font-size: 0.8rem; margin-bottom: 30px; }
-    .svg-section { margin-bottom: 200px; }
-    /* Admin Dashboard Mobile */
+    .confirmation-container .svg-section { margin-bottom: 20px; }
+    .confirmation-container .svg-placeholder { min-height: 180px; }
+
     .admin-content.dashboard { padding: 15px 10px; }
     .page-title.admin-title { font-size: 1.3rem; }
-    th, td { padding: 8px 6px; font-size: 0.75rem; }
+    th, td { padding: 8px 6px; font-size: 0.75rem; white-space: normal; }/* Allow text wrapping in all table cells on mobile. */
+    table { min-width: unset;}  /* Remove fixed min-width for tables on mobile, rely on .table-container scroll. */
     td select, td textarea, .input-in-table { font-size: 0.75rem; }
-    .actions-cell { text-align: left; }
-    .btn-action { display: block; width: 100%; max-width: 150px; margin-bottom: 5px; margin-left: 0; text-align: left; font-size: 0.75rem; padding: 4px 6px;}
+    .actions-cell { text-align: left;  }/* Action buttons aligned left for better space utilization. */
+    .btn-action { display: block; width: 100%; max-width: 150px; /* Buttons take full (max) width. */
+        margin-bottom: 5px; margin-left: 0; text-align: left; font-size: 0.75rem; padding: 6px 8px;}
     .col-status, .col-comment { min-width: 80px; }
-    /* Admin Login Mobile */
+    .dashboard-save .btn { margin: 5px 0; width: 100%; } /* Stacks buttons in dashboard save section. */
+
     .admin-content:not(.dashboard) { padding: 20px 15px; align-items: flex-start; }
-    .login-form-container { padding: 20px 25px; }
+    .login-form-container { padding: 25px 20px; width: 100%; max-width: 100%;  }/* Ensure it's full width on mobile, overriding desktop max-width. */
     .login-form-container h3 { font-size: 1.3rem; }
-    /* Admin Options Mobile */
-    .options-section { padding: 15px; }
-    .options-section h3 { font-size: 1.2rem; }
-    .options-table table { font-size: 0.75rem; }
-    .options-table th, .options-table td { padding: 6px 8px;}
-    .options-table .input-in-table { font-size: 0.75rem; }
+
+    .customer-info { font-size: 0.9rem; padding: 8px; }
+    .manual-price-update input[type="number"] { width: calc(100% - 100px); font-size: 0.9rem; padding: 6px;} /* Adjusts input for button alongside. */
+    .manual-price-update button, .send-offer button { width: auto; padding: 8px 12px; font-size: 0.9rem; }
+    .manual-price-update, .send-offer { margin-top: 15px; }
 }
