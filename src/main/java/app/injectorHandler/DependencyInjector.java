@@ -25,8 +25,7 @@ public class DependencyInjector {
 
     public DependencyInjector(ConnectionPool connectionPool) {
         this.connectionPool = connectionPool;
-
-        // Initialiser alle klasser
+      
         this.productMapper = new ProductMapper(connectionPool);
         this.orderMapper = new OrderMapper(connectionPool);
         this.adminMapper = new AdminMapper(connectionPool);

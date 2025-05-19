@@ -28,7 +28,7 @@ public class OrderMapper {
             var rs = preparedStatement.executeQuery();
             while (rs.next()) {
 
-                //Order
+                // Order
                 int carportWidth = rs.getInt("carport_width");
                 int carportLength = rs.getInt("carport_length");
                 int totalPrice = rs.getInt("total_price");
@@ -37,7 +37,7 @@ public class OrderMapper {
 
                 Order order = new Order(carportWidth, carportLength, status, totalPrice, null, trapezRoof);
 
-                //product
+                // Product
                 int productId = rs.getInt("product_id");
                 String name = rs.getString("name");
                 String unit = rs.getString("unit");
@@ -45,7 +45,7 @@ public class OrderMapper {
 
                 Product product = new Product(productId, name, unit, price);
 
-                //productVariant
+                // ProductVariant
                 int productVariantId = rs.getInt("product_variant_id");
                 int width = rs.getInt("width");
                 String description = rs.getString("description");
@@ -53,7 +53,7 @@ public class OrderMapper {
 
                 ProductVariant productVariant = new ProductVariant(productVariantId, length, width, product);
 
-                //BOM
+                // BOM
                 int bomId = rs.getInt("order_item_id");
                 int quantity = rs.getInt("quantity");
 
@@ -233,13 +233,13 @@ public class OrderMapper {
 
         try (Connection conn = connectionPool.getConnection()) {
 
-            // Slet BOM først
+            // Delete BOM first
             try (PreparedStatement ps = conn.prepareStatement(deleteBOM)) {
                 ps.setInt(1, orderId);
                 ps.executeUpdate();
             }
 
-            // Slet selve ordren
+            // Delete the order itself
             try (PreparedStatement ps = conn.prepareStatement(deleteOrder)) {
                 ps.setInt(1, orderId);
                 ps.executeUpdate();

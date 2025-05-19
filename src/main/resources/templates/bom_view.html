@@ -45,7 +45,7 @@
 
   <br><br>
 
-  <!-- FORM: Manuel opdatering af samlet pris -->
+  <!-- FORM: Manual update of total price -->
   <div class="manual-price-update">
     <form th:method="post" th:action="@{/admin/order/set-total/{id}(id=${order.orderId})}">
       <input type="hidden" name="orderId" th:value="${order.orderId}" />
@@ -56,7 +56,7 @@
     </form>
   </div>
 
-  <!-- KNAP: Send tilbud -->
+  <!-- BUTTON: Send offer -->
   <div class="send-offer">
     <form th:method="post" th:action="@{/admin/order/send-payment/{id}(id=${order.orderId})}">
       <input type="hidden" name="orderId" th:value="${order.orderId}" />

@@ -20,7 +20,7 @@ public class CalculateBOM {
         this._productMapper = productMapper;
     }
 
-    // Kalder alle metoderne til udregning af hele styklisten til carporten
+    // Calls all the methods for calculation of the entire BOM for the carport
     public void calculateCarport(Order order) throws DatabaseException {
         bomList.clear();
         calculatePoles(order);
@@ -40,7 +40,7 @@ public class CalculateBOM {
         calculateScrewsRafters(order);
     }
 
-    // Udregner hvor mange stolper der skal bruges og smider mængden og korrekt vare i stykliste
+    // Calculates how many poles we need and puts the quantity and correct product in the bill of materials
     public void calculatePoles(Order order) throws DatabaseException {
         int quantity = calculatePolesQuantity(order);
         int productId = _productMapper.getProductIdByName("97x97 mm. trykimp. Stolpe");
@@ -57,7 +57,7 @@ public class CalculateBOM {
         bomList.add(bom);
     }
 
-    // Udregner mængden af stolper der skal bruges baseret på længde
+    // Calculates quantity of poles that is needed based on the length of carport
     public int calculatePolesQuantity(Order order) throws DatabaseException {
         int overhangRear = 30;
         int distanceFirstPole = 100;
@@ -70,7 +70,7 @@ public class CalculateBOM {
         return totalAmountOfPoles * 2;
     }
 
-    // Udregner hvilke remme der skal bruges og smider de korrekte længder og mængder i stykliste
+    // Calculates which beams would be needed and puts the correct lengths and quantities in the bill of materials
     public void calculateBeams(Order order) throws DatabaseException {
         int totalLength = order.getCarportLength();
         int sides = 2;
@@ -103,7 +103,7 @@ public class CalculateBOM {
         }
     }
 
-    // Finder den bedste længde-kombination så der er mindst overskydende spild
+    // Finds the best length-combination to have the least amount of wasted material (overshoot)
     public Map<Integer, Integer> getOptimalBeamCombination(int length) {
         int[] beamLengths = _productMapper.getAvailableBeamLengths();
 
@@ -128,31 +128,31 @@ public class CalculateBOM {
         return optimalCombination;
     }
 
-    // Udregner mængden af spær baseret på længden
+    // Calculates the amount of rafters needed based on the length of the carport
     public int calculateRafterQuantity(Order order) throws DatabaseException {
-        // Regner med 60 cm mellem spær
+        // We calculate with 60cm between each rafter
         int spacing = 60;
 
-        // Hvert spærtræ er 45mm brede
+        // Each rafter is 45mm (4.5cm) wide
         double rafterWidth = 4.5;
 
-        // Vi udregner her den egentlige indre længde minus spær i hver endes bredde (altså derfor * 2)
+        // Here we calculate the actual inner-length, by removing the width of rafters in each end (hence the times 2 at the end)
         int innerLength = (int) (order.getCarportLength() - (rafterWidth * 2));
 
-        // Vi udregner her hvor mange mellemrum der er, men der er altid 1 spær mere end der er mellemrum, derfor + 1 til sidst
+        // We calculate how many spaces there are, but there's always 1 more rafter than there are spaces, hence the + 1 at the end.
         int quantity = (int) Math.ceil((double) innerLength / spacing) + 1;
 
         return quantity;
     }
 
-    // Henter mængden af spær og smider dem korrekt ned i styklisten
+    // Retrieves the amount of rafters and puts them correctly into the bill of materials
     public void calculateRafters(Order order) throws DatabaseException {
         int quantity = calculateRafterQuantity(order);
 
-        // Her henter vi produktID på det træ vi bruger. Det kunne måske være gjort hardcoded.
+        // Here we retrieve the productID of the product we're using.
         int productId = _productMapper.getProductIdByName("45x195 mm. spærtræ ubh.");
 
-        // Bruger carportens bredde som længdemål til spær (vi bruger samme produkt til spær & remme).
+        // Uses the carports width as length for rafters. Keep in mind we're using the same product for rafters & beams.
         List<ProductVariant> variants = _productMapper.getVariantsByProductIdAndMinLength(order.getCarportWidth(), productId);
 
         if (variants.isEmpty()) {
@@ -164,12 +164,13 @@ public class CalculateBOM {
         bomList.add(bom);
     }
 
-    // Denne metode tager kun den totale mængde af tagplader. Den siger ikke fx 2 240cm, 2 360cm
+    // This method only calculates the total amount of roof plates. For instance it doesn't says which combinations are optimal.
+    // TODO: Slet funktion? Bruges ikke.
     private int calculateTrapezRoofQuantity(Order order) throws DatabaseException {
         return calculateRoofLengthQuantity(order) * calculateRoofWidthQuantity(order);
     }
 
-    // Udregner mængden af tagplader baseret på bredden (altså inklusiv den optimale kombination)
+    // Calculates the amount of roof plates based on the width (including the optimal combination)
     public int calculateRoofWidthQuantity(Order order) throws DatabaseException {
         int carportWidth = order.getCarportWidth();
         Map<Integer, Integer> combination = getOptimalRoofCombination(carportWidth);
@@ -181,7 +182,7 @@ public class CalculateBOM {
         return amountOfRoofsWidth;
     }
 
-    // Udregner hvor mange tagplader (109cm længde) der skal bruges baseret på længde af carport
+    // Calculates how many roof-plates (109cm length) is needed based on the length of the carport
     public int calculateRoofLengthQuantity(Order order) throws DatabaseException {
         int carportLength = order.getCarportLength();
         int amountOfRoofsLength = (int) Math.ceil(carportLength / 109.0);
@@ -189,34 +190,32 @@ public class CalculateBOM {
         return amountOfRoofsLength;
     }
 
-    // Finder den optimale tagkombination (altså mht. bredde) md mindst overskydende spild
+    // Finds the optimal roof-combination (in relation to width) with the least amount of wasted material (overshoot).
     public Map<Integer, Integer> getOptimalRoofCombination(int width) {
         int[] roofWidths = _productMapper.getAvailableRoofWidths();
 
         Map<Integer, Integer> optimalCombination = new HashMap<>();
         int bestOvershoot = Integer.MAX_VALUE;
 
-        // Vi starter med at tjekke om en enkelt plade kan dække hele bredden
-
+        // We start by checking if a singular roof-plate can cover the entire width
         for (int roofWidth : roofWidths) {
             if (roofWidth >= width) {
                 int overshoot = roofWidth - width;
                 if (overshoot < bestOvershoot) {
                     bestOvershoot = overshoot;
                     optimalCombination.clear();
-                    optimalCombination.put(roofWidth, 1); // Brug én plade
+                    optimalCombination.put(roofWidth, 1); // Use 1 roof-plate
                 }
             }
         }
 
-        // Hvis ingen enkelt tagplade findes, så tjekker vi kombinationerne
-
+        // If no singular roof-plate can cover the width, then we check the combinations of our available ones
         for (int i = 0; i < roofWidths.length; i++) {
             for (int j = i; j < roofWidths.length; j++) {
                 int totalWidth = roofWidths[i] + roofWidths[j];
                 if (totalWidth >= width) {
                     int overshoot = totalWidth - width;
-                    if (overshoot < bestOvershoot) { // Sammenlign med den bedste løsning indtil videre
+                    if (overshoot < bestOvershoot) { // Compares with the best solution so far
                         bestOvershoot = overshoot;
                         optimalCombination.clear();
                         optimalCombination.put(roofWidths[i], 1);
@@ -229,7 +228,7 @@ public class CalculateBOM {
         return optimalCombination;
     }
 
-    // Udregner hvilke tagplader der skal bruges og smider korrekte mængder og bredder i styklisten
+    // Calculates which roof-plates are needed and puts the correct amounts and widths in the bill of materials.
     public void calculateRoofs(Order order) throws DatabaseException {
         int carportWidth = order.getCarportWidth();
         int productId = _productMapper.getProductIdByName("Plastmo Ecolite Blåtonet 109 mm.");
@@ -239,7 +238,7 @@ public class CalculateBOM {
             int width = entry.getKey();
             int totalCount = entry.getValue() * calculateRoofLengthQuantity(order);
 
-            // Henter vors product_variant med matchende bredde
+            // Gathers our product_variant with matching width.
             ProductVariant variant = _productMapper.getVariantByProductIdAndWidth(productId, width);
 
             BOM bom = new BOM(0, totalCount, "Tagplader monteres på spær", order, variant);
@@ -247,7 +246,7 @@ public class CalculateBOM {
         }
     }
 
-    // Skal bare returnere 2 ruller. 1 rulle for hvert led
+    // We will always need 2 rolls of hole bands. 1 roll for each line.
     public void calculateHoleBands(Order order) throws DatabaseException {
         int quantity = 2;
 
@@ -258,16 +257,16 @@ public class CalculateBOM {
         bomList.add(bom);
     }
 
-    // Bruger plastmo bundskruer (200 stk pr pakke). Beregner baseret på tagareal og skruer pr. m².
+    // Uses "plastmo bundskruer" (200 screws per pack). Calculates based on the roof-area and screws per m².
     public void calculateScrewsRoofs(Order order) throws DatabaseException {
-        int screwsPerM2 = 12; // anbefalet antal skruer pr. m²
+        int screwsPerM2 = 12; // recommended amount of screws per m².
         int screwsPerPackage = 200;
 
-        // Beregn arealet af carporten i m²
+        // Calculates the area of the carport in m²
         double areaM2 = (order.getCarportWidth() / 100.0) * (order.getCarportLength() / 100.0);
         int totalScrewsNeeded = (int) Math.ceil(areaM2 * screwsPerM2);
 
-        // Beregn antal nødvendige pakker (altid rund op)
+        // Calculate amount of needed packs (always rounds up)
         int numberOfPackages = (int) Math.ceil((double) totalScrewsNeeded / screwsPerPackage);
 
         int productId = _productMapper.getProductIdByName("plastmo bundskruer 200 stk.");
@@ -277,18 +276,18 @@ public class CalculateBOM {
         bomList.add(bom);
     }
 
-    // Beregner mængden af firkantskiver baseret på mængden af bræddebolte (1 bræddebolt skal bruge 1 firkantskive).
+    // Calculates the amount of square washers (firkantskiver) based on the amount of carriage bolts (bræddebolte). 1 carriage bolt uses 1 square washer.
     public void calculateFittingsBeams(Order order) throws DatabaseException {
-        // Fjerner 4 fra total mængde af stolper, fordi enderne skal bruge færre bræddebolte.
+        // Removes 4 from the total amount of poles, because the ending poles uses less carriage bolts.
         int poleAmountInBetween = calculatePolesQuantity(order) - 4;
 
-        // Mængden af bræddebolte for enderne
+        // Amount of carriage bolts for the ending poles. Only uses 2 in each ending pole.
         int boltsOnEnds = 4 * 2;
 
-        // Mængden af bræddebolte for stolperne i mellem enderne
+        // Amount of carriage bolts for poles in between the ending poles.
         int boltsInBetween = poleAmountInBetween * 4;
 
-        // Beregner total mængde af bræddebolte, hvilket er samme mængde som firkantskiver
+        // Calculates total amount of carriage bolts, which is the same amount as the square washers (fittings)
         int totalAmountOfFittings = boltsInBetween + boltsOnEnds;
 
         int productId = _productMapper.getProductIdByName("firkantskiver 40x40x11 mm.");
@@ -299,18 +298,18 @@ public class CalculateBOM {
 
     }
 
-    // Bruger 2 bræddebolte i stolperne på enderne og 4 bræddebolte på stolperne imellem.
+    // Uses 2 carriage bolts (bræddebolte) in the poles of each end, and 4 carriage bolts on the poles in between those.
     public void calculateBoltsBeams(Order order) throws DatabaseException {
-        // Fjerner 4 fra total mængde af stolper, fordi enderne skal bruge færre bræddebolte.
+        // Removes 4 from the total amount of poles, because the ending poles uses less carriage bolts.
         int poleAmountInBetween = calculatePolesQuantity(order) - 4;
 
-        // Mængden af bræddebolte for enderne
+        // Amount of carriage bolts for the ending poles. Only uses 2 in each ending pole.
         int boltsOnEnds = 4 * 2;
 
-        // Mængden af bræddebolte for stolperne i mellem enderne
+        // Amount of carriage bolts for poles in between the ending poles.
         int boltsInBetween = poleAmountInBetween * 4;
 
-        // Beregner total mængde af bræddebolte
+        // Calculates total amount of carriage bolts.
         int totalAmountOfBolts = boltsInBetween + boltsOnEnds;
 
         int productId = _productMapper.getProductIdByName("bræddebolt 10x120 mm.");
@@ -320,7 +319,7 @@ public class CalculateBOM {
         bomList.add(bom);
     }
 
-    // Bruger universalbeslag venstre. Skal bruge 1 venstre for hvert spær.
+    // Uses universal bracket left (universalbeslag venstre). Needs to use 1 for each rafter.
     public void calculateFittingsRaftersLeft(Order order) throws DatabaseException {
         int amountOfRafters = calculateRafterQuantity(order);
         int quantityOfLeftFittings = amountOfRafters;
@@ -332,7 +331,7 @@ public class CalculateBOM {
         bomList.add(bom);
     }
 
-    // Bruger universalbeslag højre. Skal bruge 1 højre for hvert beslag
+    // Uses universal bracket right (universalbeslag right). Needs to use 1 for each rafter.
     public void calculateFittingsRaftersRight(Order order) throws DatabaseException {
         int amountOfRafters = calculateRafterQuantity(order);
         int quantityOfRightFittings = amountOfRafters;
@@ -344,15 +343,15 @@ public class CalculateBOM {
         bomList.add(bom);
     }
 
-    // Udregner hvor mange skruer der skal bruges baseret på mængden af spær, og tilføjer til styklisten.
+    // Calculates how many screws are needed, based on the amount of rafters, and adds it to the bill of materials.
     public void calculateScrewsRafters(Order order) throws DatabaseException {
-        // Spær skal bruge skruer baseret på mængden af beslag. 3 skruer på hver side af beslaget (3 sider gange 3 skruer = 9 per spær)
+        // Rafters needs to use screws based on the amount of fittings. 3 screws per side of each fitting (3 sides times 3 screws = 9 screws per rafter).
         int amountOfRafters = calculateRafterQuantity(order);
         int amountOfScrews = amountOfRafters * 9;
 
-        // Vi bruger beslagskruer som er 250 stk pr. pakke
+        // We're using bracket screws (beslagskruer), which are 250 screws per pack.
         int screwsPerPackage = 250;
-        // Udregner hvor mange pakker der skal bruges. Runder selvfølgelig op bare der skal bruges 1 skrue for meget
+        // Calculate how many packs are needed. Rounds up.
         int numberOfPackages = (int) Math.ceil((double) amountOfScrews / screwsPerPackage);
 
         int productId = _productMapper.getProductIdByName("4x50 mm. skruer 250 stk.");
@@ -362,7 +361,7 @@ public class CalculateBOM {
         bomList.add(bom);
     }
 
-    // Udregner totalprisen ud fra styklisten
+    // Calculates the total price based on the products in the bill of materials
     public int calculateTotalPriceFromBOM() {
         double unroundedTotal = 0;
 
@@ -373,7 +372,7 @@ public class CalculateBOM {
             int quantity = bom.getQuantity();
             double line;
 
-            // Det er kun produktId 2 (Spærtræ og Remme) som sælges baseret på meter.
+            // It's only productId 2 (rafters and beams) that are sold based on price per meter.
             if (p.getProductId() == 2) {
                 line = price * (lengthInCm / 100.0) * quantity;
             } else {
@@ -388,8 +387,7 @@ public class CalculateBOM {
         return roundedTotal;
     }
 
-
-    // Denne metode returnerer hele styklisten.
+    // This method returns the entire bill of materials.
     public List<BOM> getBom() {
         return bomList;
     }

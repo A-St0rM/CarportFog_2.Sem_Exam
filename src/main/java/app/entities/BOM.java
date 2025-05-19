@@ -8,7 +8,7 @@ public class BOM {
     private Order order;
     private ProductVariant productVariant;
 
-    // BOM med produktvariant (fx stolper, spær)
+    // BOM with product variant (e.g. poles, beams)
     public BOM(int bomId, int quantity, String description, Order order, ProductVariant productVariant) {
         this.bomId = bomId;
         this.quantity = quantity;
@@ -23,7 +23,6 @@ public class BOM {
         this.order = order;
         this.productVariant = productVariant;
     }
-
 
     public int getBomId() {
         return bomId;
