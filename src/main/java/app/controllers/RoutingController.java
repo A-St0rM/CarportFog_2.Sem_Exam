@@ -14,7 +14,7 @@ public static void startRouting(Javalin app, ConnectionPool connectionPool) {
     AdminController adminController = di.getAdminController();
 
 
-    //General Routing
+
     app.get("/", ctx -> ctx.render("index.html"));
     app.get("/details", ctx -> OrderController.showSvg(ctx));
 

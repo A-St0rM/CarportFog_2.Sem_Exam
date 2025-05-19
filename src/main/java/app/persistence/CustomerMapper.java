@@ -27,8 +27,6 @@ public class CustomerMapper {
                     JOIN postal_codes p ON c.postal_code = p.postal_code
                     WHERE c.customer_id = ?
                 """;
-
-
         try (
                 PreparedStatement preparedStatement = connectionPool.getConnection().prepareStatement(sql)
         ) {
