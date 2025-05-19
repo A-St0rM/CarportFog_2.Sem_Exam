@@ -5,12 +5,32 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fog Admin - Dashboard</title>
     <link href="../public/css/index.css" th:href="@{/css/index.css}" rel="stylesheet"/>
+    <style>
+
+        thead th.sortable {
+            cursor: pointer;
+            position: relative; /* For sorteringsikoner */
+        }
+        thead th.sortable::after {
+            content: ' \2195'; /* Op/ned pil */
+            font-size: 0.8em;
+            color: #aaa;
+        }
+        thead th.sortable.asc::after {
+            content: ' \2191'; /* Op pil */
+            color: #333;
+        }
+        thead th.sortable.desc::after {
+            content: ' \2193'; /* Ned pil */
+            color: #333;
+        }
+    </style>
 </head>
 <body>
 
 <div class="container">
     <header class="main-header">
-        <img class="logo-img" src="/images/Fog_logo.png" alt="Fog Logo">
+        <img class="logo-img" src="/images/Fog_logo.png" th:src="@{/images/Fog_logo.png}" alt="Fog Logo">
         <a th:href="@{/}" class="admin-action-button">Forside</a>
     </header>
 
@@ -19,7 +39,6 @@
     </div>
 
     <main class="admin-content dashboard">
-
         <h2 class="page-title admin-title">Alle bestillinger</h2>
 
         <div class="admin-controls">
@@ -31,38 +50,47 @@
                 <label for="status-filter">Filter status:</label>
                 <select id="status-filter" name="statusFilter">
                     <option value="all" selected>Alle</option>
-                    <option value="pending">Afventende</option>
-                    <option value="paid">Betalt</option>
-                    <option value="completed">Gennemført</option>
-                    <option value="rejected">Afslået</option>
+                    <option value="under_behandling">Under behandling</option>
+                    <option value="afventende">Afventende</option>
+                    <option value="betalt">Betalt</option>
                 </select>
                 <button type="button" class="btn btn-secondary btn-small">Filter</button>
             </div>
         </div>
 
         <div class="table-container">
-            <table>
+            <table id="orders-table">
                 <thead>
                 <tr>
-                    <th>Navn</th>
-                    <th>Adresse</th>
-                    <th>Telefon</th>
-                    <th>Længde</th>
-                    <th>Bredde</th>
-                    <th>Trapez</th>
-                    <th class="col-status">Status</th>
+                    <th class="sortable" data-sort-by="orderId" data-sort-type="number">Ordre ID</th>
+                    <th class="sortable" data-sort-by="name">Navn</th>
+                    <th class="sortable" data-sort-by="address">Adresse</th>
+                    <th class="sortable" data-sort-by="phone">Telefon</th>
+                    <th class="sortable" data-sort-by="length" data-sort-type="number">Længde</th>
+                    <th class="sortable" data-sort-by="width" data-sort-type="number">Bredde</th>
+                    <th class="sortable" data-sort-by="trapeze">Trapez</th>
+                    <th class="sortable col-status" data-sort-by="status">Status</th>
                     <th>Handlinger</th>
                 </tr>
                 </thead>
-                <tbody>
-                <tr th:each="order : ${orders}">
-                    <td th:text="${order.customer.name}"></td>
-                    <td th:text="${order.customer.address}"></td>
-                    <td th:text="${order.customer.phone}"></td>
-                    <td th:text="${order.carportLength}"></td>
-                    <td th:text="${order.carportWidth}"></td>
-                    <td th:text="${order.trapezeRoof ? 'Ja' : 'Nej'}"></td>
-                    <td class="col-status">
+                <tbody id="orders-table-body">
+                <tr th:each="order : ${orders}" th:attr="data-status=${order.status}"> <td data-label="Ordre ID" th:text="${order.orderId}"></td>
+                    <td data-label="Navn">
+                        <span th:if="${order.customer != null}" th:text="${order.customer.name}"></span>
+                        <span th:unless="${order.customer != null}">N/A</span>
+                    </td>
+                    <td data-label="Adresse">
+                        <span th:if="${order.customer != null}" th:text="${order.customer.address}"></span>
+                        <span th:unless="${order.customer != null}">N/A</span>
+                    </td>
+                    <td data-label="Telefon">
+                        <span th:if="${order.customer != null}" th:text="${order.customer.phone}"></span>
+                        <span th:unless="${order.customer != null}">N/A</span>
+                    </td>
+                    <td data-label="Længde" th:text="${order.carportLength}"></td>
+                    <td data-label="Bredde" th:text="${order.carportWidth}"></td>
+                    <td data-label="Trapez" th:text="${order.trapezeRoof ? 'Ja' : 'Nej'}"></td>
+                    <td data-label="Status" class="col-status">
                         <span th:switch="${order.status}">
                             <span th:case="'under_behandling'">Under behandling</span>
                             <span th:case="'afventende'">Afventende</span>
@@ -76,11 +104,9 @@
                               onsubmit="return confirm('Er du sikker på, at du vil slette denne ordre?');">
                             <button type="submit" class="btn-action btn-delete">Slet</button>
                         </form>
-
-                        <a th:href="@{/admin/order/{id}/bom(id=${order.id})}" class="btn-action btn-recalculate">
+                        <a th:href="@{/admin/order/{id}/bom(id=${order.orderId})}" class="btn-action btn-recalculate">
                             Se/redigere stykliste
                         </a>
-
                     </td>
                 </tr>
                 </tbody>
@@ -88,11 +114,13 @@
         </div>
 
         <div class="button-container dashboard-save">
-            <a th:href="@{/admin/products}" class="btn btn-secondary">✏️ Ændr i produktpriser</a>
+            <a th:href="@{/admin/products}" class="btn btn-secondary"> Ændr i produktpriser</a>
             <a th:href="@{/admin/product/create}" class="btn btn-primary save-changes-button">Tilføj nyt produkt</a>
             <a th:href="@{/admin/create}" class="btn btn-secondary add-admin-button">Tilføj Admin</a>
         </div>
+
     </main>
 </div>
+
 </body>
 </html>

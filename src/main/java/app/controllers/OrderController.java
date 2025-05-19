@@ -14,7 +14,11 @@ import app.service.CarportSvg;
 import app.service.Svg;
 import io.javalin.http.Context;
 
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.ArrayList;
+import java.util.Map;
 
 
 public class OrderController {
@@ -199,25 +203,78 @@ public class OrderController {
     public void handlePaymentConfirmation(Context ctx) {
         Order order = ctx.sessionAttribute("order");
 
-        if (order == null) {
-            ctx.status(400).result("Ingen ordre fundet i session.");
-            return;
-        }
-
         try {
             _orderMapper.updateOrderStatus(order.getId(), "betalt");
             order.setStatus("betalt");
+
+            List<BOM> bomListFromDB = _orderMapper.getBOMForOrder(order.getId());
+            List<Map<String, Object>> bomItemsForEmail = new ArrayList<>();
+
+            for (BOM bomItem : bomListFromDB) {
+                Map<String, Object> itemMap = new HashMap<>();
+                itemMap.put("description", bomItem.getDescription());
+                itemMap.put("quantity", bomItem.getQuantity());
+                // itemMap.put("unit", bomItem.getUnit()); // Tilføj hvis din BOM-klasse har getUnit()
+                bomItemsForEmail.add(itemMap);
+            }
+
+            EmailService emailService = new EmailService();
+            emailService.sendMailConfirmation(
+                    order.getCustomer().getName(),
+                    order.getCustomer().getEmail(),
+                    order.getTotalPrice(),
+                    bomItemsForEmail
+            );
+
             ctx.sessionAttribute("order", order);
             ctx.attribute("customerName", order.getCustomer().getName());
-            ctx.render("payment-confirmation.html");
+            ctx.render("payment_confirmation.html");
+
         } catch (DatabaseException e) {
             e.printStackTrace();
-            ctx.status(500).result("Fejl ved betaling: " + e.getMessage());
+            ctx.status(500).result("Databasefejl ved betalingsbekræftelse: " + e.getMessage());
+        } catch (IOException e) {
+            e.printStackTrace();
+            ctx.status(500).result("Fejl ved afsendelse af bekræftelsesmail: " + e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            ctx.status(500).result("Uventet fejl ved betalingsbekræftelse: " + e.getMessage());
         }
     }
 
 
+    public void showPaymentPage(Context ctx) {
+        try {
+            int orderId = Integer.parseInt(ctx.queryParam("orderId"));
+            Order order = _orderMapper.getOrderById(orderId);
+
+            if (order == null) {
+                ctx.status(404).result("Fejl: Ordre ikke fundet.");
+                return;
+            }
 
 
+            // Gem ordren i sessionen, så den er nem at tilgå efter "betaling"
+            // Dette er vigtigt for din handlePaymentConfirmation metode
+            ctx.sessionAttribute("order", order);
+
+            // Send ordreoplysninger til HTML-skabelonen
+            ctx.attribute("order", order);
+            ctx.attribute("customer", order.getCustomer());
+            ctx.attribute("totalPrice", order.getTotalPrice());
+            ctx.attribute("orderId", order.getId()); // Send orderId med for formular action
+
+            ctx.render("payment.html"); // Din nye HTML-side for betaling
+
+        } catch (NumberFormatException e) {
+            ctx.status(400).result("Fejl: Ugyldigt orderId format.");
+        } catch (DatabaseException e) {
+            e.printStackTrace();
+            ctx.status(500).result("Databasefejl ved hentning af ordre til betaling.");
+        } catch (Exception e) {
+            e.printStackTrace();
+            ctx.status(500).result("Uventet fejl ved visning af betalingsside.");
+        }
+    }
 
 }
