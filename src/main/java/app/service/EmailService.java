@@ -42,7 +42,7 @@ public class EmailService {
 
         } catch (IOException ex) {
             System.err.println("Fejl ved afsendelse af tilbudsmail: " + ex.getMessage());
-            throw ex; // sender fejlen videre
+            throw ex;
         }
     }
 

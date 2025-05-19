@@ -13,7 +13,7 @@ public class Svg {
         this.svg.append(" viewBox=\"" + viewBox + "\"");
         this.svg.append(" width=\"" + width + "\"");
         this.svg.append(" height=\"" + height + "\"");
-        this.svg.append(" xmlns=\"http://www.w3.org/2000/svg\">\n"); // (best practise) Nødvendigt for at alle browsere forstår sproget/svg formatet.
+        this.svg.append(" xmlns=\"http://www.w3.org/2000/svg\">\n"); // Required to make sure all browsers understands the language/svg format.
     }
 
 
@@ -42,7 +42,6 @@ public class Svg {
     }
 
     public void addText(double x, double y, String textContent, String style, String transform) {
-        // font-family:Arial,sans-serif; font-size:10px; fill:black;
         String transformAttribute = (transform != null && !transform.isEmpty()) ? String.format(Locale.US, " transform=\"%s\"", transform) : "";
         this.svg.append(String.format(Locale.US,
                 " <text x=\"%.2f\" y=\"%.2f\" style=\"%s\"%s>%s</text>\n",
@@ -54,6 +53,4 @@ public class Svg {
         this.svg.append("</svg>\n");
         return svg.toString();
     }
-
-    // til  Routing Controller:    app.get(ROUTE_DETAILS, ctx -> OrderController.showSvg(ctx, connectionPool));
 }
