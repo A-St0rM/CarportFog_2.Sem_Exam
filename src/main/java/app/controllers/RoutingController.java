@@ -18,9 +18,9 @@ public static void startRouting(Javalin app, ConnectionPool connectionPool) {
     app.get("/", ctx -> ctx.render("index.html"));
     app.get("/details", ctx -> OrderController.showSvg(ctx));
 
-    //Middleware beskytte admin ruter
+    //Middleware protects admin routes
     app.before("/admin/*", ctx -> {
-        // Undtagelse: login
+        // Exception: login
         String path = ctx.path();
         if (!path.equals("/admin/login")) {
             if (ctx.sessionAttribute("currentAdmin") == null) {

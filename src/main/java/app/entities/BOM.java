@@ -9,7 +9,7 @@ public class BOM {
     private Product product;
     private ProductVariant productVariant;
 
-    // BOM med produktvariant (fx stolper, spær)
+    // BOM with product variant (e.g. poles, beams)
     public BOM(int bomId, int quantity, String description, Order order, ProductVariant productVariant) {
         this.bomId = bomId;
         this.quantity = quantity;
@@ -25,9 +25,10 @@ public class BOM {
         this.productVariant = productVariant;
     }
 
-    // BOM uden variant (fx skruer)
+
+    // BOM without variant (e.g. screws)
     public BOM(int bomId, int quantity, String description, Order order, Product product) {
-        this.bomId = bomId; // <== denne manglede før
+        this.bomId = bomId;
         this.quantity = quantity;
         this.description = description;
         this.order = order;

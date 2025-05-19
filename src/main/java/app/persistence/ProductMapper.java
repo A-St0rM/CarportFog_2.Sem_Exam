@@ -19,17 +19,17 @@ public class ProductMapper {
     public List<ProductVariant> getVariantsByProductIdAndMinLength(int minLength, int productId) throws DatabaseException {
         List<ProductVariant> variants = new ArrayList<>();
         String sql = """
-        SELECT pv.product_variant_id,
-               pv.length,
-               pv.width,
-               p.product_id,
-               p.name,
-               p.unit,
-               p.price
-        FROM product_variants pv
-        JOIN products p ON pv.product_id = p.product_id
-        WHERE pv.product_id = ? AND pv.length >= ?
-        """;
+                SELECT pv.product_variant_id,
+                       pv.length,
+                       pv.width,
+                       p.product_id,
+                       p.name,
+                       p.unit,
+                       p.price
+                FROM product_variants pv
+                JOIN products p ON pv.product_id = p.product_id
+                WHERE pv.product_id = ? AND pv.length >= ?
+                """;
 
         try (Connection con = connectionPool.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
@@ -52,8 +52,7 @@ public class ProductMapper {
                 );
                 variants.add(variant);
             }
-        }
-        catch (SQLException e) {
+        } catch (SQLException e) {
             throw new DatabaseException("Couldn't get variants: " + e.getMessage());
         }
 
@@ -115,7 +114,7 @@ public class ProductMapper {
     }
 
     public int getProductIdByName(String name) throws DatabaseException {
-        String sql = "SELECT product_id FROM products WHERE LOWER(TRIM(name)) = LOWER(TRIM(?))"; // Trim and lowercase
+        String sql = "SELECT product_id FROM products WHERE LOWER(TRIM(name)) = LOWER(TRIM(?))"; // Trim and lowercase so we ensure no mistakes
         try (Connection conn = connectionPool.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, name);
@@ -136,12 +135,12 @@ public class ProductMapper {
 
         try (Connection con = connectionPool.getConnection()) {
             PreparedStatement ps = con.prepareStatement(query);
-            int productIdForBeams = 2; // Det er produkt-ID’et for remme
+            int productIdForBeams = 2; // Product ID for beams
             ps.setInt(1, productIdForBeams);
 
             ResultSet rs = ps.executeQuery();
 
-            // Tilføj alle beam-længder til vores liste
+            // Adds all beam-lengths to our list (beamLengths)
             while (rs.next()) {
                 int length = rs.getInt("length");
                 beamLengths.add(length);
@@ -150,7 +149,7 @@ public class ProductMapper {
             throw new DatabaseException("Couldn't get beam lengths: " + e.getMessage(), e.getMessage());
         }
 
-        // Konverter List til array og returner
+        // Converts List to array and returns
         int[] beamLengthsArray = new int[beamLengths.size()];
         for (int i = 0; i < beamLengths.size(); i++) {
             beamLengthsArray[i] = beamLengths.get(i);
@@ -164,12 +163,12 @@ public class ProductMapper {
 
         try (Connection con = connectionPool.getConnection()) {
             PreparedStatement ps = con.prepareStatement(query);
-            int productIdForRoofs = 3; // Det er produkt-ID’et for tag
+            int productIdForRoofs = 3; // Product ID for roof
             ps.setInt(1, productIdForRoofs);
 
             ResultSet rs = ps.executeQuery();
 
-            // Tilføj alle tag-længder til vores liste
+            // Adds all roof-widths to our list (roofWidths)
             while (rs.next()) {
                 int width = rs.getInt("width");
                 roofWidths.add(width);
@@ -178,7 +177,7 @@ public class ProductMapper {
             throw new DatabaseException("Couldn't get roof widths: " + e.getMessage(), e.getMessage());
         }
 
-        // Konverter List til array og returner
+        // Converts List to array and returns
         int[] roofWidthsArray = new int[roofWidths.size()];
         for (int i = 0; i < roofWidths.size(); i++) {
             roofWidthsArray[i] = roofWidths.get(i);
@@ -200,7 +199,7 @@ public class ProductMapper {
 
             ResultSet rs = ps.getGeneratedKeys();
             if (rs.next()) {
-                return rs.getInt(1); // returnerer product_id
+                return rs.getInt(1); // Returns product_id
             } else {
                 throw new DatabaseException("Produkt blev ikke oprettet.");
             }
@@ -286,8 +285,6 @@ public class ProductMapper {
             throw new DatabaseException("Fejl ved sletning af produkt: " + e.getMessage());
         }
     }
-
-
 
 
 }

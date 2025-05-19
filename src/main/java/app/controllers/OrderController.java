@@ -52,17 +52,17 @@ public class OrderController {
 
     public void handleDetailsPost(Context ctx) {
         try {
-            // 1. Hent data fra formular
+            // Retrieves data from form
             String name = ctx.formParam("customerName");
             String address = ctx.formParam("customerAddress");
             String phone = ctx.formParam("customerPhone");
             String email = ctx.formParam("customerEmail");
             int zip = Integer.parseInt(ctx.formParam("customerZip"));
 
-            // 2. Slå by op i databasen
+            // Finds the targeted city in the database
             String city = _postalCodeMapper.getCityByPostalCode(zip);
 
-            // 3. Hvis by ikke findes, vis fejl og behold input
+            // If city doesn't exist, show error and keep input
             if (city == null) {
                 ctx.attribute("error", "Postnummeret findes ikke.");
                 ctx.attribute("customerName", name);
@@ -76,36 +76,37 @@ public class OrderController {
                 return;
             }
 
-            // 4. Opret Customer-objekt og gem i DB
+            // Create customer-object and save in database
             Customer customer = new Customer(email, address, phone, name, zip, city);
             Customer savedCustomer = _customerMapper.createCustomer(customer);
 
-            // 5. Hent carportdata fra session
+            // Get carport data from session
             int width = ctx.sessionAttribute("carportWidth");
             int length = ctx.sessionAttribute("carportLength");
             boolean trapezeRoof = ctx.sessionAttribute("hasTrapezRoof");
 
-            // 6. Opret ordre uden totalpris
+            // Create order without total price
             Order order = new Order(0, width, length, "under_behandling", 0, savedCustomer, trapezeRoof);
-            Order savedOrder = _orderMapper.insertOrder(order); // Får rigtigt orderId
+            Order savedOrder = _orderMapper.insertOrder(order); // Retrieves correct orderId
 
-            // 7. Beregn BOM med rigtig orderId
+            // Calculate BOM with correct orderId
             _calculateBOM.calculateCarport(savedOrder);
 
-            // 8. Beregn totalpris og opdater i DB
+            // Calculate total price and updates in database
             int calculatedTotal = _calculateBOM.calculateTotalPriceFromBOM();
             savedOrder.setTotalPrice(calculatedTotal);
             _orderMapper.updateOrderTotalPrice(savedOrder.getOrderId(), calculatedTotal);
 
-            // 9. Gem BOM-linjerne
+            // Saves BOM-lines
             _orderMapper.insertBOMItems(_calculateBOM.getBom());
 
-            // 10. Send tilbudsmail
+            // Sends e-mail with offer
             EmailService emailService = new EmailService();
             emailService.sendMailOffer(name, email, savedOrder.getTotalPrice());
 
             ctx.attribute("svg", ctx.sessionAttribute("svg"));
-            // 11. Ryd session og vis bekræftelse
+
+            // Invalidates (cleans) session and shows confirmation
             ctx.req().getSession().invalidate();
             ctx.render("confirmation.html");
 
@@ -183,10 +184,10 @@ public class OrderController {
 
     public static void showSvg(Context ctx) {
         CarportSvg svgDrawer = new CarportSvg(ctx);
-        String svg = svgDrawer.toString(); // gem som variabel
+        String svg = svgDrawer.toString(); // saves as variable
 
-        ctx.attribute("svg", svg);             // til første visning
-        ctx.sessionAttribute("svg", svg);      // til brug ved fejl (fx forkert postnummer)
+        ctx.attribute("svg", svg);             // for the first viewing of the svg
+        ctx.sessionAttribute("svg", svg);      // for usage when errors happen (e.g. wrong postal code)
         ctx.render("details.html");
     }
 
@@ -194,7 +195,7 @@ public class OrderController {
     public void handleDeleteOrder(Context ctx, int orderId) {
         try {
             _orderMapper.deleteOrderById(orderId);
-            ctx.redirect("/admin/dashboard"); // Tilbage til oversigt
+            ctx.redirect("/admin/dashboard");
         } catch (DatabaseException e) {
             ctx.status(500).result("Fejl ved sletning: " + e.getMessage());
         }
@@ -214,7 +215,6 @@ public class OrderController {
                 Map<String, Object> itemMap = new HashMap<>();
                 itemMap.put("description", bomItem.getDescription());
                 itemMap.put("quantity", bomItem.getQuantity());
-                // itemMap.put("unit", bomItem.getUnit()); // Tilføj hvis din BOM-klasse har getUnit()
                 bomItemsForEmail.add(itemMap);
             }
 
@@ -254,17 +254,16 @@ public class OrderController {
             }
 
 
-            // Gem ordren i sessionen, så den er nem at tilgå efter "betaling"
-            // Dette er vigtigt for din handlePaymentConfirmation metode
+            // Saves order in session, so it's easier to access after "payment"
             ctx.sessionAttribute("order", order);
 
-            // Send ordreoplysninger til HTML-skabelonen
+            // Sends order information to the HTML-template
             ctx.attribute("order", order);
             ctx.attribute("customer", order.getCustomer());
             ctx.attribute("totalPrice", order.getTotalPrice());
-            ctx.attribute("orderId", order.getId()); // Send orderId med for formular action
+            ctx.attribute("orderId", order.getId());
 
-            ctx.render("payment.html"); // Din nye HTML-side for betaling
+            ctx.render("payment.html"); // Your new HTML-page for payment
 
         } catch (NumberFormatException e) {
             ctx.status(400).result("Fejl: Ugyldigt orderId format.");

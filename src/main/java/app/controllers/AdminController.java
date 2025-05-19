@@ -28,20 +28,18 @@ public class AdminController {
 
     public void adminLogin(@NotNull Context ctx) {
         String email = ctx.formParam("email");
-        String password = ctx.formParam("password"); // Plain password
+        String password = ctx.formParam("password");
 
         try {
-            // checks the hashing code
+            // Checks the hashing code
             AdminDTO adminDTO = adminMapper.login(email, password);
-            // success with login
-            ctx.sessionAttribute("currentAdmin", adminDTO); // Use a consistent session key
-            // Redirect to the admin dashboard
+            ctx.sessionAttribute("currentAdmin", adminDTO);
             ctx.redirect("/admin/dashboard");
 
         } catch (DatabaseException e) {
             // Handle known login errors (email not found, wrong password)
             ctx.attribute("message", e.getMessage());
-            ctx.render("admin_login.html"); //
+            ctx.render("admin_login.html");
         } catch (SQLException e) {
             System.err.println("SQL Exception during admin login: " + e.getMessage());
             ctx.attribute("message", "En databasefejl opstod");
@@ -75,11 +73,10 @@ public class AdminController {
         try {
             adminMapper.createAdmin(email, hashedPassword);
             ctx.attribute("message", "Admin oprettet: " + email);
-            // Redirect to dashboard
             ctx.redirect("/admin/dashboard");
 
         } catch (DatabaseException e) {
-            // Handle errors from mapper (e.g., duplicate email)
+            // Handles errors from mapper (for instance duplicate emails)
             ctx.attribute("message", e.getMessage());
             ctx.render("admin/create_admin.html");
         }
@@ -87,23 +84,21 @@ public class AdminController {
 
     public void handleCreateProduct(Context ctx) {
         try {
-            // 1. Læs produktdata fra formularen
+            // Retrieves product data from form
             String name = ctx.formParam("name");
             String unit = ctx.formParam("unit");
             int price = Integer.parseInt(ctx.formParam("price"));
 
-            // 2. Opret produktobjekt
             Product product = new Product(name, unit, price);
 
-            // 3. Gem produkt i DB og få ID
             int productId = productMapper.insertProduct(product);
             product.setProductId(productId); // så vi kan sende det til ProductVariant
 
-            // 4. Læs varianter (format: længde-bredde, fx "480-45,600-45")
+            // Reads variants (format: length-width, e.g. "480-45,600-45")
             String[] variants = ctx.formParam("variants").split(",");
 
             for (String v : variants) {
-                String[] dims = v.trim().split("-"); // fx ["480", "45"]
+                String[] dims = v.trim().split("-"); // e.g. ["480", "45"]
                 int length = Integer.parseInt(dims[0].trim());
                 int width = Integer.parseInt(dims[1].trim());
 
