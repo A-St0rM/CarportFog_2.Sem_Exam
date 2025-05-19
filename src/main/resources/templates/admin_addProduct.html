@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<h2>Opret nyt produkt</h2>
+<form method="post" th:action="@{/admin/product/create}">
+  <label for="name">Produktnavn:</label>
+  <input type="text" id="name" name="name" required>
+
+  <label for="unit">Enhed (fx stk, m):</label>
+  <input type="text" id="unit" name="unit" required>
+
+  <label for="price">Pris pr. meter:</label>
+  <input type="number" id="price" name="price" required>
+
+  <label for="variants">Varianter (længde-bredde, kommasepareret):</label>
+  <input type="text" id="variants" name="variants" placeholder="480-45,600-45" required>
+
+  <button type="submit">Opret produkt</button>
+</form>
+
+
+</body>
+</html>

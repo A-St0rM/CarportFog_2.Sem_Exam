@@ -22,12 +22,17 @@ public class CalculateBOM {
 
     // Kalder alle metoderne til udregning af hele styklisten til carporten
     public void calculateCarport(Order order) throws DatabaseException {
+        bomList.clear();
         calculatePoles(order);
         calculateBeams(order);
         calculateRafters(order);
-        calculateRoofs(order);
+
+        if (order.getTrapezeRoof()) {
+            calculateRoofs(order);
+            calculateScrewsRoofs(order);
+        }
+
         calculateHoleBands(order);
-        calculateScrewsRoofs(order);
         calculateFittingsBeams(order);
         calculateBoltsBeams(order);
         calculateFittingsRaftersLeft(order);
@@ -245,26 +250,30 @@ public class CalculateBOM {
     // Skal bare returnere 2 ruller. 1 rulle for hvert led
     public void calculateHoleBands(Order order) throws DatabaseException {
         int quantity = 2;
-        Product product = _productMapper.getProductByName("hulbånd 1x20 mm. 10 meter");
 
-        if (product == null) {
-            throw new DatabaseException("Produktet 'hulbånd 1x20 mm. 10 meter' blev ikke fundet.");
-        }
+        int productId = _productMapper.getProductIdByName("hulbånd 1x20 mm. 10 meter");
+        ProductVariant variant = _productMapper.getVariantsByProductIdAndMinLength(0, productId).get(0);
+        BOM bom = new BOM(0, quantity, "Til vindkryds på spær", order, variant);
 
-        BOM bom = new BOM(quantity, "Til vindkryds på spær", order, product);
         bomList.add(bom);
     }
 
-    // Bruger plastmo bundskruer (200 stk pr pakke). Vi regner med 1 pakke per carport.
+    // Bruger plastmo bundskruer (200 stk pr pakke). Beregner baseret på tagareal og skruer pr. m².
     public void calculateScrewsRoofs(Order order) throws DatabaseException {
-        int quantity = 1;
-        Product product = _productMapper.getProductByName("plastmo bundskruer 200 stk.");
+        int screwsPerM2 = 12; // anbefalet antal skruer pr. m²
+        int screwsPerPackage = 200;
 
-        if (product == null) {
-            throw new DatabaseException("Produktet 'plastmo bundskruer 200 stk.' blev ikke fundet.");
-        }
+        // Beregn arealet af carporten i m²
+        double areaM2 = (order.getCarportWidth() / 100.0) * (order.getCarportLength() / 100.0);
+        int totalScrewsNeeded = (int) Math.ceil(areaM2 * screwsPerM2);
 
-        BOM bom = new BOM(quantity, "Skruer til tagplader", order, product);
+        // Beregn antal nødvendige pakker (altid rund op)
+        int numberOfPackages = (int) Math.ceil((double) totalScrewsNeeded / screwsPerPackage);
+
+        int productId = _productMapper.getProductIdByName("plastmo bundskruer 200 stk.");
+        ProductVariant variant = _productMapper.getVariantsByProductIdAndMinLength(0, productId).get(0);
+        BOM bom = new BOM(0, numberOfPackages, "Skruer til tagplader", order, variant);
+
         bomList.add(bom);
     }
 
@@ -282,13 +291,10 @@ public class CalculateBOM {
         // Beregner total mængde af bræddebolte, hvilket er samme mængde som firkantskiver
         int totalAmountOfFittings = boltsInBetween + boltsOnEnds;
 
-        Product product = _productMapper.getProductByName("firkantskiver 40x40x11 mm.");
+        int productId = _productMapper.getProductIdByName("firkantskiver 40x40x11 mm.");
+        ProductVariant variant = _productMapper.getVariantsByProductIdAndMinLength(0, productId).get(0);
+        BOM bom = new BOM(0, totalAmountOfFittings, "Til montering af rem på stolper", order, variant);
 
-        if (product == null) {
-            throw new DatabaseException("Produktet 'firkantskiver 40x40x11 mm.' blev ikke fundet.");
-        }
-
-        BOM bom = new BOM(totalAmountOfFittings, "Til montering af rem på stolper", order, product);
         bomList.add(bom);
 
     }
@@ -307,43 +313,34 @@ public class CalculateBOM {
         // Beregner total mængde af bræddebolte
         int totalAmountOfBolts = boltsInBetween + boltsOnEnds;
 
-        Product product = _productMapper.getProductByName("bræddebolt 10x120 mm.");
+        int productId = _productMapper.getProductIdByName("bræddebolt 10x120 mm.");
+        ProductVariant variant = _productMapper.getVariantsByProductIdAndMinLength(0, productId).get(0);
+        BOM bom = new BOM(0, totalAmountOfBolts, "Til montering af rem på stolper", order, variant);
 
-        if (product == null) {
-            throw new DatabaseException("Produktet 'bræddebolt 10x120 mm.' blev ikke fundet.");
-        }
-
-        BOM bom = new BOM(totalAmountOfBolts, "Til montering af rem på stolper", order, product);
         bomList.add(bom);
     }
 
     // Bruger universalbeslag venstre. Skal bruge 1 venstre for hvert spær.
     public void calculateFittingsRaftersLeft(Order order) throws DatabaseException {
         int amountOfRafters = calculateRafterQuantity(order);
-        int quantityOfLeftFittings = amountOfRafters / 2;
+        int quantityOfLeftFittings = amountOfRafters;
 
-        Product product = _productMapper.getProductByName("universalbeslag 190 mm. venstre");
+        int productId = _productMapper.getProductIdByName("universalbeslag 190 mm. venstre");
+        ProductVariant variant = _productMapper.getVariantsByProductIdAndMinLength(0, productId).get(0);
+        BOM bom = new BOM(0, quantityOfLeftFittings, "Til montering af spær på rem", order, variant);
 
-        if (product == null) {
-            throw new DatabaseException("Produktet 'universalbeslag 190 mm. venstre' blev ikke fundet.");
-        }
-
-        BOM bom = new BOM(quantityOfLeftFittings, "Til montering af spær på rem", order, product);
         bomList.add(bom);
     }
 
     // Bruger universalbeslag højre. Skal bruge 1 højre for hvert beslag
     public void calculateFittingsRaftersRight(Order order) throws DatabaseException {
         int amountOfRafters = calculateRafterQuantity(order);
-        int quantityOfRightFittings = amountOfRafters / 2;
+        int quantityOfRightFittings = amountOfRafters;
 
-        Product product = _productMapper.getProductByName("universalbeslag 190 mm. højre");
+        int productId = _productMapper.getProductIdByName("universalbeslag 190 mm. højre");
+        ProductVariant variant = _productMapper.getVariantsByProductIdAndMinLength(0, productId).get(0);
+        BOM bom = new BOM(0, quantityOfRightFittings, "Til montering af spær på rem", order, variant);
 
-        if (product == null) {
-            throw new DatabaseException("Produktet 'universalbeslag 190 mm. højre' blev ikke fundet.");
-        }
-
-        BOM bom = new BOM(quantityOfRightFittings, "Til montering af spær på rem", order, product);
         bomList.add(bom);
     }
 
@@ -358,26 +355,39 @@ public class CalculateBOM {
         // Udregner hvor mange pakker der skal bruges. Runder selvfølgelig op bare der skal bruges 1 skrue for meget
         int numberOfPackages = (int) Math.ceil((double) amountOfScrews / screwsPerPackage);
 
-        Product product = _productMapper.getProductByName("4x50 mm. skruer 250 stk.");
+        int productId = _productMapper.getProductIdByName("4x50 mm. skruer 250 stk.");
+        ProductVariant variant = _productMapper.getVariantsByProductIdAndMinLength(0, productId).get(0);
+        BOM bom = new BOM(0, numberOfPackages, "Til montering af universalbeslag + hulbånd", order, variant);
 
-        if (product == null) {
-            throw new DatabaseException("Produktet '4x50 mm. skruer 250 stk.' blev ikke fundet.");
-        }
-
-        BOM bom = new BOM(numberOfPackages, "Til montering af universalbeslag + hulbånd", order, product);
         bomList.add(bom);
     }
 
     // Udregner totalprisen ud fra styklisten
     public int calculateTotalPriceFromBOM() {
-        int total = 0;
+        double unroundedTotal = 0;
+
         for (BOM bom : bomList) {
-            int pricePerMeter = bom.getProductVariant().getProduct().getPrice() + bom.getProduct().getPrice();
+            Product p = bom.getProductVariant().getProduct();
+            int price = p.getPrice();
+            int lengthInCm = bom.getProductVariant().getLength();
             int quantity = bom.getQuantity();
-            total += pricePerMeter * quantity;
+            double line;
+
+            // Det er kun produktId 2 (Spærtræ og Remme) som sælges baseret på meter.
+            if (p.getProductId() == 2) {
+                line = price * (lengthInCm / 100.0) * quantity;
+            } else {
+                line = price * quantity;
+            }
+
+            unroundedTotal += line;
         }
-        return total;
+
+        int roundedTotal = (int) Math.round(unroundedTotal);
+
+        return roundedTotal;
     }
+
 
     // Denne metode returnerer hele styklisten.
     public List<BOM> getBom() {

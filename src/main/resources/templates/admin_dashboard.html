@@ -63,19 +63,23 @@
                     <td th:text="${order.carportWidth}"></td>
                     <td th:text="${order.trapezeRoof ? 'Ja' : 'Nej'}"></td>
                     <td class="col-status">
-                        <select class="input-in-table" th:name="'status_' + ${order.id}" th:attr="data-order-id=${order.id}">
-                            <option value="pending" th:selected="${order.status == 'pending'}">Afventende</option>
-                            <option value="paid" th:selected="${order.status == 'paid'}">Betalt</option>
-                            <option value="completed" th:selected="${order.status == 'completed'}">Gennemført</option>
-                            <option value="rejected" th:selected="${order.status == 'rejected'}">Afslået</option>
-                        </select>
+                        <span th:switch="${order.status}">
+                            <span th:case="'under_behandling'">Under behandling</span>
+                            <span th:case="'afventende'">Afventende</span>
+                            <span th:case="'betalt'">Betalt</span>
+                            <span th:case="*">Ukendt</span>
+                        </span>
                     </td>
                     <td class="actions-cell">
-                        <button type="button" class="btn-action btn-delete" th:attr="data-order-id=${order.id}">Slet</button>
-                        <button type="button" class="btn-action btn-recalculate"
-                                th:onclick="'window.location.href=\'/admin/order/' + ${order.id} + '/bom\''">
+                        <form th:action="@{/admin/order/delete/{id}(id=${order.orderId})}" method="post"
+                              style="display: inline;"
+                              onsubmit="return confirm('Er du sikker på, at du vil slette denne ordre?');">
+                            <button type="submit" class="btn-action btn-delete">Slet</button>
+                        </form>
+
+                        <a th:href="@{/admin/order/{id}/bom(id=${order.id})}" class="btn-action btn-recalculate">
                             Se/redigere stykliste
-                        </button>
+                        </a>
 
                     </td>
                 </tr>
@@ -84,10 +88,10 @@
         </div>
 
         <div class="button-container dashboard-save">
-            <button type="button" class="btn btn-primary save-changes-button">Gem ændringer</button>
+            <a th:href="@{/admin/products}" class="btn btn-secondary">✏️ Ændr i produktpriser</a>
+            <a th:href="@{/admin/product/create}" class="btn btn-primary save-changes-button">Tilføj nyt produkt</a>
             <a th:href="@{/admin/create}" class="btn btn-secondary add-admin-button">Tilføj Admin</a>
         </div>
-
     </main>
 </div>
 </body>

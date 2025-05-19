@@ -2,7 +2,6 @@ package app.entities;
 
 public class BOM {
 
-
     private int bomId;
     private int quantity;
     private String description;
@@ -10,6 +9,7 @@ public class BOM {
     private Product product;
     private ProductVariant productVariant;
 
+    // BOM med produktvariant (fx stolper, spær)
     public BOM(int bomId, int quantity, String description, Order order, ProductVariant productVariant) {
         this.bomId = bomId;
         this.quantity = quantity;
@@ -25,6 +25,15 @@ public class BOM {
         this.productVariant = productVariant;
     }
 
+    // BOM uden variant (fx skruer)
+    public BOM(int bomId, int quantity, String description, Order order, Product product) {
+        this.bomId = bomId; // <== denne manglede før
+        this.quantity = quantity;
+        this.description = description;
+        this.order = order;
+        this.product = product;
+    }
+
     public BOM(int quantity, String description, Order order, Product product) {
         this.quantity = quantity;
         this.description = description;
@@ -32,18 +41,7 @@ public class BOM {
         this.product = product;
     }
 
-    public BOM(int bomId, int quantity, String description, Order order, Product product) {
-        this.quantity = quantity;
-        this.description = description;
-        this.order = order;
-        this.product = product;
-    }
-
-
-    public Product getProduct() {
-        return product;
-    }
-
+    // Getters
     public int getBomId() {
         return bomId;
     }
@@ -64,5 +62,12 @@ public class BOM {
         return productVariant;
     }
 
+    public Product getProduct() {
+        return product;
+    }
 
+    // Setters
+    public void setProduct(Product product) {
+        this.product = product;
+    }
 }

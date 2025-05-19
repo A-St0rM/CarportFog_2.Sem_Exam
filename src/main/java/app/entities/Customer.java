@@ -7,24 +7,27 @@ public class Customer {
     private String address;
     private String phone;
     private String name;
-    private int postalCode; //TODO: object or variable?
+    private int postalCode;
+    private String city;
 
 
-    public Customer(int customerId, String email, String address, String phone, String name, int postalCode) {
+    public Customer(int customerId, String email, String address, String phone, String name, int postalCode, String city) {
         this.customerId = customerId;
         this.email = email;
         this.address = address;
         this.phone = phone;
         this.name = name;
         this.postalCode = postalCode;
+        this.city = city;
     }
 
-    public Customer(String email, String address, String phone, String name, int postalCode) {
+    public Customer(String email, String address, String phone, String name, int postalCode,  String city) {
         this.email = email;
         this.address = address;
         this.phone = phone;
         this.name = name;
         this.postalCode = postalCode;
+        this.city = city;
     }
 
     public int getCustomerId() {
@@ -52,5 +55,13 @@ public class Customer {
 
     public void setCustomerId(int generatedId) {
         this.customerId = generatedId;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
     }
 }

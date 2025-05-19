@@ -26,7 +26,7 @@ class CalculateBOMTest {
 
     public static final ConnectionPool connectionPool = ConnectionPool.getInstance(USER, PASSWORD, URL, DB);
 
-    Customer customer = new Customer("Casper@example.com", "Voltvej 5", "12345678", "Casper", 1000);
+    Customer customer = new Customer("Casper@example.com", "Voltvej 5", "12345678", "Casper", 1000, "Kongens Lyngby");
     Order order = new Order(300, 470, "Kommer", 10000, customer, false);
 
 

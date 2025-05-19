@@ -43,4 +43,8 @@ public class Product {
     public String getProductName() {
         return productName;
     }
+
+    public void setProductId(int productId) {
+        this.productId = productId;
+    }
 }

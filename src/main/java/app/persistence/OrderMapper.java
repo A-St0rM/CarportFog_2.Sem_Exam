@@ -47,10 +47,11 @@ public class OrderMapper {
 
                 //productVariant
                 int productVariantId = rs.getInt("product_variant_id");
+                int width = rs.getInt("width");
                 String description = rs.getString("description");
                 int length = rs.getInt("length");
 
-                ProductVariant productVariant = new ProductVariant(productVariantId, length, product);
+                ProductVariant productVariant = new ProductVariant(productVariantId, length, width, product);
 
                 //BOM
                 int bomId = rs.getInt("order_item_id");
@@ -100,10 +101,15 @@ public class OrderMapper {
 
     public void insertBOMItems(List<BOM> bomlist) throws DatabaseException {
 
-        String query = "INSERT INTO bom_Items (order_id, product_variant_id, quantity, description)" + "VALUES(?,?,?,?)";
+        String query = "INSERT INTO bom_Items (order_id, product_variant_id, quantity, description) VALUES (?,?,?,?)";
 
         try (Connection connection = connectionPool.getConnection()) {
             for (BOM bom : bomlist) {
+
+                if (bom.getProductVariant() == null) {
+                    System.out.println("⚠️ Skipper BOM uden variant (fx skruer): " + bom.getDescription());
+                    continue; // spring BOM over hvis der ikke er nogen variant
+                }
 
                 try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
                     preparedStatement.setInt(1, bom.getOrder().getId());
@@ -116,18 +122,21 @@ public class OrderMapper {
         } catch (SQLException e) {
             throw new DatabaseException("Could not insert BOM items into the Database " + e.getMessage());
         }
-
     }
+
 
     public List<Order> getAllOrdersWithCustomerInfo() throws DatabaseException {
         List<Order> orders = new ArrayList<>();
 
         String sql = """
-        SELECT o.order_id, o.carport_width, o.carport_length, o.status, o.total_price, o.trapeze_roof,
-               c.customer_id, c.name, c.address, c.postal_code, c.phone, c.email
-        FROM orders o
-        JOIN customers c ON o.customer_id = c.customer_id
-    """;
+                    SELECT o.order_id, o.carport_width, o.carport_length, o.status, o.total_price, o.trapeze_roof,
+                           c.customer_id, c.name, c.address, c.postal_code, c.phone, c.email,
+                           pc.city
+                    FROM orders o
+                    JOIN customers c ON o.customer_id = c.customer_id
+                    JOIN postal_codes pc ON c.postal_code = pc.postal_code
+                """;
+
 
         try (Connection con = connectionPool.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
@@ -140,7 +149,8 @@ public class OrderMapper {
                         rs.getString("address"),
                         rs.getString("phone"),
                         rs.getString("name"),
-                        rs.getInt("postal_code")
+                        rs.getInt("postal_code"),
+                        rs.getString("city")
                 );
 
                 Order order = new Order(
@@ -163,10 +173,14 @@ public class OrderMapper {
     }
 
     public Order getOrderById(int orderId) throws DatabaseException {
-        String sql = "SELECT o.*, c.customer_id, c.name AS customer_name, c.email, c.address, c.phone, c.postal_code " +
-                "FROM orders o " +
-                "JOIN customers c ON o.customer_id = c.customer_id " +
-                "WHERE o.order_id = ?";
+        String sql = """
+                    SELECT o.*, c.customer_id, c.name AS customer_name, c.email, c.address, c.phone, c.postal_code, pc.city
+                    FROM orders o
+                    JOIN customers c ON o.customer_id = c.customer_id
+                    JOIN postal_codes pc ON c.postal_code = pc.postal_code
+                    WHERE o.order_id = ?
+                """;
+
 
         try (Connection conn = connectionPool.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -181,8 +195,9 @@ public class OrderMapper {
                     String address = rs.getString("address");
                     String phone = rs.getString("phone");
                     int postalCode = rs.getInt("postal_code");
+                    String city = rs.getString("city");
 
-                    Customer customer = new Customer(customerId, email, address, phone, customerName, postalCode);
+                    Customer customer = new Customer(customerId, email, address, phone, customerName, postalCode, city);
 
                     // Order
                     int width = rs.getInt("carport_width");
@@ -213,7 +228,40 @@ public class OrderMapper {
         }
     }
 
+    public void deleteOrderById(int orderId) throws DatabaseException {
+        String deleteBOM = "DELETE FROM bom_items WHERE order_id = ?";
+        String deleteOrder = "DELETE FROM orders WHERE order_id = ?";
 
+        try (Connection conn = connectionPool.getConnection()) {
+
+            // Slet BOM først
+            try (PreparedStatement ps = conn.prepareStatement(deleteBOM)) {
+                ps.setInt(1, orderId);
+                ps.executeUpdate();
+            }
+
+            // Slet selve ordren
+            try (PreparedStatement ps = conn.prepareStatement(deleteOrder)) {
+                ps.setInt(1, orderId);
+                ps.executeUpdate();
+            }
+
+        } catch (SQLException e) {
+            throw new DatabaseException("Kunne ikke slette ordre: " + e.getMessage());
+        }
+    }
+
+    public void updateOrderStatus(int orderId, String newStatus) throws DatabaseException {
+        String sql = "UPDATE orders SET status = ? WHERE order_id = ?";
+        try (Connection conn = connectionPool.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, newStatus);
+            ps.setInt(2, orderId);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new DatabaseException("Could not update order status: " + e.getMessage());
+        }
+    }
 
 
 }

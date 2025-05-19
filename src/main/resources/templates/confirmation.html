@@ -34,14 +34,8 @@
             </a>
           </li>
           <li class="completed">
-            <a th:href="@{/additions}">
-              <span class="step-indicator" data-step-number="3"></span>
-              <span class="step-text">Tilføjelser</span>
-            </a>
-          </li>
-          <li class="completed">
             <a th:href="@{/details}">
-              <span class="step-indicator" data-step-number="4"></span>
+              <span class="step-indicator" data-step-number="3"></span>
               <span class="step-text">Oplysninger</span>
             </a>
           </li>
@@ -62,7 +56,7 @@
           </p>
           <div class="svg-section">
             <h3 class="svg-placeholder-title">SVG tegning af din carport</h3>
-            <div class="svg-placeholder" id="carport-svg-confirmation">
+            <div class="svg-placeholder" id="carport-svg-confirmation" th:utext="${svg}">
               (Tegning vises her)
             </div>
           </div>

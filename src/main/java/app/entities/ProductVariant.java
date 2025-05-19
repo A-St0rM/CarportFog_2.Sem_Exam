@@ -7,9 +7,16 @@ public class ProductVariant {
     private int width;
     private Product product;
 
-    public ProductVariant(int productVariantId, int length, Product product) {
+    public ProductVariant(int productVariantId, int length, int width, Product product) {
         this.productVariantId = productVariantId;
         this.length = length;
+        this.product = product;
+        this.width = width;
+    }
+
+    public ProductVariant(int length, int width, Product product) {
+        this.length = length;
+        this.width = width;
         this.product = product;
     }
 
@@ -17,14 +24,6 @@ public class ProductVariant {
         this.length = length;
         this.product = product;
     }
-
-    public ProductVariant(int productVariantId, int length, int width, Product product) {
-        this.productVariantId = productVariantId;
-        this.length = length;
-        this.width = width;
-        this.product = product;
-    }
-
 
 
     public int getProductVariantId() {

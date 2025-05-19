@@ -13,6 +13,7 @@ public class DependencyInjector {
     private final AdminMapper adminMapper;
     private final OrderMapper orderMapper;
     private final CustomerMapper customerMapper;
+    private final PostalCodeMapper postalCodeMapper;
 
     // Services
     private final CalculateBOM calculateBOM;
@@ -29,11 +30,12 @@ public class DependencyInjector {
         this.productMapper = new ProductMapper(connectionPool);
         this.orderMapper = new OrderMapper(connectionPool);
         this.adminMapper = new AdminMapper(connectionPool);
+        this.postalCodeMapper = new PostalCodeMapper(connectionPool);
         this.customerMapper = new CustomerMapper(connectionPool);
         this.calculateBOM = new CalculateBOM(productMapper);
 
-        this.adminController = new AdminController(adminMapper, customerMapper);
-        this.orderController = new OrderController(orderMapper, connectionPool, customerMapper, calculateBOM);
+        this.adminController = new AdminController(adminMapper, customerMapper, productMapper);
+        this.orderController = new OrderController(orderMapper, connectionPool, customerMapper, calculateBOM, postalCodeMapper);
     }
 
     public ConnectionPool getConnectionPool() {

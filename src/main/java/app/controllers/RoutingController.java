@@ -16,12 +16,11 @@ public static void startRouting(Javalin app, ConnectionPool connectionPool) {
 
     //General Routing
     app.get("/", ctx -> ctx.render("index.html"));
-    app.get("/details", ctx -> OrderController.showSvg(ctx, connectionPool));
-    app.get("/additions", ctx -> ctx.render("additions.html"));
+    app.get("/details", ctx -> OrderController.showSvg(ctx));
 
     //Middleware beskytte admin ruter
     app.before("/admin/*", ctx -> {
-        // Undtagelse: login- og oprettelsessider
+        // Undtagelse: login
         String path = ctx.path();
         if (!path.equals("/admin/login")) {
             if (ctx.sessionAttribute("currentAdmin") == null) {
@@ -35,19 +34,29 @@ public static void startRouting(Javalin app, ConnectionPool connectionPool) {
     app.get("/admin/dashboard", ctx -> orderController.showAllOrders(ctx));
     app.get("/admin/order/{orderId}/bom", ctx -> orderController.showBOMPage(ctx));
     app.get("/specifications", ctx -> ctx.render("specifications.html"));
+    app.get("/admin/product/create", ctx -> ctx.render("admin_addProduct.html"));
+    app.get("/admin/products", ctx -> adminController.showAllProducts(ctx));
+    app.get("/payment", ctx -> ctx.render("payment.html"));
+
 
 
 
     app.post("/details", ctx -> orderController.handleDetailsPost(ctx));
-    app.post("/additions", ctx -> orderController.handleAdditionsPost(ctx));
     app.post("/specifications", ctx -> orderController.handleSpecificationsPost(ctx));
     app.post("/admin/login", ctx -> adminController.adminLogin(ctx));
     app.post("/admin/create", ctx -> adminController.createAdmin(ctx));
     app.post("/admin/order/set-total/{orderId}", ctx -> orderController.handleUpdateTotalPrice(ctx));
-
+    app.post("/admin/order/send-payment/{id}", ctx -> orderController.handleSendPaymentEmail(ctx));
+    app.post("/admin/order/delete/{id}", ctx -> {
+        int orderId = Integer.parseInt(ctx.pathParam("id"));
+        orderController.handleDeleteOrder(ctx, orderId);
+    });
+    app.post("/admin/product/create", ctx -> adminController.handleCreateProduct(ctx));
+    app.post("/admin/products/update", ctx -> adminController.handleUpdateProductPrices(ctx));
+    app.post("/admin/products/delete/{id}", ctx -> adminController.handleDeleteProduct(ctx));
+    app.post("/payment-confirmation", ctx -> orderController.handlePaymentConfirmation(ctx));
 
 
 }
-
 
 }

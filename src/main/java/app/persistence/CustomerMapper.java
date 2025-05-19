@@ -1,6 +1,8 @@
 package app.persistence;
+
 import app.entities.Customer;
 import app.exceptions.DatabaseException;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +20,14 @@ public class CustomerMapper {
     public List<Customer> getCustomersByCustomerId(ConnectionPool connectionPool, int customerId) throws DatabaseException {
 
         List<Customer> customerList = new ArrayList<>();
-        String sql = "SELECT * FROM customers WHERE customer_id = ?";
+        String sql = """
+                    SELECT c.customer_id, c.name, c.address, c.phone, c.email, c.postal_code,
+                           p.city
+                    FROM customers c
+                    JOIN postal_codes p ON c.postal_code = p.postal_code
+                    WHERE c.customer_id = ?
+                """;
+
 
         try (
                 PreparedStatement preparedStatement = connectionPool.getConnection().prepareStatement(sql)
@@ -26,15 +35,15 @@ public class CustomerMapper {
             preparedStatement.setInt(1, customerId);
             var rs = preparedStatement.executeQuery();
             while (rs.next()) {
-                int id = rs.getInt("id");
                 String name = rs.getString("name");
                 String address = rs.getString("address");
                 String phone = rs.getString("phone");
                 String email = rs.getString("email");
                 int postalCode = rs.getInt("postalCode");
+                String city = rs.getString("city");
 
                 Customer customer;
-                customer = new Customer (email,address,phone,name,postalCode);
+                customer = new Customer(email, address, phone, name, postalCode, city);
                 customerList.add(customer);
 
             }
