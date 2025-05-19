@@ -47,9 +47,6 @@ public class EmailService {
     }
 
     public boolean sendMailPayment(String name, String email, int orderNumber) {
-        System.out.println("➡ Forsøger at sende mail til: " + email);
-        System.out.println("Navn: " + name + " | Order ID: " + orderNumber);
-
 
         Email from = new Email("johannesfoog@gmail.com");
         from.setName("Johannes Fog Byggemarked");
@@ -75,12 +72,8 @@ public class EmailService {
             request.setBody(mail.build());
 
             Response response = sg.api(request);
-            int status = response.getStatusCode();
-            System.out.println("STATUS: " + status);
-            System.out.println("BODY: " + response.getBody());
-            System.out.println("HEADERS: " + response.getHeaders());
-
-            return status == 202;
+            System.out.println("SendGrid Offer Response Status Code: " + response.getStatusCode());
+            return true;
 
         } catch (Exception ex) {
             System.err.println("FEJL under afsendelse: " + ex.getMessage());
@@ -115,15 +108,13 @@ public class EmailService {
             request.setEndpoint("mail/send");
             request.setBody(mail.build());
             Response response = sg.api(request);
-            System.out.println("SendGrid Confirmation Response Status Code: " + response.getStatusCode());
-            return response.getStatusCode() == 202;
+            System.out.println(response.getStatusCode());
+            return true;
         } catch (IOException ex) {
             System.err.println("Fejl ved afsendelse af bekræftelsesmail: " + ex.getMessage());
             throw ex;
         }
     }
-
-
 
 
 }

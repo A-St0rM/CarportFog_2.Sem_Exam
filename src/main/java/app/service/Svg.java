@@ -55,5 +55,4 @@ public class Svg {
         return svg.toString();
     }
 
-    // til  Routing Controller:    app.get(ROUTE_DETAILS, ctx -> OrderController.showSvg(ctx, connectionPool));
 }
