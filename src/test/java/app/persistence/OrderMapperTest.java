@@ -1,6 +1,7 @@
 package app.persistence;
 
 import app.entities.*;
+// import app.entities.Order; // Dækket af app.entities.*
 import app.entities.Order;
 import app.exceptions.DatabaseException;
 import org.junit.jupiter.api.*;
@@ -25,6 +26,8 @@ class OrderMapperTest {
 
     private static ConnectionPool connectionPool;
     private static OrderMapper orderMapper;
+
+    // Instansfelter, der initialiseres i @BeforeEach
     private Customer customer;
     private Product product;
     private ProductVariant productVariant;
@@ -33,6 +36,9 @@ class OrderMapperTest {
     @BeforeAll
     static void setUpClass() {
         try {
+            if (DB_IP == null || PASSWORD == null) {
+                fail("Miljøvariabler 'ip' og 'password' skal være sat.");
+            }
             connectionPool = ConnectionPool.getInstance(USER, PASSWORD, URL, DB_NAME);
             orderMapper = new OrderMapper(connectionPool);
 
@@ -53,9 +59,10 @@ class OrderMapperTest {
                 stmt.execute("DROP SEQUENCE IF EXISTS orders_order_id_seq CASCADE;");
                 stmt.execute("DROP SEQUENCE IF EXISTS customers_customer_id_seq CASCADE;");
 
+
                 stmt.execute("CREATE TABLE postal_codes (" +
                         "postal_code INT PRIMARY KEY, " +
-                        "city_name VARCHAR(255)" +
+                        "city VARCHAR(255)" +
                         ");");
 
                 stmt.execute("CREATE TABLE customers (" +
@@ -86,10 +93,12 @@ class OrderMapperTest {
                         "price INT" +
                         ");");
 
+
                 stmt.execute("CREATE TABLE product_variants (" +
                         "product_variant_id SERIAL PRIMARY KEY, " +
                         "product_id INT NOT NULL, " +
                         "length INT, " +
+                        "width DOUBLE PRECISION, " + // TILFØJET width
                         "FOREIGN KEY (product_id) REFERENCES products(product_id)" +
                         ");");
 
@@ -106,10 +115,10 @@ class OrderMapperTest {
                 stmt.execute(
                         "CREATE VIEW bill_of_products_view AS " +
                                 "SELECT " +
-                                "   o.order_id, o.carport_width, o.carport_length, o.total_price, o.trapeze_roof, o.status, " +
-                                "   p.product_id, p.name, p.unit, p.price, " +
-                                "   pv.product_variant_id, pv.length, " +
-                                "   bi.order_item_id, bi.quantity, bi.description " +
+                                "   o.order_id, o.carport_width, o.carport_length, o.total_price, o.trapeze_roof, o.status, " + // o.total_price er ordrens totalpris
+                                "   p.product_id, p.name, p.unit, p.price, " + // p.price er produktets pris, navngivet 'price'
+                                "   pv.product_variant_id, pv.length, pv.width, " + // pv.width er variantens bredde
+                                "   bi.order_item_id, bi.quantity, bi.description " + // bi.description
                                 "FROM " +
                                 "   orders o " +
                                 "JOIN " +
@@ -121,13 +130,17 @@ class OrderMapperTest {
                                 ";"
                 );
 
-                stmt.execute("INSERT INTO postal_codes (postal_code, city_name) VALUES (1000, 'Testby');");
-                stmt.execute("INSERT INTO postal_codes (postal_code, city_name) VALUES (2000, 'Andenby');");
+                stmt.execute("INSERT INTO postal_codes (postal_code, city) VALUES (1000, 'Testby');");
+                stmt.execute("INSERT INTO postal_codes (postal_code, city) VALUES (2000, 'Andenby');");
+                stmt.execute("INSERT INTO postal_codes (postal_code, city) VALUES (2500, 'Valby');");
+
 
             } catch (SQLException e) {
+                e.printStackTrace();
                 fail("Fejl ved opbygning af DB: " + e.getMessage());
             }
         } catch (DatabaseException e) {
+            e.printStackTrace();
             fail("Fejl ved start af DB-forbindelse: " + e.getMessage());
         }
     }
@@ -149,93 +162,96 @@ class OrderMapperTest {
             stmt.execute("ALTER SEQUENCE product_variants_product_variant_id_seq RESTART WITH 1;");
             stmt.execute("ALTER SEQUENCE bom_items_order_item_id_seq RESTART WITH 1;");
 
-            stmt.execute("INSERT INTO customers (name, email, postal_code) VALUES ('Testperson', 'test@mail.dk', 1000);");
-            customer = new Customer(1, "test@mail.dk", "Testvej 1", "123", "Testperson", 1000);
+            // sikrer at elementerne få ID 1
+            stmt.execute("INSERT INTO customers (customer_id, name, email, postal_code, address, phone) VALUES (1, 'Testperson', 'test@mail.dk', 1000, 'Testvej 1', '12341234');");
+            customer = new Customer(1,"test@mail.dk", "Testvej 1", "12341234","Testperson" , 1000, "Testby"); // Byen "Testby" er kendt fra postal_code 1000
 
-            stmt.execute("INSERT INTO products (name, unit, price) VALUES ('Spær', 'stk', 200);");
+            stmt.execute("INSERT INTO products (product_id, name, unit, price) VALUES (1, 'Spær', 'stk', 200);");
             product = new Product(1, "Spær", "stk", 200);
 
-            stmt.execute("INSERT INTO product_variants (product_id, length) VALUES (1, 300);");
-            productVariant = new ProductVariant(1, 300, product);
+            stmt.execute("INSERT INTO product_variants (product_variant_id, product_id, length, width) VALUES (1, 1, 300, " + 100 + ");");
+            productVariant = new ProductVariant(1, 300, 100, product);
 
         } catch (SQLException | DatabaseException e) {
-            fail("Fejl i oprydning før test: " + e.getMessage());
+            e.printStackTrace();
+            fail("Fejl i oprydning/opsætning i @BeforeEach: " + e.getMessage());
         }
     }
 
     @Test
     void insertOrderTest() throws DatabaseException {
-        Order nyOrdre = new Order(200, 400, "Afventede", 5000, customer, false);
-        Order indsatOrdre = orderMapper.insertOrder(nyOrdre);
-        assertTrue(indsatOrdre.getId() > 0);
+        Order newOrder = new Order(200, 400, "Afventede", 5000, customer, false);
+        Order insertedOrder = orderMapper.insertOrder(newOrder);
+        assertTrue(insertedOrder.getId() > 0);
+        assertEquals(1, insertedOrder.getId());
     }
 
     @Test
     void getOrderByIdTest() throws DatabaseException {
-        Order nyOrdre = new Order(250, 500, "Afventede", 6000, customer, true);
-        Order indsatOrdre = orderMapper.insertOrder(nyOrdre);
-        int forventetId = indsatOrdre.getId();
+        Order newOrder = new Order(250, 500, "Afventede", 6000, customer, true);
+        Order insertedOrder = orderMapper.insertOrder(newOrder);
+        int expectedId= insertedOrder.getId();
 
-        Order hentetOrdre = orderMapper.getOrderById(forventetId);
-        assertNotNull(hentetOrdre);
-        assertEquals(forventetId, hentetOrdre.getId());
+        Order collectedOrder = orderMapper.getOrderById(expectedId);
+        assertNotNull(collectedOrder);
+        assertEquals(expectedId, collectedOrder.getId());
     }
 
     @Test
     void getAllOrdersWithCustomerInfoTest() throws DatabaseException {
-        orderMapper.insertOrder(new Order(300, 600, "Afventede", 7000, customer, true));
-        List<Order> alleOrdrer = orderMapper.getAllOrdersWithCustomerInfo();
-        assertEquals(1, alleOrdrer.size());
+        orderMapper.insertOrder(new Order(300, 600, "Afventede", 7000, customer, true)); // ID = 1
+        List<Order> allOrders = orderMapper.getAllOrdersWithCustomerInfo();
+        assertEquals(1, allOrders.size());
+        assertEquals("Testby", allOrders.get(0).getCustomer().getCity());
     }
 
     @Test
     void updateOrderTotalPriceTest() throws DatabaseException {
-        Order oprindeligOrdre = new Order(100, 200, "Afventede", 2000, customer, false);
-        Order indsatOrdre = orderMapper.insertOrder(oprindeligOrdre);
+        Order originalOrder = new Order(100, 200, "Afventede", 2000, customer, false);
+        Order insertedOrder = orderMapper.insertOrder(originalOrder);
         int newPrice = 2500;
 
-        orderMapper.updateOrderTotalPrice(indsatOrdre.getId(), newPrice);
+        orderMapper.updateOrderTotalPrice(insertedOrder.getId(), newPrice);
 
-        Order opdateretOrdre = orderMapper.getOrderById(indsatOrdre.getId());
+        Order opdateretOrdre = orderMapper.getOrderById(insertedOrder.getId());
         assertEquals(newPrice, opdateretOrdre.getTotalPrice());
     }
 
     @Test
-    void insertBOMItemsTest() throws DatabaseException, SQLException {
-        Order ordreForBOM = orderMapper.insertOrder(new Order(150, 300, "Afventemde", 3000, customer, true));
-        List<BOM> bomListe = new ArrayList<>();
-        bomListe.add(new BOM(0, 5, "Skrue", ordreForBOM, productVariant));
+    void insertBOMItemsTest() throws DatabaseException {
+        Order orderForBOM = orderMapper.insertOrder(new Order(150, 300, "Afventemde", 3000, customer, true)); // ID = 1
 
-        orderMapper.insertBOMItems(bomListe);
+        List<BOM> bomList = new ArrayList<>();
+        bomList.add(new BOM(0, 5, "Skrue", orderForBOM, this.productVariant));
 
-        int antalBomLinjer = 0;
-        Connection conn = connectionPool.getConnection();
-        PreparedStatement ps = conn.prepareStatement("SELECT COUNT(*) FROM bom_items WHERE order_id = ?");
-        ps.setInt(1, ordreForBOM.getId());
-        ResultSet rs = ps.executeQuery();
-        if (rs.next()) {
-            antalBomLinjer = rs.getInt(1);
-        }
-        rs.close();
-        ps.close();
-        conn.close();
-        assertEquals(1, antalBomLinjer);
+        orderMapper.insertBOMItems(bomList);
+        List<BOM> hentetBOM = orderMapper.getBOMForOrder(orderForBOM.getId());
+        assertNotNull(hentetBOM);
+        assertEquals(1, hentetBOM.size());
+        assertEquals(5, hentetBOM.get(0).getQuantity());
+        assertEquals(this.productVariant.getProductVariantId(), hentetBOM.get(0).getProductVariant().getProductVariantId());
     }
 
 
     @Test
     void getBOMForOrderTest() throws DatabaseException, SQLException {
-        Order ordreForBOM = orderMapper.insertOrder(new Order(180, 360, "Afventede", 4000, customer, false));
+        Order orderForBOM = orderMapper.insertOrder(new Order(180, 360, "Afventede", 4000, customer, false)); // ID = 1
 
+        // Indsæt et BOM item manuelt
+        try (Connection conn = connectionPool.getConnection();
+             PreparedStatement ps = conn.prepareStatement("INSERT INTO bom_items (order_id, product_variant_id, quantity, description) VALUES (?, ?, ?, ?)")) {
+            ps.setInt(1, orderForBOM.getId());
+            ps.setInt(2, this.productVariant.getProductVariantId());
+            ps.setInt(3, 10);
+            ps.setString(4, "Planke");
+            ps.executeUpdate();
+        }
 
-        Connection conn = connectionPool.getConnection();
-        Statement stmt = conn.createStatement();
-        stmt.execute("INSERT INTO bom_items (order_id, product_variant_id, quantity, description) VALUES " +
-                "(" + ordreForBOM.getId() + ", " + productVariant.getProductVariantId() + ", 10, 'Planke')");
-        stmt.close();
-        conn.close();
-
-        List<BOM> hentetBOM = orderMapper.getBOMForOrder(ordreForBOM.getId());
-        assertEquals(1, hentetBOM.size());
+        List<BOM> collectedBOM = orderMapper.getBOMForOrder(orderForBOM.getId());
+        assertEquals(1, collectedBOM.size());
+        assertEquals(10, collectedBOM.get(0).getQuantity());
+        assertEquals("Planke", collectedBOM.get(0).getDescription());
+        assertNotNull(collectedBOM.get(0).getProductVariant());
+        assertEquals(this.productVariant.getLength(), collectedBOM.get(0).getProductVariant().getLength());
     }
 }
