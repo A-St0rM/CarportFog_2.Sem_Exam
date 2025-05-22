@@ -61,7 +61,7 @@ public class OrderMapper {
                 bomList.add(bom);
             }
         } catch (SQLException e) {
-            throw new DatabaseException("Could not get BOM from the Database " + e.getMessage());
+            throw new DatabaseException("Kunne ikke hente BOM fra databasen " + e.getMessage());
         }
         return bomList;
     }
@@ -92,10 +92,10 @@ public class OrderMapper {
                         order.getStatus(), order.getTotalPrice(), order.getCustomer(),
                         order.getTrapezeRoof());
             } else {
-                throw new DatabaseException("No generated key returned after inserting order.");
+                throw new DatabaseException("Ingen genererede nøgler blev returneret efter indsættelsen af ordren.");
             }
         } catch (SQLException e) {
-            throw new DatabaseException("Could not insert order into the Database: " + e.getMessage());
+            throw new DatabaseException("Kunne ikke indsætte ordren ind i databasen: " + e.getMessage());
         }
     }
 
@@ -107,7 +107,7 @@ public class OrderMapper {
             for (BOM bom : bomlist) {
 
                 if (bom.getProductVariant() == null) {
-                    continue; // spring BOM over hvis der ikke er nogen variant
+                    continue; // Skips BOM if there's no variant
                 }
 
                 try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
@@ -119,7 +119,7 @@ public class OrderMapper {
                 }
             }
         } catch (SQLException e) {
-            throw new DatabaseException("Could not insert BOM items into the Database " + e.getMessage());
+            throw new DatabaseException("Kunne ikke indsætte BOM Could not insert BOM items into the Database " + e.getMessage());
         }
     }
 
@@ -258,7 +258,7 @@ public class OrderMapper {
             ps.setInt(2, orderId);
             ps.executeUpdate();
         } catch (SQLException e) {
-            throw new DatabaseException("Could not update order status: " + e.getMessage());
+            throw new DatabaseException("Kunne ikke opdatere ordre status: " + e.getMessage());
         }
     }
 
