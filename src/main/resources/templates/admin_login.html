@@ -10,7 +10,7 @@
 <a th:href="@{/}" class="admin-login-button">Tilbage til forsiden</a>
 <div class="container">
     <header class="main-header">
-        <img class="logo-img" src="/images/Fog_logo.png" alt="Fog Logo">
+        <img class="logo-img" src="/images/Fog_logo.png" th:src="@{/images/Fog_logo.png}" alt="Fog Logo">
     </header>
 
     <div class="content-header">
@@ -20,6 +20,11 @@
     <main class="admin-content">
         <div class="login-form-container">
             <h3>Admin Login</h3>
+
+            <div th:if="${message != null}" class="error-message">
+                <span th:text="${message}"></span>
+
+            </div>
             <form method="post" th:action="@{/admin/login}" id="admin-login-form">
                 <div class="form-group">
                     <label for="admin-email">Email</label>
@@ -36,5 +41,6 @@
         </div>
     </main>
 
-</div> </body>
+</div>
+</body>
 </html>
