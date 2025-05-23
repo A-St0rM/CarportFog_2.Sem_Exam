@@ -1,0 +1,72 @@
+:root {
+    --fog-primary-blue: #00406C;
+    --fog-content-header-bg: #B1CBFF;
+    --fog-white: #ffffff;
+    --fog-text-dark: #000452;
+    --fog-text-grey: #333333;
+    --fog-border-grey: #dee2e6;
+    --font-primary: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    font-family: var(--font-primary);
+    background-color: var(--fog-white);
+    color: var(--fog-text-grey);
+    padding: 40px;
+}
+
+h2 {
+    color: var(--fog-primary-blue);
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+form {
+    max-width: 500px;
+    margin: 0 auto;
+    background-color: var(--fog-content-header-bg);
+    padding: 50px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: var(--fog-text-dark);
+}
+
+input[type="text"],
+input[type="number"] {
+    width: 100%;
+    padding: 10px 12px;
+    margin-bottom: 20px;
+    border: 1px solid var(--fog-border-grey);
+    border-radius: 4px;
+    font-size: 1rem;
+    background-color: #f8f9fa;
+}
+
+input:focus {
+    outline: none;
+    border-color: var(--fog-primary-blue);
+    box-shadow: 0 0 0 2px rgba(0, 64, 108, 0.2);
+}
+
+button[type="submit"] {
+    width: 100%;
+    padding: 12px;
+    background-color: var(--fog-primary-blue);
+    color: var(--fog-white);
+    font-size: 1.1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+button[type="submit"]:hover {
+    background-color: #003055;
+}
