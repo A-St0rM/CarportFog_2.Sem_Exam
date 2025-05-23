@@ -122,7 +122,7 @@ class CalculateBOMTest {
         assertEquals(8, getQuantityForProduct("stolpe"));
 
         // Had to combine rafters and beams since they're the same product and variant in this instance
-        assertEquals(13, getQuantityForBeamsAndRafters());
+        assertEquals(13, getQuantityForBeamsAndRaftersFixedLength300());
         assertEquals(2, getQuantityForProduct("hulbånd"));
         assertEquals(24, getQuantityForProduct("bræddebolt"));
         assertEquals(24, getQuantityForProduct("firkantskiver"));
@@ -140,7 +140,7 @@ class CalculateBOMTest {
     }
 
     @Test
-    void testEdgeCase_MinimalDimensions() throws DatabaseException {
+    void testMinimalDimensionsPolesAndRafters() throws DatabaseException {
         Order smallOrder = new Order(10, 10, "pending", 0, customer, false);
         calculateBOM.calculateCarport(smallOrder);
         assertEquals(4, getQuantityForProduct("Stolpe"));
@@ -148,7 +148,7 @@ class CalculateBOMTest {
     }
 
     @Test
-    void testErrorHandling_NoVariants() {
+    void testNoVariantsErrorHandling() throws DatabaseException {
         productMapperStub.variants.clear();
         assertThrows(DatabaseException.class, () -> calculateBOM.calculateCarport(order));
     }
@@ -159,7 +159,7 @@ class CalculateBOMTest {
         int totalPrice = calculateBOM.calculateTotalPriceFromBOM();
 
         // In this test-case, the total sum expected would be 4636
-        assertEquals(4636, totalPrice, "Totalprisen stemmer ikke overens med forventet værdi");
+        assertEquals(4636, totalPrice);
     }
 
     // Helper methods
@@ -173,7 +173,7 @@ class CalculateBOMTest {
         return 0;
     }
 
-    private int getQuantityForBeamsAndRafters() {
+    private int getQuantityForBeamsAndRaftersFixedLength300() {
         int total = 0;
         for (BOM b : calculateBOM.getBom()) {
             ProductVariant variant = b.getProductVariant();
