@@ -95,7 +95,7 @@ class OrderMapperTest {
                         "product_variant_id SERIAL PRIMARY KEY, " +
                         "product_id INT NOT NULL, " +
                         "length INT, " +
-                        "width DOUBLE PRECISION, " + // TILFØJET width
+                        "width DOUBLE PRECISION, " +
                         "FOREIGN KEY (product_id) REFERENCES products(product_id)" +
                         ");");
 
@@ -109,6 +109,7 @@ class OrderMapperTest {
                         "FOREIGN KEY (product_variant_id) REFERENCES product_variants(product_variant_id)" +
                         ");");
 
+                //Makes the whole BOM by joining the different tables.
                 stmt.execute(
                         "CREATE VIEW bill_of_products_view AS " +
                                 "SELECT " +
@@ -180,7 +181,7 @@ class OrderMapperTest {
         Order newOrder = new Order(200, 400, "Afventede", 5000, customer, false);
         Order insertedOrder = orderMapper.insertOrder(newOrder);
         assertTrue(insertedOrder.getId() > 0);
-        assertEquals(1, insertedOrder.getId()); // Din originale test havde ikke denne
+        assertEquals(1, insertedOrder.getId());
     }
 
     @Test
@@ -196,7 +197,7 @@ class OrderMapperTest {
 
     @Test
     void getAllOrdersWithCustomerInfoTest() throws DatabaseException {
-        orderMapper.insertOrder(new Order(300, 600, "Afventede", 7000, customer, true)); // ID = 1
+        orderMapper.insertOrder(new Order(300, 600, "Afventede", 7000, customer, true));
         List<Order> allOrders = orderMapper.getAllOrdersWithCustomerInfo();
         assertEquals(1, allOrders.size());
         assertEquals("Testby", allOrders.get(0).getCustomer().getCity());
@@ -207,49 +208,55 @@ class OrderMapperTest {
         Order originalOrder = new Order(100, 200, "Afventede", 2000, customer, false);
         Order insertedOrder = orderMapper.insertOrder(originalOrder);
         int newPrice = 2500;
-
+        //updates the price for the inserted order.
         orderMapper.updateOrderTotalPrice(insertedOrder.getId(), newPrice);
 
-        Order opdateretOrdre = orderMapper.getOrderById(insertedOrder.getId());
-        assertEquals(newPrice, opdateretOrdre.getTotalPrice());
+        //gets the order again and checks if the price is now updated.
+        Order updatedOrder = orderMapper.getOrderById(insertedOrder.getId());
+        assertEquals(newPrice, updatedOrder.getTotalPrice());
     }
 
     @Test
-    void insertBOMItemsTest() throws DatabaseException, SQLException { // SQLException beholdes fra din original
+    void insertBOMItemsTest() throws DatabaseException, SQLException {
         Order orderForBOM = orderMapper.insertOrder(new Order(150, 300, "Afventemde", 3000, customer, true));
         List<BOM> bomList = new ArrayList<>();
+        //makes a BOM item with the product variant set up in the @beforeEach with ID = 1 since we set the bomId as 0 and it autoincrements.
         bomList.add(new BOM(0, 5, "Skrue", orderForBOM, this.productVariant));
 
         orderMapper.insertBOMItems(bomList);
 
-        int antalBomLinjer = 0;
+        //checks the database to make sure the BOM is inserted.
+        int amountOfBOMitems = 0;
         Connection conn = connectionPool.getConnection();
+        //inserts the order manually to correctly do the test of the method so we don't rely on the other methods to be working.
         PreparedStatement ps = conn.prepareStatement("SELECT COUNT(*) FROM bom_items WHERE order_id = ?");
         ps.setInt(1, orderForBOM.getId());
         ResultSet rs = ps.executeQuery();
         if (rs.next()) {
-            antalBomLinjer = rs.getInt(1);
+            amountOfBOMitems = rs.getInt(1);
         }
+        // closes database resource to avoid issues.
         rs.close();
         ps.close();
         conn.close();
-        assertEquals(1, antalBomLinjer);
+        assertEquals(1, amountOfBOMitems);
     }
 
 
     @Test
-    void getBOMForOrderTest() throws DatabaseException, SQLException { // SQLException beholdes
+    void getBOMForOrderTest() throws DatabaseException, SQLException {
         Order orderForBOM = orderMapper.insertOrder(new Order(180, 360, "Afventede", 4000, customer, false));
 
 
         Connection conn = connectionPool.getConnection();
         Statement stmt = conn.createStatement();
+        //inserts the order manually to correctly do the test of the method so we don't rely on the other methods to be working.
         stmt.execute("INSERT INTO bom_items (order_id, product_variant_id, quantity, description) VALUES " +
                 "(" + orderForBOM.getId() + ", " + productVariant.getProductVariantId() + ", 10, 'Planke')");
         stmt.close();
         conn.close();
 
-        List<BOM> hentetBOM = orderMapper.getBOMForOrder(orderForBOM.getId());
-        assertEquals(1, hentetBOM.size());
+        List<BOM> collectedBOM = orderMapper.getBOMForOrder(orderForBOM.getId());
+        assertEquals(1, collectedBOM.size());
     }
 }
