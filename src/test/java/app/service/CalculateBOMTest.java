@@ -19,7 +19,6 @@ class CalculateBOMTest {
     static class ProductMapperStub extends ProductMapper {
         private final List<ProductVariant> variants = new ArrayList<>();
 
-        // We've chosen to use a Stub method to ensure test-data is accurate without needing to connect to the DB
         public ProductMapperStub() {
             super(null);
         }
@@ -79,12 +78,12 @@ class CalculateBOMTest {
         customer = new Customer("test@mail.dk", "Testvej 1", "123", "Testperson", 1000, "Testby");
         order = new Order(300, 600, "pending", 0, customer, false);
 
-        // Adds all product variants we currently have in the database manually.
+        // Add test product variants
         productMapperStub.variants.addAll(List.of(
                 // Poles (product_id=1)
                 new ProductVariant(1, 300, 97, new Product(1, "97x97 mm. trykimp. Stolpe", "stk", 45)),
 
-                // Beams/Rafters (spærtræ) (product_id=2)
+                // Beams/Rafters (product_id=2)
                 new ProductVariant(2, 300, 45, new Product(2, "45x195 mm. spærtræ ubh.", "stk", 46)),
                 new ProductVariant(3, 360, 45, new Product(2, "45x195 mm. spærtræ ubh.", "stk", 46)),
                 new ProductVariant(4, 420, 45, new Product(2, "45x195 mm. spærtræ ubh.", "stk", 46)),
@@ -92,7 +91,7 @@ class CalculateBOMTest {
                 new ProductVariant(6, 540, 45, new Product(2, "45x195 mm. spærtræ ubh.", "stk", 46)),
                 new ProductVariant(7, 600, 45, new Product(2, "45x195 mm. spærtræ ubh.", "stk", 46)),
 
-                // Roofplates (product_id=3)
+                // Roof plates (product_id=3)
                 new ProductVariant(8, 109, 240, new Product(3, "Plastmo Ecolite Blåtonet 109 mm.", "stk", 250)),
                 new ProductVariant(9, 109, 300, new Product(3, "Plastmo Ecolite Blåtonet 109 mm.", "stk", 250)),
                 new ProductVariant(10, 109, 360, new Product(3, "Plastmo Ecolite Blåtonet 109 mm.", "stk", 250)),
@@ -100,7 +99,7 @@ class CalculateBOMTest {
                 new ProductVariant(12, 109, 480, new Product(3, "Plastmo Ecolite Blåtonet 109 mm.", "stk", 250)),
                 new ProductVariant(13, 109, 600, new Product(3, "Plastmo Ecolite Blåtonet 109 mm.", "stk", 250)),
 
-                // Other products (screws, brackets, hole bands)
+                // Other products
                 new ProductVariant(26, 0, 0, new Product(4, "plastmo bundskruer 200 stk.", "pakke", 429)),
                 new ProductVariant(27, 0, 0, new Product(5, "4x50 mm. skruer 250 stk.", "pakke", 60)),
                 new ProductVariant(28, 0, 0, new Product(6, "bræddebolt 10x120 mm.", "stk", 17)),
@@ -120,43 +119,38 @@ class CalculateBOMTest {
 
         // The expected values are based from a calculation of what exactly a carport with 300width, 600length should return.
         assertTrue(bom.size() >= 9, "Manglende BOM-elementer");
-        assertEquals(8, getQuantityForProduct("stolpe"), "Antal stolper");
+        assertEquals(8, getQuantityForProduct("stolpe"));
 
         // Had to combine rafters and beams since they're the same product and variant in this instance
-        assertEquals(13, getQuantityForBeamsAndRafters(), "Antal spær & remme");
-        assertEquals(2, getQuantityForProduct("hulbånd"), "Antal hulbånd");
-        assertEquals(24, getQuantityForProduct("bræddebolt"), "Antal bolte");
-        assertEquals(24, getQuantityForProduct("firkantskiver"), "Antal firkantskiver");
-        assertEquals(11, getQuantityForProduct("venstre"), "Venstre beslag");
-        assertEquals(11, getQuantityForProduct("højre"), "Højre beslag");
-        assertEquals(1, getQuantityForProduct("4x50 mm"), "Beslagskruer");
+        assertEquals(13, getQuantityForBeamsAndRafters());
+        assertEquals(2, getQuantityForProduct("hulbånd"));
+        assertEquals(24, getQuantityForProduct("bræddebolt"));
+        assertEquals(24, getQuantityForProduct("firkantskiver"));
+        assertEquals(11, getQuantityForProduct("venstre"));
+        assertEquals(11, getQuantityForProduct("højre"));
+        assertEquals(1, getQuantityForProduct("4x50 mm"));
     }
 
     @Test
     void testFullCarportBOMWithRoof() throws DatabaseException {
         order = new Order(300, 600, "pending", 0, customer, true);
         calculateBOM.calculateCarport(order);
-        List<BOM> bom = calculateBOM.getBom();
-
-        assertTrue(getQuantityForProduct("Plastmo") > 0, "Tagplader mangler");
-        assertTrue(getQuantityForProduct("plastmo bundskruer") > 0, "Tag-skruer mangler");
+        assertTrue(getQuantityForProduct("Plastmo") > 0);
+        assertTrue(getQuantityForProduct("plastmo bundskruer") > 0);
     }
 
     @Test
     void testEdgeCase_MinimalDimensions() throws DatabaseException {
         Order smallOrder = new Order(10, 10, "pending", 0, customer, false);
         calculateBOM.calculateCarport(smallOrder);
-
-        assertEquals(4, getQuantityForProduct("Stolpe"), "Minimumsstolper");
-        assertEquals(2, getQuantityForProduct("Spær"), "Minimumsspær");
+        assertEquals(4, getQuantityForProduct("Stolpe"));
+        assertEquals(2, getQuantityForProduct("Spær"));
     }
 
     @Test
     void testErrorHandling_NoVariants() {
         productMapperStub.variants.clear();
-        assertThrows(DatabaseException.class, () -> calculateBOM.calculateCarport(order),
-                "Skal håndtere manglende varianter"
-        );
+        assertThrows(DatabaseException.class, () -> calculateBOM.calculateCarport(order));
     }
 
     @Test
@@ -168,6 +162,7 @@ class CalculateBOMTest {
         assertEquals(4636, totalPrice, "Totalprisen stemmer ikke overens med forventet værdi");
     }
 
+    // Helper methods
     private int getQuantityForProduct(String partialProductName) {
         for (BOM b : calculateBOM.getBom()) {
             String productName = b.getProductVariant().getProduct().getProductName().toLowerCase();

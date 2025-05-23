@@ -150,7 +150,7 @@ class OrderMapperTest {
             stmt.execute("ALTER SEQUENCE bom_items_order_item_id_seq RESTART WITH 1;");
 
             stmt.execute("INSERT INTO customers (name, email, postal_code) VALUES ('Testperson', 'test@mail.dk', 1000);");
-            customer = new Customer(1, "test@mail.dk", "Testvej 1", "123", "Testperson", 1000);
+//            customer = new Customer(1, "test@mail.dk", "Testvej 1", "123", "Testperson", 1000);
 
             stmt.execute("INSERT INTO products (name, unit, price) VALUES ('Spær', 'stk', 200);");
             product = new Product(1, "Spær", "stk", 200);
