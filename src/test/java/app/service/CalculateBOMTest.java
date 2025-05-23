@@ -1,198 +1,191 @@
 package app.service;
 
-import app.entities.BOM;
-import app.entities.Customer;
-import app.entities.Order;
+import app.entities.*;
 import app.exceptions.DatabaseException;
-import app.persistence.ConnectionPool;
 import app.persistence.ProductMapper;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 class CalculateBOMTest {
-
-    private static final String USER = "postgres";
-    private static final String PASSWORD = System.getenv("password");
-    private static final String URL = "jdbc:postgresql://" + System.getenv("ip") + ":5432/%s?currentSchema=public";
-    private static final String DB = "CarportFog";
-
-    public static final ConnectionPool connectionPool = ConnectionPool.getInstance(USER, PASSWORD, URL, DB);
-
-    Customer customer = new Customer("Casper@example.com", "Voltvej 5", "12345678", "Casper", 1000, "Kongens Lyngby");
-    Order order = new Order(300, 470, "Kommer", 10000, customer, false);
-
-
     private CalculateBOM calculateBOM;
-    private ProductMapper productMapper;
+    private ProductMapperStub productMapperStub;
+    private Customer customer;
+    private Order order;
+
+    static class ProductMapperStub extends ProductMapper {
+        private final List<ProductVariant> variants = new ArrayList<>();
+
+        // We've chosen to use a Stub method to ensure test-data is accurate without needing to connect to the DB
+        public ProductMapperStub() {
+            super(null);
+        }
+
+        @Override
+        public int getProductIdByName(String name) {
+            return switch (name.toLowerCase()) {
+                case "97x97 mm. trykimp. stolpe" -> 1;
+                case "45x195 mm. spærtræ ubh." -> 2;
+                case "plastmo ecolite blåtonet 109 mm." -> 3;
+                case "plastmo bundskruer 200 stk." -> 4;
+                case "4x50 mm. skruer 250 stk." -> 5;
+                case "bræddebolt 10x120 mm." -> 6;
+                case "firkantskiver 40x40x11 mm." -> 7;
+                case "universalbeslag 190 mm. højre" -> 8;
+                case "universalbeslag 190 mm. venstre" -> 9;
+                case "hulbånd 1x20 mm. 10 meter" -> 10;
+                default -> throw new IllegalArgumentException("Ukendt produkt: " + name);
+            };
+        }
+
+        @Override
+        public List<ProductVariant> getVariantsByProductIdAndMinLength(int minLength, int productId) {
+            List<ProductVariant> result = new ArrayList<>();
+            for (ProductVariant v : variants) {
+                if (v.getProduct().getProductId() == productId && v.getLength() >= minLength) {
+                    result.add(v);
+                }
+            }
+            return result;
+        }
+
+        @Override
+        public ProductVariant getVariantByProductIdAndWidth(int productId, int width) {
+            for (ProductVariant v : variants) {
+                if (v.getProduct().getProductId() == productId && v.getWidth() == width) {
+                    return v;
+                }
+            }
+            throw new DatabaseException("Ingen variant fundet");
+        }
+
+        @Override
+        public int[] getAvailableBeamLengths() {
+            return new int[]{300, 360, 420, 480, 540, 600};
+        }
+
+        @Override
+        public int[] getAvailableRoofWidths() {
+            return new int[]{240, 300, 360, 420, 480, 600};
+        }
+    }
 
     @BeforeEach
-    void setUp() {
-        productMapper = new ProductMapper(connectionPool);
-        calculateBOM = new CalculateBOM(productMapper);
-    }
+    void setup() {
+        productMapperStub = new ProductMapperStub();
+        customer = new Customer("test@mail.dk", "Testvej 1", "123", "Testperson", 1000, "Testby");
+        order = new Order(300, 600, "pending", 0, customer, false);
 
-    @AfterEach
-    void tearDown() {
-        // Ikke nødvendig hvis ny CalculateBOM instantieres i @BeforeEach
+        // Adds all product variants we currently have in the database manually.
+        productMapperStub.variants.addAll(List.of(
+                // Poles (product_id=1)
+                new ProductVariant(1, 300, 97, new Product(1, "97x97 mm. trykimp. Stolpe", "stk", 45)),
+
+                // Beams/Rafters (spærtræ) (product_id=2)
+                new ProductVariant(2, 300, 45, new Product(2, "45x195 mm. spærtræ ubh.", "stk", 46)),
+                new ProductVariant(3, 360, 45, new Product(2, "45x195 mm. spærtræ ubh.", "stk", 46)),
+                new ProductVariant(4, 420, 45, new Product(2, "45x195 mm. spærtræ ubh.", "stk", 46)),
+                new ProductVariant(5, 480, 45, new Product(2, "45x195 mm. spærtræ ubh.", "stk", 46)),
+                new ProductVariant(6, 540, 45, new Product(2, "45x195 mm. spærtræ ubh.", "stk", 46)),
+                new ProductVariant(7, 600, 45, new Product(2, "45x195 mm. spærtræ ubh.", "stk", 46)),
+
+                // Roofplates (product_id=3)
+                new ProductVariant(8, 109, 240, new Product(3, "Plastmo Ecolite Blåtonet 109 mm.", "stk", 250)),
+                new ProductVariant(9, 109, 300, new Product(3, "Plastmo Ecolite Blåtonet 109 mm.", "stk", 250)),
+                new ProductVariant(10, 109, 360, new Product(3, "Plastmo Ecolite Blåtonet 109 mm.", "stk", 250)),
+                new ProductVariant(11, 109, 420, new Product(3, "Plastmo Ecolite Blåtonet 109 mm.", "stk", 250)),
+                new ProductVariant(12, 109, 480, new Product(3, "Plastmo Ecolite Blåtonet 109 mm.", "stk", 250)),
+                new ProductVariant(13, 109, 600, new Product(3, "Plastmo Ecolite Blåtonet 109 mm.", "stk", 250)),
+
+                // Other products (screws, brackets, hole bands)
+                new ProductVariant(26, 0, 0, new Product(4, "plastmo bundskruer 200 stk.", "pakke", 429)),
+                new ProductVariant(27, 0, 0, new Product(5, "4x50 mm. skruer 250 stk.", "pakke", 60)),
+                new ProductVariant(28, 0, 0, new Product(6, "bræddebolt 10x120 mm.", "stk", 17)),
+                new ProductVariant(29, 0, 0, new Product(7, "firkantskiver 40x40x11 mm.", "stk", 9)),
+                new ProductVariant(30, 0, 0, new Product(8, "universalbeslag 190 mm. højre", "stk", 50)),
+                new ProductVariant(31, 0, 0, new Product(9, "universalbeslag 190 mm. venstre", "stk", 50)),
+                new ProductVariant(32, 0, 0, new Product(10, "hulbånd 1x20 mm. 10 meter", "rulle", 349))
+        ));
+
+        calculateBOM = new CalculateBOM(productMapperStub);
     }
 
     @Test
-    void calculateCarportTest() throws DatabaseException {
-        // BOM skal være tom til at starte med
-        assertEquals(0, calculateBOM.getBom().size());
-
-        // Kald den samlede beregning
+    void testFullCarportBOM() throws DatabaseException {
         calculateBOM.calculateCarport(order);
+        List<BOM> bom = calculateBOM.getBom();
 
-        // Bekræft at BOM ikke er tom bagefter
-        assertTrue(calculateBOM.getBom().size() > 0);
-    }
+        // The expected values are based from a calculation of what exactly a carport with 300width, 600length should return.
+        assertTrue(bom.size() >= 9, "Manglende BOM-elementer");
+        assertEquals(8, getQuantityForProduct("stolpe"), "Antal stolper");
 
-
-    @Test
-    void calculatePolesTest() {
-        // Forventer at størrelsen på styklisten er 0
-        assertEquals(0, calculateBOM.getBom().size());
-
-        // Kører metoden for at (forhåbentligt) smide poles ned i listen
-        calculateBOM.calculatePoles(order);
-
-        // Forventer at listen nu er 1 i størrelsen
-        assertEquals(1, calculateBOM.getBom().size());
-
-
+        // Had to combine rafters and beams since they're the same product and variant in this instance
+        assertEquals(13, getQuantityForBeamsAndRafters(), "Antal spær & remme");
+        assertEquals(2, getQuantityForProduct("hulbånd"), "Antal hulbånd");
+        assertEquals(24, getQuantityForProduct("bræddebolt"), "Antal bolte");
+        assertEquals(24, getQuantityForProduct("firkantskiver"), "Antal firkantskiver");
+        assertEquals(11, getQuantityForProduct("venstre"), "Venstre beslag");
+        assertEquals(11, getQuantityForProduct("højre"), "Højre beslag");
+        assertEquals(1, getQuantityForProduct("4x50 mm"), "Beslagskruer");
     }
 
     @Test
-    void calculatePolesQuantityTest() {
-        int expected = 6;
-        int actual = calculateBOM.calculatePolesQuantity(order);
-        assertEquals(expected, actual);
-    }
+    void testFullCarportBOMWithRoof() throws DatabaseException {
+        order = new Order(300, 600, "pending", 0, customer, true);
+        calculateBOM.calculateCarport(order);
+        List<BOM> bom = calculateBOM.getBom();
 
-
-    @Test
-    void calculateBeamsTest() throws DatabaseException {
-        // Forventer at størrelsen på styklisten er 0
-        assertEquals(0, calculateBOM.getBom().size());
-
-        // Kalder metode
-        calculateBOM.calculateBeams(order);
-
-        // Forventer at der er mindst tilføjet 1 beam til styklisten
-        assertTrue(calculateBOM.getBom().size() > 0);
-
-        // Vi tjekker om der er et element i BOM med beskrivelsen for remme
-        boolean hasBeam = false;
-        for (BOM bom : calculateBOM.getBom()) {
-            if (bom.getDescription().equals("Remme i sider, sadles ned i stolper")) {
-                hasBeam = true;
-                break;
-            }
-
-        }
-        assertTrue(hasBeam);
+        assertTrue(getQuantityForProduct("Plastmo") > 0, "Tagplader mangler");
+        assertTrue(getQuantityForProduct("plastmo bundskruer") > 0, "Tag-skruer mangler");
     }
 
     @Test
-    void getOptimalBeamCombinationTest() {
-        // Har smidt 580 ind som længde for at drille metoden mest muligt. Altså den skal finde spøjse kombinationer
-        Map<Integer, Integer> combination = calculateBOM.getOptimalBeamCombination(580);
+    void testEdgeCase_MinimalDimensions() throws DatabaseException {
+        Order smallOrder = new Order(10, 10, "pending", 0, customer, false);
+        calculateBOM.calculateCarport(smallOrder);
 
-        // Laver testen false hvis kombinationen er tom. Det skal den ikke være.
-        assertFalse(combination.isEmpty());
-
-        // Tjekker at den indeholder de optimale længder (i dette tilfælde er det 240+360 || 300 + 300 der er mest optimal)
-        assertTrue(combination.containsKey(240) || combination.containsKey(300));
-        assertTrue(combination.containsKey(360) || combination.containsKey(300));
+        assertEquals(4, getQuantityForProduct("Stolpe"), "Minimumsstolper");
+        assertEquals(2, getQuantityForProduct("Spær"), "Minimumsspær");
     }
 
     @Test
-    void calculateRaftersTest() throws DatabaseException {
-        // Opretter en ny test order med lidt større tal
-        Order order = new Order(600, 780, "Test", 10000, customer, false);
-        calculateBOM.calculateRafters(order);
+    void testErrorHandling_NoVariants() {
+        productMapperStub.variants.clear();
+        assertThrows(DatabaseException.class, () -> calculateBOM.calculateCarport(order),
+                "Skal håndtere manglende varianter"
+        );
+    }
 
-        List<BOM> bomList = calculateBOM.getBom();
-        BOM rafterBom = null;
+    @Test
+    void testCalculateTotalPriceFromBOM() throws DatabaseException {
+        calculateBOM.calculateCarport(order);
+        int totalPrice = calculateBOM.calculateTotalPriceFromBOM();
 
-        for (BOM bom : bomList) {
-            if (bom.getDescription().equals("Spær monteres på rem")) {
-                rafterBom = bom;
-                break;
+        // In this test-case, the total sum expected would be 4636
+        assertEquals(4636, totalPrice, "Totalprisen stemmer ikke overens med forventet værdi");
+    }
+
+    private int getQuantityForProduct(String partialProductName) {
+        for (BOM b : calculateBOM.getBom()) {
+            String productName = b.getProductVariant().getProduct().getProductName().toLowerCase();
+            if (productName.contains(partialProductName.toLowerCase())) {
+                return b.getQuantity();
             }
         }
-
-        assertNotNull(rafterBom, "Rafters entry missing in BOM");
-        assertEquals(14, rafterBom.getQuantity());
-        assertEquals(600, rafterBom.getProductVariant().getLength());
+        return 0;
     }
 
-
-    @Test
-    void calculateRoofWidthQuantityTest() throws DatabaseException {
-        Order order500 = new Order(500, 600, "Test", 10000, customer, false);
-        int actual = calculateBOM.calculateRoofWidthQuantity(order500);
-
-        // Forventer 2 (240 + 300 cm plader per række)
-        assertEquals(2, actual);
-    }
-
-    @Test
-    void calculateRoofLengthQuantityTest() {
-        int length = 470;
-        int expected = (int) Math.ceil(length / 109.0);
-        int actual = calculateBOM.calculateRoofLengthQuantity(order);
-
-        assertEquals(expected, actual);
-    }
-
-    @Test
-    void getOptimalRoofCombinationTest() {
-        // Test 1 bredde på 300 cm skal matche med 1 tagplade på 300 cm
-        Map<Integer, Integer> combination1 = calculateBOM.getOptimalRoofCombination(300);
-        assertEquals(1, combination1.size());
-        assertTrue(combination1.containsKey(300));
-
-        // Test 2 bredde på 500 cm skal matche med 2 tagplade på 240+300 cm (for 1 på 600cm ville være 100cm overskud, dette er 60cm spild i stedet)
-        Map<Integer, Integer> combination2 = calculateBOM.getOptimalRoofCombination(500);
-        assertEquals(2, combination2.size());
-        assertTrue(combination2.containsKey(240) && combination2.containsKey(300));
-    }
-
-    @Test
-    void calculateRoofsTest() throws DatabaseException {
-        calculateBOM.calculateRoofs(order);
-
-        boolean hasRoofEntry = false;
-        for (BOM bom : calculateBOM.getBom()) {
-            if (bom.getDescription().equals("Tagplader monteres på spær")) {
-                hasRoofEntry = true;
-                break;
+    private int getQuantityForBeamsAndRafters() {
+        int total = 0;
+        for (BOM b : calculateBOM.getBom()) {
+            ProductVariant variant = b.getProductVariant();
+            if (variant.getProduct().getProductId() == 2 && variant.getLength() == 300) {
+                total += b.getQuantity();
             }
         }
-        assertTrue(hasRoofEntry);
+        return total;
     }
-
-    @Test
-    void getBomTest() throws DatabaseException {
-        // Vi tjekker om styklisten starter med at være tom
-        assertTrue(calculateBOM.getBom().isEmpty());
-
-        // Tilføjer ting til styklisten ved eksempelvis at regne stolperne ud (kan bruge enhver anden metode til udregning også)
-        calculateBOM.calculatePoles(order);
-
-        // Verificerer at styklisten har 1 produkt i sig.
-        assertFalse(calculateBOM.getBom().isEmpty());
-        assertEquals(1, calculateBOM.getBom().size());
-    }
-
 }
