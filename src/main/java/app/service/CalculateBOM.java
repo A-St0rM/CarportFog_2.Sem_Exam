@@ -41,7 +41,7 @@ public class CalculateBOM {
     }
 
     // Calculates how many poles we need and puts the quantity and correct product in the bill of materials
-    public void calculatePoles(Order order) throws DatabaseException {
+    private void calculatePoles(Order order) throws DatabaseException {
         int quantity = calculatePolesQuantity(order);
         int productId = _productMapper.getProductIdByName("97x97 mm. trykimp. Stolpe");
 
@@ -58,7 +58,7 @@ public class CalculateBOM {
     }
 
     // Calculates quantity of poles that is needed based on the length of carport
-    public int calculatePolesQuantity(Order order) throws DatabaseException {
+    private int calculatePolesQuantity(Order order) throws DatabaseException {
         int overhangRear = 30;
         int distanceFirstPole = 100;
         int maxDistanceBetweenPoles = 130;
@@ -71,7 +71,7 @@ public class CalculateBOM {
     }
 
     // Calculates which beams would be needed and puts the correct lengths and quantities in the bill of materials
-    public void calculateBeams(Order order) throws DatabaseException {
+    private void calculateBeams(Order order) throws DatabaseException {
         int totalLength = order.getCarportLength();
         int sides = 2;
 
@@ -104,7 +104,7 @@ public class CalculateBOM {
     }
 
     // Finds the best length-combination to have the least amount of wasted material (overshoot)
-    public Map<Integer, Integer> getOptimalBeamCombination(int length) {
+    private Map<Integer, Integer> getOptimalBeamCombination(int length) {
         int[] beamLengths = _productMapper.getAvailableBeamLengths();
 
         Map<Integer, Integer> optimalCombination = new HashMap<>();
@@ -129,7 +129,7 @@ public class CalculateBOM {
     }
 
     // Calculates the amount of rafters needed based on the length of the carport
-    public int calculateRafterQuantity(Order order) throws DatabaseException {
+    private int calculateRafterQuantity(Order order) throws DatabaseException {
         // We calculate with 60cm between each rafter
         int spacing = 60;
 
@@ -146,7 +146,7 @@ public class CalculateBOM {
     }
 
     // Retrieves the amount of rafters and puts them correctly into the bill of materials
-    public void calculateRafters(Order order) throws DatabaseException {
+    private void calculateRafters(Order order) throws DatabaseException {
         int quantity = calculateRafterQuantity(order);
 
         // Here we retrieve the productID of the product we're using.
@@ -164,26 +164,8 @@ public class CalculateBOM {
         bomList.add(bom);
     }
 
-    // This method only calculates the total amount of roof plates. For instance it doesn't says which combinations are optimal.
-    // TODO: Slet funktion? Bruges ikke.
-    private int calculateTrapezRoofQuantity(Order order) throws DatabaseException {
-        return calculateRoofLengthQuantity(order) * calculateRoofWidthQuantity(order);
-    }
-
-    // Calculates the amount of roof plates based on the width (including the optimal combination)
-    public int calculateRoofWidthQuantity(Order order) throws DatabaseException {
-        int carportWidth = order.getCarportWidth();
-        Map<Integer, Integer> combination = getOptimalRoofCombination(carportWidth);
-
-        int amountOfRoofsWidth = 0;
-        for (Integer count : combination.values()) {
-            amountOfRoofsWidth += count;
-        }
-        return amountOfRoofsWidth;
-    }
-
     // Calculates how many roof-plates (109cm length) is needed based on the length of the carport
-    public int calculateRoofLengthQuantity(Order order) throws DatabaseException {
+    private int calculateRoofLengthQuantity(Order order) throws DatabaseException {
         int carportLength = order.getCarportLength();
         int amountOfRoofsLength = (int) Math.ceil(carportLength / 109.0);
 
@@ -191,7 +173,7 @@ public class CalculateBOM {
     }
 
     // Finds the optimal roof-combination (in relation to width) with the least amount of wasted material (overshoot).
-    public Map<Integer, Integer> getOptimalRoofCombination(int width) {
+    private Map<Integer, Integer> getOptimalRoofCombination(int width) {
         int[] roofWidths = _productMapper.getAvailableRoofWidths();
 
         Map<Integer, Integer> optimalCombination = new HashMap<>();
@@ -229,7 +211,7 @@ public class CalculateBOM {
     }
 
     // Calculates which roof-plates are needed and puts the correct amounts and widths in the bill of materials.
-    public void calculateRoofs(Order order) throws DatabaseException {
+    private void calculateRoofs(Order order) throws DatabaseException {
         int carportWidth = order.getCarportWidth();
         int productId = _productMapper.getProductIdByName("Plastmo Ecolite Blåtonet 109 mm.");
         Map<Integer, Integer> widthCombination = getOptimalRoofCombination(carportWidth);
@@ -247,7 +229,7 @@ public class CalculateBOM {
     }
 
     // We will always need 2 rolls of hole bands. 1 roll for each line.
-    public void calculateHoleBands(Order order) throws DatabaseException {
+    private void calculateHoleBands(Order order) throws DatabaseException {
         int quantity = 2;
 
         int productId = _productMapper.getProductIdByName("hulbånd 1x20 mm. 10 meter");
@@ -258,7 +240,7 @@ public class CalculateBOM {
     }
 
     // Uses "plastmo bundskruer" (200 screws per pack). Calculates based on the roof-area and screws per m².
-    public void calculateScrewsRoofs(Order order) throws DatabaseException {
+    private void calculateScrewsRoofs(Order order) throws DatabaseException {
         int screwsPerM2 = 12; // recommended amount of screws per m².
         int screwsPerPackage = 200;
 
@@ -277,7 +259,7 @@ public class CalculateBOM {
     }
 
     // Calculates the amount of square washers (firkantskiver) based on the amount of carriage bolts (bræddebolte). 1 carriage bolt uses 1 square washer.
-    public void calculateFittingsBeams(Order order) throws DatabaseException {
+    private void calculateFittingsBeams(Order order) throws DatabaseException {
         // Removes 4 from the total amount of poles, because the ending poles uses less carriage bolts.
         int poleAmountInBetween = calculatePolesQuantity(order) - 4;
 
@@ -299,7 +281,7 @@ public class CalculateBOM {
     }
 
     // Uses 2 carriage bolts (bræddebolte) in the poles of each end, and 4 carriage bolts on the poles in between those.
-    public void calculateBoltsBeams(Order order) throws DatabaseException {
+    private void calculateBoltsBeams(Order order) throws DatabaseException {
         // Removes 4 from the total amount of poles, because the ending poles uses less carriage bolts.
         int poleAmountInBetween = calculatePolesQuantity(order) - 4;
 
@@ -320,7 +302,7 @@ public class CalculateBOM {
     }
 
     // Uses universal bracket left (universalbeslag venstre). Needs to use 1 for each rafter.
-    public void calculateFittingsRaftersLeft(Order order) throws DatabaseException {
+    private void calculateFittingsRaftersLeft(Order order) throws DatabaseException {
         int amountOfRafters = calculateRafterQuantity(order);
         int quantityOfLeftFittings = amountOfRafters;
 
@@ -332,7 +314,7 @@ public class CalculateBOM {
     }
 
     // Uses universal bracket right (universalbeslag right). Needs to use 1 for each rafter.
-    public void calculateFittingsRaftersRight(Order order) throws DatabaseException {
+    private void calculateFittingsRaftersRight(Order order) throws DatabaseException {
         int amountOfRafters = calculateRafterQuantity(order);
         int quantityOfRightFittings = amountOfRafters;
 
@@ -344,7 +326,7 @@ public class CalculateBOM {
     }
 
     // Calculates how many screws are needed, based on the amount of rafters, and adds it to the bill of materials.
-    public void calculateScrewsRafters(Order order) throws DatabaseException {
+    private void calculateScrewsRafters(Order order) throws DatabaseException {
         // Rafters needs to use screws based on the amount of fittings. 3 screws per side of each fitting (3 sides times 3 screws = 9 screws per rafter).
         int amountOfRafters = calculateRafterQuantity(order);
         int amountOfScrews = amountOfRafters * 9;
