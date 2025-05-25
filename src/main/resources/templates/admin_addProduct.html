@@ -1,29 +1,42 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="da">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
-    <link href="../public/css/index.css" th:href="@{/css/admin_addProduct.css}" rel="stylesheet"/>
+    <title>Opret produkt</title>
+    <link href="../public/css/index.css" th:href="@{/css/index.css}" rel="stylesheet"/>
 </head>
 <body>
+<main class="admin-content">
+    <div class="login-form-container">
 
-<h2>Opret nyt produkt</h2>
-<form method="post" th:action="@{/admin/product/create}">
-  <label for="name">Produktnavn:</label>
-  <input type="text" id="name" name="name" required>
+        <h3>Opret nyt produkt</h3>
+        <form method="post" th:action="@{/admin/product/create}">
+            <div class="form-group">
+                <label for="name">Produktnavn:</label>
+                <input type="text" id="name" name="name" required>
+            </div>
 
-  <label for="unit">Enhed (fx stk, m):</label>
-  <input type="text" id="unit" name="unit" required>
+            <div class="form-group">
+                <label for="unit">Enhed (fx stk, m):</label>
+                <input type="text" id="unit" name="unit" required>
+            </div>
 
-  <label for="price">Pris pr. meter:</label>
-  <input type="number" id="price" name="price" required>
+            <div class="form-group">
+                <label for="price">Pris pr. meter:</label>
+                <input type="number" id="price" name="price" required>
+            </div>
 
-  <label for="variants">Varianter (længde-bredde, kommasepareret):</label>
-  <input type="text" id="variants" name="variants" placeholder="480-45,600-45" required>
+            <div class="form-group">
+                <label for="variants">Varianter (længde-bredde, kommasepareret):</label>
+                <input type="text" id="variants" name="variants" placeholder="480-45,600-45" required>
+            </div>
 
-  <button type="submit">Opret produkt</button>
-</form>
-
-
+            <div class="login-button-container">
+                <button type="submit" class="btn btn-primary">Opret produkt</button>
+            </div>
+        </form>
+    </div>
+    <a href="/admin/dashboard" class="btn btn-secondary">← Tilbage til dashboard</a>
+</main>
 </body>
 </html>
