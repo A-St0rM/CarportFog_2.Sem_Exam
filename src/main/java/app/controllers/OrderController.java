@@ -184,10 +184,10 @@ public class OrderController {
 
     public static void showSvg(Context ctx) {
         CarportSvg svgDrawer = new CarportSvg(ctx);
-        String svg = svgDrawer.toString(); // saves as variable
+        String svg = svgDrawer.toString(); // saves as a variable
 
         ctx.attribute("svg", svg);             // for the first viewing of the svg
-        ctx.sessionAttribute("svg", svg);      // for usage when errors happen (e.g. wrong postal code)
+        ctx.sessionAttribute("svg", svg);      // for  when errors happen (for example wrong postal code)
         ctx.render("details.html");
     }
 
@@ -254,7 +254,7 @@ public class OrderController {
             }
 
 
-            // Saves order in session, so it's easier to access after "payment"
+            // Saves order in session, so it's easier to access after payment
             ctx.sessionAttribute("order", order);
 
             // Sends order information to the HTML-template
@@ -263,7 +263,7 @@ public class OrderController {
             ctx.attribute("totalPrice", order.getTotalPrice());
             ctx.attribute("orderId", order.getId());
 
-            ctx.render("payment.html"); // Your new HTML-page for payment
+            ctx.render("payment.html");
 
         } catch (NumberFormatException e) {
             ctx.status(400).result("Fejl: Ugyldigt orderId format.");
