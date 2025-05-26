@@ -148,7 +148,7 @@ public class OrderController {
 
         try {
             _orderMapper.updateOrderTotalPrice(orderId, newTotalPrice);
-            ctx.redirect("/admin_dashboard");
+            ctx.redirect("/admin/dashboard");
         } catch (DatabaseException e) {
             e.printStackTrace();
             ctx.status(500).result("Kunne ikke opdatere prisen: " + e.getMessage());
